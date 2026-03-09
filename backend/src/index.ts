@@ -57,7 +57,7 @@ eventBus.onMessage(async (message: ParsedMessage) => {
   );
 
   try {
-    const replyText = await handleOnboarding(message);
+    const replyText = await handleOnboarding(message, replyToUser);
     if (!replyText) return;
 
     // Send reply via Meta Cloud API using your existing /api/message/send route

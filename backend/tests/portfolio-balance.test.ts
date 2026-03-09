@@ -32,6 +32,7 @@ function seedUser(partial: Partial<User> & Pick<User, "phone">): User {
     strategy: partial.strategy ?? "balanced",
     walletAddress: partial.walletAddress ?? "GTESTWALLETADDRESS000000000000000000000000000000000000000001",
     encryptedPrivateKey: partial.encryptedPrivateKey ?? "enc:key",
+    balance: partial.balance ?? 0,
     totalDeposited: partial.totalDeposited ?? 500,
     depositedAt: partial.depositedAt ?? new Date("2025-01-15T00:00:00.000Z"),
     createdAt: partial.createdAt || new Date("2025-01-15T00:00:00.000Z"),
