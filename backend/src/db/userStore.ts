@@ -1,4 +1,3 @@
-<<<<<<< detection
 /**
  * User store - Backward compatibility wrapper
  * 
@@ -230,7 +229,17 @@ export type OnboardingStep =
 
 export type Strategy = "conservative" | "balanced" | "growth";
 
+export type NotificationType = "weekly_summary" | "rebalance" | "apy_alert";
 export type TransactionType = "deposit" | "withdrawal" | "rebalance";
+
+export interface NotificationHistory {
+  id: string;
+  userId: string;
+  type: NotificationType;
+  templateName: string;
+  sentAt: Date;
+  data: Record<string, any>;
+}
 
 export interface Transaction {
   id: string;
@@ -266,6 +275,7 @@ export interface User {
 // ─── Storage ──────────────────────────────────────────────────────────────────
 
 const store = new Map<string, User>();
+const notificationStore = new Map<string, NotificationHistory>();
 const transactions = new Map<string, Transaction[]>();
 
 // ─── Queries ──────────────────────────────────────────────────────────────────
@@ -390,7 +400,57 @@ export async function updateBalance(phone: string, balance: number): Promise<voi
   store.set(phone, { ...user, balance, updatedAt: new Date() });
 }
 
-// ─── Transaction History ──────────────────────────────────────────────────────
+// ─── Notification History Functions ─────────────────────────────────────────────
+
+export async function createNotificationHistory(
+  userId: string,
+  type: NotificationType,
+  templateName: string,
+  data: Record<string, any>
+): Promise<NotificationHistory> {
+  const notification: NotificationHistory = {
+    id: randomUUID(),
+    userId,
+    type,
+    templateName,
+    sentAt: new Date(),
+    data
+  };
+  
+  notificationStore.set(notification.id, notification);
+  return notification;
+}
+
+export async function getRecentNotification(
+  userId: string,
+  type: NotificationType,
+  timeWindowMs: number
+): Promise<NotificationHistory | null> {
+  const now = Date.now();
+  const notifications = Array.from(notificationStore.values())
+    .filter(n => n.userId === userId && n.type === type)
+    .filter(n => (now - n.sentAt.getTime()) < timeWindowMs)
+    .sort((a, b) => b.sentAt.getTime() - a.sentAt.getTime());
+
+  return notifications[0] || null;
+}
+
+export async function getAllActiveUsers(): Promise<User[]> {
+  return Array.from(store.values())
+    .filter(user => user.step === 'active' && user.totalDeposited > 0);
+}
+
+export async function getNotificationHistory(
+  userId: string,
+  limit: number = 10
+): Promise<NotificationHistory[]> {
+  return Array.from(notificationStore.values())
+    .filter(n => n.userId === userId)
+    .sort((a, b) => b.sentAt.getTime() - a.sentAt.getTime())
+    .slice(0, limit);
+}
+
+// ─── Transaction History Functions ─────────────────────────────────────────────
 
 export async function addTransaction(tx: Omit<Transaction, "id" | "createdAt">): Promise<void> {
   const txId = randomUUID();
@@ -414,9 +474,10 @@ export async function getTransactionHistory(phone: string, limit: number = 5): P
 export const _test = {
   clear: () => {
     store.clear();
+    notificationStore.clear();
     transactions.clear();
   },
   all: () => Array.from(store.values()),
   seed: (user: User) => store.set(user.phone, user),
 };
->>>>>>> main
+
