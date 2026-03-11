@@ -1,10 +1,22 @@
 import { EventEmitter } from 'events';
 import { ParsedMessage } from '../types/whatsapp';
 import { logger } from '../utils/logger';
+import {
+  DepositDetectedEvent,
+  DepositRecordedEvent,
+  DeploymentRequestedEvent,
+  DeploymentConfirmedEvent,
+  DeploymentFailedEvent,
+} from '../types/deposit';
 
 export const EVENTS = {
   MESSAGE_RECEIVED: 'message:received',
   MESSAGE_PARSE_ERROR: 'message:parse_error',
+  DEPOSIT_DETECTED: 'deposit:detected',
+  DEPOSIT_RECORDED: 'deposit:recorded',
+  DEPLOYMENT_REQUESTED: 'deployment:requested',
+  DEPLOYMENT_CONFIRMED: 'deployment:confirmed',
+  DEPLOYMENT_FAILED: 'deployment:failed',
   AGENT_REBALANCED: 'agent:rebalanced',
   PORTFOLIO_APY_CHANGED: 'portfolio:apy_changed',
 } as const;
@@ -36,22 +48,93 @@ class MessageEventBus extends EventEmitter {
     this.on(EVENTS.MESSAGE_PARSE_ERROR, handler);
   }
 
-  emitAgentRebalanced(userId: string, rebalanceData: any): void {
-    logger.info({ userId, rebalanceData }, 'Emitting agent rebalanced event');
-    this.emit(EVENTS.AGENT_REBALANCED, { userId, rebalanceData });
-  }
+  // ── Notification event emitters ───────────────────────────────────────────
 
-  emitPortfolioApyChanged(userId: string, currentApy: number, originalApy: number): void {
-    logger.info({ userId, currentApy, originalApy }, 'Emitting portfolio APY changed event');
-    this.emit(EVENTS.PORTFOLIO_APY_CHANGED, { userId, currentApy, originalApy });
+  emitAgentRebalanced(phone: string, data: {
+    fromStrategy: string;
+    toStrategy: string;
+    oldApy: number;
+    newApy: number;
+  }): void {
+    logger.info({ phone, data }, 'Emitting agent rebalanced event');
+    this.emit(EVENTS.AGENT_REBALANCED, { userId: phone, rebalanceData: data });
   }
 
   onAgentRebalanced(handler: (data: { userId: string; rebalanceData: any }) => void): void {
     this.on(EVENTS.AGENT_REBALANCED, handler);
   }
 
+  emitPortfolioApyChanged(phone: string, currentApy: number, originalApy: number): void {
+    logger.info({ phone, currentApy, originalApy }, 'Emitting portfolio APY changed event');
+    this.emit(EVENTS.PORTFOLIO_APY_CHANGED, { userId: phone, currentApy, originalApy });
+  }
+
   onPortfolioApyChanged(handler: (data: { userId: string; currentApy: number; originalApy: number }) => void): void {
     this.on(EVENTS.PORTFOLIO_APY_CHANGED, handler);
+  }
+
+  // ── Deposit event emitters ────────────────────────────────────────────────
+
+  emitDepositDetected(event: DepositDetectedEvent): void {
+    logger.info(
+      { userId: event.userId, amount: event.amount, txHash: event.txHash },
+      'Emitting deposit detected event'
+    );
+    this.emit(EVENTS.DEPOSIT_DETECTED, event);
+  }
+
+  emitDepositRecorded(event: DepositRecordedEvent): void {
+    logger.info(
+      { depositId: event.depositId, userId: event.userId, amount: event.amount },
+      'Emitting deposit recorded event'
+    );
+    this.emit(EVENTS.DEPOSIT_RECORDED, event);
+  }
+
+  emitDeploymentRequested(event: DeploymentRequestedEvent): void {
+    logger.info(
+      { depositId: event.depositId, userId: event.userId, strategy: event.strategy },
+      'Emitting deployment requested event'
+    );
+    this.emit(EVENTS.DEPLOYMENT_REQUESTED, event);
+  }
+
+  emitDeploymentConfirmed(event: DeploymentConfirmedEvent): void {
+    logger.info(
+      { txHash: event.txHash, deployedAt: event.deployedAt },
+      'Emitting deployment confirmed event'
+    );
+    this.emit(EVENTS.DEPLOYMENT_CONFIRMED, event);
+  }
+
+  emitDeploymentFailed(event: DeploymentFailedEvent): void {
+    logger.error(
+      { txHash: event.txHash, error: event.error },
+      'Emitting deployment failed event'
+    );
+    this.emit(EVENTS.DEPLOYMENT_FAILED, event);
+  }
+
+  // ── Deposit event listeners ───────────────────────────────────────────────
+
+  onDepositDetected(handler: (event: DepositDetectedEvent) => void): void {
+    this.on(EVENTS.DEPOSIT_DETECTED, handler);
+  }
+
+  onDepositRecorded(handler: (event: DepositRecordedEvent) => void): void {
+    this.on(EVENTS.DEPOSIT_RECORDED, handler);
+  }
+
+  onDeploymentRequested(handler: (event: DeploymentRequestedEvent) => void): void {
+    this.on(EVENTS.DEPLOYMENT_REQUESTED, handler);
+  }
+
+  onDeploymentConfirmed(handler: (event: DeploymentConfirmedEvent) => void): void {
+    this.on(EVENTS.DEPLOYMENT_CONFIRMED, handler);
+  }
+
+  onDeploymentFailed(handler: (event: DeploymentFailedEvent) => void): void {
+    this.on(EVENTS.DEPLOYMENT_FAILED, handler);
   }
 }
 

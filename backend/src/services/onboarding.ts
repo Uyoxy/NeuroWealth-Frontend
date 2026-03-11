@@ -26,15 +26,15 @@ import {
 } from "../db/userStore";
 import { ParsedMessage } from "../types/whatsapp";
 import {
-  executeVaultWithdrawal,
-  validateWithdrawalAmount,
-  getStellarExpertLink,
-} from "./withdrawal";
-import {
   buildPortfolioBalanceReply,
   formatMidOnboardingReply,
   isBalanceIntent,
 } from "./portfolio";
+import {
+  executeVaultWithdrawal,
+  validateWithdrawalAmount,
+  getStellarExpertLink,
+} from "./withdrawal";
 import {
   buildHistoryReply,
   isHistoryIntent,
@@ -119,6 +119,7 @@ const WITHDRAWAL_KEYWORDS = new Set([
   "take out",
   "take out my money",
   "send me my money",
+  "withdraw funds",
 ]);
 
 // ─── FAQ definitions ──────────────────────────────────────────────────────────
@@ -438,7 +439,7 @@ function withdrawalPrompt(balance: number): string {
 
 function withdrawalConfirm(amount: number, walletAddress: string): string {
   return (
-    `Confirm withdrawal of *${amount.toFixed(2)} USDC*?\n\n` +
+    `⚠️ *Confirm withdrawal of ${amount.toFixed(2)} USDC*\n\n` +
     `Funds will arrive at:\n` +
     `\`${walletAddress}\`\n\n` +
     `⏱ Takes ~10 seconds on Stellar\n\n` +
@@ -545,6 +546,7 @@ export async function handleOnboarding(
   const lower = input.toLowerCase();
   const requestedBalance = isBalanceIntent(lower);
   const requestedHistory = isHistoryIntent(lower);
+  const requestedWithdrawal = isWithdrawalIntent(lower);
 
   // ── HELP shortcut — works at any stage ───────────────────────────────────
   if (HELP_TRIGGERS.has(lower)) return HELP_MSG;
@@ -557,7 +559,7 @@ export async function handleOnboarding(
     logger.info({ from }, "New user — starting onboarding");
     await createUser(from);
 
-    if (requestedBalance) {
+    if (requestedBalance || requestedWithdrawal) {
       return (
         formatMidOnboardingReply("awaiting_strategy") +
         "\n\n" +
@@ -583,7 +585,7 @@ export async function handleOnboarding(
 
   // ── Portfolio balance command ─────────────────────────────────────────────
   if (requestedBalance) {
-    if (user.step !== "active") {
+    if (user.step !== "active" && user.step !== "withdrawal_amount" && user.step !== "withdrawal_confirm") {
       return formatMidOnboardingReply(user.step);
     }
 
@@ -593,6 +595,15 @@ export async function handleOnboarding(
   // ── Transaction history command ───────────────────────────────────────────
   if (requestedHistory) {
     return buildHistoryReply(user);
+  }
+
+  // ── Withdrawal intent detection (only for active users) ──────────────────
+  if (user.step === "active" && requestedWithdrawal) {
+    if (user.balance <= 0) {
+      return `You don't have any funds to withdraw. Your balance is 0 USDC.\n\nReply *DEPOSIT* to add funds.`;
+    }
+    await setUserStep(from, "withdrawal_amount");
+    return withdrawalPrompt(user.balance);
   }
 
   // ── FAQ — plain-English questions, works at any stage ────────────────────
@@ -614,15 +625,6 @@ async function handleStep(
   // If they send a greeting again at any point → re-send welcome
   if (GREETINGS.has(lower) && user.step === "awaiting_strategy") {
     return WELCOME;
-  }
-
-  // ── Withdrawal intent detection (only for active users) ──────────────────
-  if (user.step === "active" && isWithdrawalIntent(lower)) {
-    if (user.balance <= 0) {
-      return `You don't have any funds to withdraw. Your balance is 0 USDC.\n\nReply *DEPOSIT* to add funds.`;
-    }
-    await setUserStep(from, "withdrawal_amount");
-    return withdrawalPrompt(user.balance);
   }
 
   switch (user.step) {
@@ -690,7 +692,7 @@ async function handleStep(
         amount = parseFloat(input);
         const validationError = validateWithdrawalAmount(amount, user.balance);
         if (validationError) {
-          return validationError + `\n\nAvailable: ${user.balance.toFixed(2)} USDC`;
+          return `❌ ${validationError}\n\nAvailable: ${user.balance.toFixed(2)} USDC\n\nReply with a different amount or *CANCEL*.`;
         }
       }
 
