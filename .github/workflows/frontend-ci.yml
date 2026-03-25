@@ -2,48 +2,12 @@ name: Frontend CI
 
 on:
   push:
-    branches: [ main ]
+    branches: [main, master]
   pull_request:
-    branches: [ main ]
+    branches: [main, master]
 
 jobs:
-  build_and_lint:
-    if: ${{ hashFiles('package.json') != '' }}
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-
-      - name: Use Node.js 20
-        uses: actions/setup-node@v4
-        with:
-          node-version: '20'
-          cache: 'npm'
-
-      - name: Install dependencies
-        run: npm ci
-
-      - name: Lint
-        run: |
-          if npm run -s lint; then
-            echo "Lint passed"
-          else
-            echo "Lint failed"; exit 1
-          fi
-
-      - name: Build
-        run: npm run build
-
-name: Frontend CI
-
-on:
-  push:
-    branches: [ main, master ]
-  pull_request:
-    branches: [ main, master ]
-
-jobs:
-  build:
+  ci:
     runs-on: ubuntu-latest
 
     steps:
@@ -53,11 +17,14 @@ jobs:
       - name: Set up Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '20'
-          cache: 'npm'
+          node-version: "20"
+          cache: "npm"
 
       - name: Install dependencies
         run: npm ci --legacy-peer-deps
+
+      - name: Lint
+        run: npm run lint
 
       - name: Type Check
         run: npx tsc --noEmit
@@ -66,3 +33,4 @@ jobs:
         run: npm run build
         env:
           NEXT_PUBLIC_WEBHOOK_URL: "http://localhost:2000"
+          NEXT_PUBLIC_API_URL: "http://localhost:3001"
