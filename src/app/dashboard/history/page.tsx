@@ -1,8 +1,9 @@
+"use client";
+
 import { TransactionHistory } from "@/components/transactions/TransactionHistory";
 import { ProtectedRoute } from "@/components/auth/ProtectedRoute";
-import { Suspense } from "react";
+import { Suspense, useState } from "react";
 
-import { useState } from "react";
 import { Clock } from "lucide-react";
 import { EmptyState } from "@/components/ui/EmptyState";
 
