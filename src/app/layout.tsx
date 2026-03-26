@@ -1,8 +1,7 @@
 import type { Metadata } from "next";
 import "./globals.css";
-import { ErrorBoundary } from "@/components/ErrorBoundary";
-import { DiagnosticsPanel } from "@/components/diagnostics/DiagnosticsPanel";
-import { AuthProvider } from "@/contexts/AuthContext";
+import { AuthProvider } from "@/contexts";
+import { ClientProviders } from "@/components/ClientProviders";
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://neurowealth.app"),
@@ -12,46 +11,6 @@ export const metadata: Metadata = {
   },
   description:
     "NeuroWealth is an autonomous AI agent that deploys your USDC into the highest-yielding DeFi opportunities on Stellar — automatically, 24/7. No DeFi knowledge required.",
-  keywords: [
-    "DeFi",
-    "Stellar",
-    "yield farming",
-    "AI agent",
-    "USDC",
-    "automated investing",
-    "Soroban",
-    "blockchain",
-    "passive income",
-  ],
-  openGraph: {
-    type: "website",
-    locale: "en_US",
-    url: "/",
-    siteName: "NeuroWealth",
-    title: "NeuroWealth — AI-Powered Yield on Stellar",
-    description:
-      "Autonomous AI yield optimization on Stellar DeFi. Deposit USDC, earn automatically.",
-    images: [
-      {
-        url: "/og-image.png",
-        width: 1200,
-        height: 630,
-        alt: "NeuroWealth — AI-Powered Yield on Stellar",
-      },
-    ],
-  },
-  twitter: {
-    card: "summary_large_image",
-    title: "NeuroWealth — AI-Powered Yield on Stellar",
-    description:
-      "Autonomous AI yield optimization on Stellar DeFi. Deposit USDC, earn automatically.",
-    images: ["/og-image.png"],
-  },
-  robots: {
-    index: true,
-    follow: true,
-    googleBot: { index: true, follow: true },
-  },
 };
 
 export default function RootLayout({
@@ -61,13 +20,12 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en" className="dark" suppressHydrationWarning>
-      <body className="antialiased font-sans bg-dark-900 text-slate-200">
-        <AuthProvider>
-          <ErrorBoundary>
-            {children}
-            <DiagnosticsPanel />
-          </ErrorBoundary>
-        </AuthProvider>
+      <body className="antialiased">
+        {/* WalletProvider is loaded client-side only (ssr:false) to prevent
+            @creit.tech/stellar-wallets-kit from accessing `window` at SSR time */}
+        <ClientProviders>
+          <AuthProvider>{children}</AuthProvider>
+        </ClientProviders>
       </body>
     </html>
   );
