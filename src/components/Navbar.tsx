@@ -27,10 +27,10 @@ export function Navbar() {
   const networkLabel = formatNetworkLabel(config?.network);
 
   return (
-    <nav className="fixed top-0 left-0 right-0 z-50 border-b border-white/5 bg-dark-900/80 backdrop-blur-md">
+    <nav aria-label="Main navigation" className="fixed top-0 left-0 right-0 z-50 border-b border-white/5 bg-dark-900/80 backdrop-blur-md">
       <div className="mx-auto flex max-w-7xl items-center justify-between px-8 py-5">
-        <Link href="/" className="flex items-center gap-2 text-lg font-bold text-white">
-          <span className="text-brand-400">&#x2B21;</span> NeuroWealth
+        <Link href="/" aria-label="NeuroWealth home" className="flex items-center gap-2 text-lg font-bold text-white">
+          <span aria-hidden="true" className="text-brand-400">&#x2B21;</span> NeuroWealth
         </Link>
 
         <div className="hidden md:flex items-center gap-8 text-sm text-slate-400">
@@ -68,6 +68,7 @@ export function Navbar() {
               </div>
               <button
                 onClick={signOut}
+                aria-label={`Sign out of ${user.name}'s account`}
                 className="text-[10px] text-slate-500 hover:text-red-400 transition-colors uppercase font-bold"
               >
                 Sign Out

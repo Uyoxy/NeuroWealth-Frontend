@@ -32,38 +32,44 @@ export default function SignUpPage() {
           <p className="text-slate-400">Join NeuroWealth and start earning automatically</p>
         </div>
 
-        <form onSubmit={handleSubmit} className="space-y-6">
+        <form onSubmit={handleSubmit} className="space-y-6" noValidate>
           <div className="space-y-2">
-            <label className="text-xs font-bold text-slate-500 uppercase tracking-widest px-1">Full Name</label>
+            <label htmlFor="signup-name" className="text-xs font-bold text-slate-500 uppercase tracking-widest px-1">Full Name</label>
             <input
+              id="signup-name"
               type="text"
               value={name}
               onChange={(e) => setName(e.target.value)}
               placeholder="John Doe"
+              aria-required="true"
               className="w-full bg-dark-900 border border-white/10 rounded-xl px-4 min-h-[44px] text-white focus:outline-none focus:ring-2 focus:ring-brand-400 focus:border-transparent transition-all placeholder:text-slate-600"
               required
             />
           </div>
 
           <div className="space-y-2">
-            <label className="text-xs font-bold text-slate-500 uppercase tracking-widest px-1">Email Address</label>
+            <label htmlFor="signup-email" className="text-xs font-bold text-slate-500 uppercase tracking-widest px-1">Email Address</label>
             <input
+              id="signup-email"
               type="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               placeholder="name@example.com"
+              aria-required="true"
               className="w-full bg-dark-900 border border-white/10 rounded-xl px-4 min-h-[44px] text-white focus:outline-none focus:ring-2 focus:ring-brand-400 focus:border-transparent transition-all placeholder:text-slate-600"
               required
             />
           </div>
 
           <div className="space-y-2">
-            <label className="text-xs font-bold text-slate-500 uppercase tracking-widest px-1">Password</label>
+            <label htmlFor="signup-password" className="text-xs font-bold text-slate-500 uppercase tracking-widest px-1">Password</label>
             <input
+              id="signup-password"
               type="password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               placeholder="••••••••"
+              aria-required="true"
               className="w-full bg-dark-900 border border-white/10 rounded-xl px-4 min-h-[44px] text-white focus:outline-none focus:ring-2 focus:ring-brand-400 focus:border-transparent transition-all placeholder:text-slate-600"
               required
             />

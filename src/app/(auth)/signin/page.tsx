@@ -26,44 +26,52 @@ export default function SignInPage() {
   };
 
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center p-6 bg-dark-900">
+    <div id="main-content" className="min-h-screen flex flex-col items-center justify-center p-6 bg-dark-900">
       <div className="w-full max-w-[420px] bg-dark-800/50 p-8 rounded-2xl border border-white/5 shadow-2xl backdrop-blur-xl animate-in fade-in zoom-in duration-300">
         <div className="text-center mb-10">
           <h1 className="text-3xl font-bold text-white mb-2">Welcome Back</h1>
           <p className="text-slate-400">Sign in to manage your AI-powered yield</p>
         </div>
 
-        <form onSubmit={handleSubmit} className="space-y-6">
+        <form onSubmit={handleSubmit} className="space-y-6" noValidate>
           <div className="space-y-2">
-            <label className="text-xs font-bold text-slate-500 uppercase tracking-widest px-1">Email Address</label>
+            <label htmlFor="signin-email" className="text-xs font-bold text-slate-500 uppercase tracking-widest px-1">Email Address</label>
             <input
+              id="signin-email"
               type="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               placeholder="name@example.com"
+              aria-required="true"
+              aria-describedby={error ? "signin-error" : undefined}
               className="w-full bg-dark-900 border border-white/10 rounded-xl px-4 min-h-[44px] text-white focus:outline-none focus:ring-2 focus:ring-brand-400 focus:border-transparent transition-all placeholder:text-slate-600"
               required
             />
           </div>
 
           <div className="space-y-2">
-            <label className="text-xs font-bold text-slate-500 uppercase tracking-widest px-1">Password</label>
+            <label htmlFor="signin-password" className="text-xs font-bold text-slate-500 uppercase tracking-widest px-1">Password</label>
             <input
+              id="signin-password"
               type="password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               placeholder="••••••••"
+              aria-required="true"
+              aria-describedby={`signin-password-hint${error ? " signin-error" : ""}`}
               className="w-full bg-dark-900 border border-white/10 rounded-xl px-4 min-h-[44px] text-white focus:outline-none focus:ring-2 focus:ring-brand-400 focus:border-transparent transition-all placeholder:text-slate-600"
               required
             />
-            <p className="text-[10px] text-slate-500 italic px-1">Hint: Use &quot;password123&quot; for mock login</p>
+            <p id="signin-password-hint" className="text-[10px] text-slate-500 italic px-1">Hint: Use &quot;password123&quot; for mock login</p>
           </div>
 
-          {error && (
-            <div className="bg-red-500/10 border border-red-500/20 text-red-500 p-3 rounded-lg text-[14px] animate-in slide-in-from-top-2 duration-200">
-              {error}
-            </div>
-          )}
+          <div role="alert" aria-live="polite" aria-atomic="true">
+            {error && (
+              <div id="signin-error" className="bg-red-500/10 border border-red-500/20 text-red-500 p-3 rounded-lg text-[14px] animate-in slide-in-from-top-2 duration-200">
+                {error}
+              </div>
+            )}
+          </div>
 
           <Button
             type="submit"
