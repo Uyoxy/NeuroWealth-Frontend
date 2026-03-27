@@ -2,25 +2,38 @@
 
 import { useEffect, useState } from 'react';
 import OnboardingFlow from '@/components/onboarding/OnboardingFlow';
+import { OnboardingStepSkeleton } from '@/components/ui/Skeleton';
 
 export default function OnboardingPage() {
   const [shouldShowOnboarding, setShouldShowOnboarding] = useState(true);
+  const [pageLoading, setPageLoading] = useState(true);
 
   useEffect(() => {
     // Check if user has already completed onboarding
-    const savedState = localStorage.getItem('onboarding-state');
-    if (savedState) {
-      try {
-        const { completed } = JSON.parse(savedState);
-        if (completed) {
-          // Redirect to dashboard or show completion message
-          setShouldShowOnboarding(false);
+    const timer = setTimeout(() => {
+      const savedState = localStorage.getItem('onboarding-state');
+      if (savedState) {
+        try {
+          const { completed } = JSON.parse(savedState);
+          if (completed) {
+            setShouldShowOnboarding(false);
+          }
+        } catch (error) {
+          console.error('Failed to parse onboarding state:', error);
         }
-      } catch (error) {
-        console.error('Failed to parse onboarding state:', error);
       }
-    }
+      setPageLoading(false);
+    }, 500);
+    return () => clearTimeout(timer);
   }, []);
+
+  if (pageLoading) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-dark-900 via-dark-800 to-dark-900 flex items-center justify-center px-4">
+        <OnboardingStepSkeleton />
+      </div>
+    );
+  }
 
   const handleOnboardingComplete = () => {
     // Redirect to dashboard or home page
