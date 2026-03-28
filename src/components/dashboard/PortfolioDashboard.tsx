@@ -21,6 +21,10 @@ import {
 
 type ThemeMode = "light" | "dark";
 
+function getTheme(searchParams: Pick<URLSearchParams, "get">): ThemeMode {
+  return searchParams.get("theme") === "dark" ? "dark" : "light";
+}
+
 interface EmptyStateProps {
   icon: React.ReactNode;
   copy: string;
