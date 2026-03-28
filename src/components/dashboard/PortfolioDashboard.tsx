@@ -9,6 +9,7 @@ import {
   ChartTone,
   PortfolioPayload,
   PortfolioScenario,
+  parseScenario,
 } from "@/lib/portfolio";
 import {
   formatCurrency,
@@ -18,6 +19,7 @@ import {
   formatSyncLabel,
   formatTimestamp,
 } from "@/lib/formatters";
+import { useSandbox } from "@/contexts/SandboxContext";
 
 type ThemeMode = "light" | "dark";
 
@@ -98,8 +100,13 @@ function EmptyState({ copy, cta, icon, onAction }: EmptyStateProps) {
 
 function getScenario(
   searchParams: Pick<URLSearchParams, "get">,
+  sandboxScenario?: PortfolioScenario,
 ): PortfolioScenario {
-  return searchParams.get("scenario") === "empty" ? "empty" : "live";
+  const urlScenario = searchParams.get("scenario");
+  if (sandboxScenario && process.env.NODE_ENV === "development") {
+    return sandboxScenario;
+  }
+  return parseScenario(urlScenario);
 }
 
 function getTheme(searchParams: Pick<URLSearchParams, "get">): ThemeMode {
@@ -176,12 +183,13 @@ function SummarySkeleton() {
 export function PortfolioDashboard() {
   const router = useRouter();
   const searchParams = useSearchParams();
+  const { getCurrentScenario, isSandboxMode } = useSandbox();
   const [portfolio, setPortfolio] = useState<PortfolioPayload | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
   const theme = getTheme(searchParams);
-  const scenario = getScenario(searchParams);
+  const scenario = getScenario(searchParams, getCurrentScenario("portfolio"));
 
   useEffect(() => {
     const controller = new AbortController();
@@ -352,6 +360,11 @@ export function PortfolioDashboard() {
             </div>
 
             <div className={styles.bannerChips}>
+              {isSandboxMode && (
+                <span className={styles.chip} style={{ backgroundColor: "#10b981", color: "white" }}>
+                  Sandbox: {scenario}
+                </span>
+              )}
               <span className={styles.chip}>Theme: {theme}</span>
               <span className={styles.chip}>
                 Source:{" "}
