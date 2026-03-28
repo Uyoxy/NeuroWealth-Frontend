@@ -1,3 +1,6 @@
+const { validateEnv } = require("./lib/env");
+validateEnv();
+
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   eslint: {
@@ -22,4 +25,4 @@ const nextConfig = {
   },
 };
 
-export default nextConfig;
+module.exports = nextConfig;

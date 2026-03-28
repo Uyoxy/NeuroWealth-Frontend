@@ -1,0 +1,71 @@
+name: Deploy to Production
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: Neurowealth-Frontend
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+          cache-dependency-path: frontend/package-lock.json
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Validate environment variables
+        run: |
+          node -e "
+            const required = [
+              'NEXT_PUBLIC_APP_ENV','NEXT_PUBLIC_APP_URL',
+              'WHATSAPP_APP_SECRET','WHATSAPP_VERIFY_TOKEN',
+              'WHATSAPP_ACCESS_TOKEN','WHATSAPP_PHONE_NUMBER_ID','WHATSAPP_WABA_ID',
+              'DB_HOST','DB_PORT','DB_NAME','DB_USER','DB_PASSWORD',
+              'STELLAR_NETWORK','STELLAR_HORIZON_URL','WALLET_ENCRYPTION_KEY'
+            ];
+            const missing = required.filter(k => !process.env[k]);
+            if (missing.length) { console.error('Missing:', missing.join(', ')); process.exit(1); }
+            const key = process.env.WALLET_ENCRYPTION_KEY;
+            if (!/^[a-f0-9]{64}$/i.test(key)) { console.error('Invalid WALLET_ENCRYPTION_KEY'); process.exit(1); }
+            if (!['testnet','mainnet'].includes(process.env.STELLAR_NETWORK)) { console.error('Invalid STELLAR_NETWORK'); process.exit(1); }
+            console.log('✅ All env vars valid');
+          "
+        env:
+          NEXT_PUBLIC_APP_ENV: ${{ secrets.PROD_APP_ENV }}
+          NEXT_PUBLIC_APP_URL: ${{ secrets.PROD_APP_URL }}
+          WHATSAPP_APP_SECRET: ${{ secrets.PROD_WHATSAPP_APP_SECRET }}
+          WHATSAPP_VERIFY_TOKEN: ${{ secrets.PROD_WHATSAPP_VERIFY_TOKEN }}
+          WHATSAPP_ACCESS_TOKEN: ${{ secrets.PROD_WHATSAPP_ACCESS_TOKEN }}
+          WHATSAPP_PHONE_NUMBER_ID: ${{ secrets.PROD_WHATSAPP_PHONE_NUMBER_ID }}
+          WHATSAPP_WABA_ID: ${{ secrets.PROD_WHATSAPP_WABA_ID }}
+          DB_HOST: ${{ secrets.PROD_DB_HOST }}
+          DB_PORT: ${{ secrets.PROD_DB_PORT }}
+          DB_NAME: ${{ secrets.PROD_DB_NAME }}
+          DB_USER: ${{ secrets.PROD_DB_USER }}
+          DB_PASSWORD: ${{ secrets.PROD_DB_PASSWORD }}
+          STELLAR_NETWORK: mainnet
+          STELLAR_HORIZON_URL: https://horizon.stellar.org
+          WALLET_ENCRYPTION_KEY: ${{ secrets.PROD_WALLET_ENCRYPTION_KEY }}
+
+      - name: Build
+        run: npm run build
+        env:
+          NEXT_PUBLIC_APP_ENV: production
+          NEXT_PUBLIC_APP_URL: ${{ secrets.PROD_APP_URL }}
+
+      - name: Deploy to Vercel (Production)
+        run: npx vercel --prod --token=${{ secrets.VERCEL_TOKEN }} --yes
+        env:
+          VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+          VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
