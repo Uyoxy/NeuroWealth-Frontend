@@ -102,10 +102,6 @@ function getScenario(
   return searchParams.get("scenario") === "empty" ? "empty" : "live";
 }
 
-function getTheme(searchParams: Pick<URLSearchParams, "get">): ThemeMode {
-  return searchParams.get("theme") === "dark" ? "dark" : "light";
-}
-
 function getValueTone(value: number): "positive" | "negative" | "neutral" {
   if (value > 0) {
     return "positive";
