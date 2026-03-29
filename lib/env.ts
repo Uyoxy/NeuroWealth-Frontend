@@ -20,18 +20,17 @@ export function validateEnv() {
   const missing = requiredEnvVars.filter((key) => !process.env[key]);
   if (missing.length > 0) {
     throw new Error(
-      ` Missing required environment variables:\n${missing.map((k) => `  - ${k}`).join("\n")}`
+      `Missing required environment variables:\n${missing.map((k) => `  - ${k}`).join("\n")}`
     );
   }
-  // Extra validation: WALLET_ENCRYPTION_KEY must be 64 hex chars
+
   const key = process.env.WALLET_ENCRYPTION_KEY!;
   if (!/^[a-f0-9]{64}$/i.test(key)) {
     throw new Error(" WALLET_ENCRYPTION_KEY must be a 64-character hex string");
   }
 
-  // Stellar network must be testnet or mainnet
   const network = process.env.STELLAR_NETWORK!;
   if (!["testnet", "mainnet"].includes(network)) {
-    throw new Error(" STELLAR_NETWORK must be 'testnet' or 'mainnet'");
+    throw new Error("STELLAR_NETWORK must be 'testnet' or 'mainnet'");
   }
 }

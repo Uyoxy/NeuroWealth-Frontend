@@ -1,4 +1,4 @@
-const { validateEnv } = require("./lib/env");
+import { validateEnv } from "./lib/env.js";
 validateEnv();
 
 /** @type {import('next').NextConfig} */
