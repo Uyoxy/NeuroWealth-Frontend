@@ -10,7 +10,7 @@ jobs:
     runs-on: ubuntu-latest
     defaults:
       run:
-        working-directory: Neurowealth-Frontend
+        working-directory: NeuroWealth-Frontend
 
     steps:
       - uses: actions/checkout@v4
@@ -19,28 +19,13 @@ jobs:
         with:
           node-version: 20
           cache: npm
-          cache-dependency-path: frontend/package-lock.json
+          cache-dependency-path: NeuroWealth-Frontend/package-lock.json
 
       - name: Install dependencies
         run: npm ci
 
       - name: Validate environment variables
-        run: |
-          node -e "
-            const required = [
-              'NEXT_PUBLIC_APP_ENV','NEXT_PUBLIC_APP_URL',
-              'WHATSAPP_APP_SECRET','WHATSAPP_VERIFY_TOKEN',
-              'WHATSAPP_ACCESS_TOKEN','WHATSAPP_PHONE_NUMBER_ID','WHATSAPP_WABA_ID',
-              'DB_HOST','DB_PORT','DB_NAME','DB_USER','DB_PASSWORD',
-              'STELLAR_NETWORK','STELLAR_HORIZON_URL','WALLET_ENCRYPTION_KEY'
-            ];
-            const missing = required.filter(k => !process.env[k]);
-            if (missing.length) { console.error('Missing:', missing.join(', ')); process.exit(1); }
-            const key = process.env.WALLET_ENCRYPTION_KEY;
-            if (!/^[a-f0-9]{64}$/i.test(key)) { console.error('Invalid WALLET_ENCRYPTION_KEY'); process.exit(1); }
-            if (!['testnet','mainnet'].includes(process.env.STELLAR_NETWORK)) { console.error('Invalid STELLAR_NETWORK'); process.exit(1); }
-            console.log('✅ All env vars valid');
-          "
+        run: npm run validate:env  
         env:
           NEXT_PUBLIC_APP_ENV: ${{ secrets.PROD_APP_ENV }}
           NEXT_PUBLIC_APP_URL: ${{ secrets.PROD_APP_URL }}

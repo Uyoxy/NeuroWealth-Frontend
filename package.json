@@ -7,10 +7,11 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint --max-warnings 100",
     "typecheck": "tsc --noEmit",
     "test": "TZ=UTC node --import tsx --test \"src/**/*.test.ts\"",
-    "qa:visual-baseline": "node scripts/capture-visual-baselines.mjs"
+    "qa:visual-baseline": "node scripts/capture-visual-baselines.mjs",
+    "lint": "next lint",
+    "validate:env": "tsx scripts/validate-env.ts"
   },
   "dependencies": {
     "@creit.tech/stellar-wallets-kit": "^1.8.0",

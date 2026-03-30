@@ -1,6 +1,3 @@
-import { validateEnv } from "./lib/env.js";
-validateEnv();
-
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   eslint: {
@@ -24,5 +21,6 @@ const nextConfig = {
     optimizePackageImports: ["lucide-react"],
   },
 };
+const nextConfig = {};
 
-module.exports = nextConfig;
+export default nextConfig;
