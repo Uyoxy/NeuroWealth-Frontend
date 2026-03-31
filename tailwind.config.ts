@@ -110,6 +110,14 @@ const config: Config = {
       backdropBlur: {
         md: '12px',
       },
+      motion: {
+        'duration-120': '120ms',
+        'duration-180': '180ms',
+        'duration-240': '240ms',
+      },
+      transitionTimingFunction: {
+        'standard': 'cubic-bezier(0.25, 0.46, 0.45, 0.94)',
+      },
     },
   },
   plugins: [],
