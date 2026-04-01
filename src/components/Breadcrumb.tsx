@@ -1,7 +1,11 @@
 "use client";
 
 import React, { useState, useRef, useEffect } from "react";
+<<<<<<< HEAD
 import type { BreadcrumbProps, BreadcrumbItem } from "@/types/breadcrumb.types";
+=======
+import { BreadcrumbProps, BreadcrumbItem } from "../types/breadcrumb.types";
+>>>>>>> 3fecff1 (resolved import modules error)
 
 // ─── Separator Icon (12–16px per spec) ────────────────────────────────────────
 const SeparatorIcon = () => (
