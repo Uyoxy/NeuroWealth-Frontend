@@ -3,6 +3,12 @@ import {
   normalizePortfolioPayload,
   parseScenario,
 } from "@/lib/portfolio";
+import {
+  ERROR_CODE,
+  HTTP_STATUS,
+  errorResponse,
+  successResponse,
+} from "@/lib/api-response";
 import { NextRequest, NextResponse } from "next/server";
 
 function resolveEndpoint(baseUrl: string, pathOrUrl: string): string {
@@ -26,7 +32,7 @@ export async function GET(request: NextRequest) {
 
   // Handle all sandbox scenarios
   if (scenario !== "live") {
-    return NextResponse.json(buildScenarioPayload(scenario), {
+    return NextResponse.json(successResponse(buildScenarioPayload(scenario)), {
       headers: {
         "Cache-Control": "no-store",
         "x-neurowealth-source": "demo",
@@ -35,7 +41,7 @@ export async function GET(request: NextRequest) {
   }
 
   if (!apiBaseUrl) {
-    return NextResponse.json(buildScenarioPayload("live"), {
+    return NextResponse.json(successResponse(buildScenarioPayload("live")), {
       headers: {
         "Cache-Control": "no-store",
         "x-neurowealth-source": "demo",
@@ -57,23 +63,28 @@ export async function GET(request: NextRequest) {
 
     const payload = normalizePortfolioPayload(await response.json(), "api");
 
-    return NextResponse.json(payload, {
+    return NextResponse.json(successResponse(payload), {
       headers: {
         "Cache-Control": "no-store",
         "x-neurowealth-source": payload.source,
       },
     });
-  } catch {
-    const fallbackPayload = buildScenarioPayload("live", {
-      source: "fallback",
-      notice: "Backend endpoint unavailable, showing preview data instead.",
-    });
+  } catch (error) {
+    const message =
+      error instanceof Error ? error.message : "Failed to fetch portfolio data";
 
-    return NextResponse.json(fallbackPayload, {
-      headers: {
-        "Cache-Control": "no-store",
-        "x-neurowealth-source": fallbackPayload.source,
+    return NextResponse.json(
+      errorResponse(
+        ERROR_CODE.SERVICE_UNAVAILABLE,
+        "Portfolio service temporarily unavailable. Showing preview data.",
+        { details: message },
+      ),
+      {
+        status: HTTP_STATUS.SERVICE_UNAVAILABLE,
+        headers: {
+          "Cache-Control": "no-store",
+        },
       },
-    });
+    );
   }
 }

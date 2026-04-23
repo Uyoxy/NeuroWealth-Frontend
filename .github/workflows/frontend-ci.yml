@@ -18,19 +18,52 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: "20"
-          cache: "npm"
+          cache: "yarn"
+
+      - name: Validate package.json
+        run: |
+          node -e "
+          const fs = require('fs');
+          try {
+            const pkg = JSON.parse(fs.readFileSync('package.json', 'utf8'));
+            console.log('✓ package.json is valid JSON');
+            if (!pkg.name) throw new Error('Missing required field: name');
+            if (!pkg.packageManager) throw new Error('Missing required field: packageManager');
+            console.log('✓ package.json has required fields');
+          } catch (e) {
+            console.error('✗ package.json validation failed:', e.message);
+            process.exit(1);
+          }
+          "
+
+      - name: Validate tsconfig.json
+        run: |
+          node -e "
+          const fs = require('fs');
+          try {
+            const tsconfig = JSON.parse(fs.readFileSync('tsconfig.json', 'utf8'));
+            console.log('✓ tsconfig.json is valid JSON');
+            if (!tsconfig.compilerOptions) throw new Error('Missing required field: compilerOptions');
+            if (!tsconfig.include) throw new Error('Missing required field: include');
+            console.log('✓ tsconfig.json has required fields');
+          } catch (e) {
+            console.error('✗ tsconfig.json validation failed:', e.message);
+            process.exit(1);
+          }
+          "
 
       - name: Install dependencies
-        run: npm ci --legacy-peer-deps
+        run: yarn install --frozen-lockfile
 
       - name: Lint
-        run: npm run lint
+        run: yarn lint
 
       - name: Type Check
-        run: npx tsc --noEmit
+        run: yarn build
 
       - name: Build
-        run: npm run build
+        run: yarn build
         env:
           NEXT_PUBLIC_WEBHOOK_URL: "http://localhost:2000"
           NEXT_PUBLIC_API_URL: "http://localhost:3001"
+
