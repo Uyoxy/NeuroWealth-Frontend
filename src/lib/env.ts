@@ -53,8 +53,8 @@ function validateEnv(): EnvConfig {
   }
 
   return {
-    webhookUrl,
-    apiUrl,
+    webhookUrl: webhookUrl!,
+    apiUrl: apiUrl!,
     neuroWealthApiBaseUrl: neuroWealthApiBaseUrl || "",
     neuroWealthPortfolioPath,
     neuroWealthTransactionsPath,

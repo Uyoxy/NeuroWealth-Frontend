@@ -78,8 +78,17 @@ async function delay(ms: number): Promise<void> {
 // ─── Auth service ─────────────────────────────────────────────────────────────
 
 export interface AuthService {
-  signIn(email: string, password: string, opts?: SimulationOptions): Promise<AuthSession>;
-  signUp(email: string, name: string, password: string, opts?: SimulationOptions): Promise<AuthSession>;
+  signIn(
+    email: string,
+    password: string,
+    opts?: SimulationOptions,
+  ): Promise<AuthSession>;
+  signUp(
+    email: string,
+    name: string,
+    password: string,
+    opts?: SimulationOptions,
+  ): Promise<AuthSession>;
   signOut(): void;
   getSession(): AuthSession | null;
 }
@@ -92,7 +101,11 @@ export const mockAuthService: AuthService = {
     await delay(opts.latencyMs ?? 800);
 
     if (shouldFail(opts.outcome)) {
-      throw new ServiceError("NETWORK_ERROR", "Sign-in request failed. Please try again.", true);
+      throw new ServiceError(
+        "NETWORK_ERROR",
+        "Sign-in request failed. Please try again.",
+        true,
+      );
     }
 
     if (password !== "password123") {
@@ -100,8 +113,14 @@ export const mockAuthService: AuthService = {
     }
 
     const session: AuthSession = {
-      user: { id: "u1", email, name: email.split("@")[0] },
+      user: {
+        id: "u1",
+        email,
+        name: email.split("@")[0],
+        createdAt: new Date().toISOString(),
+      },
       token: "mock-jwt-" + Math.random().toString(36).slice(2, 9),
+      expiresAt: Date.now() + 1000 * 60 * 60 * 24 * 7,
     };
     localStorage.setItem(STORAGE_KEY, JSON.stringify(session));
     return session;
@@ -112,16 +131,30 @@ export const mockAuthService: AuthService = {
     await delay(opts.latencyMs ?? 1000);
 
     if (shouldFail(opts.outcome)) {
-      throw new ServiceError("NETWORK_ERROR", "Sign-up request failed. Please try again.", true);
+      throw new ServiceError(
+        "NETWORK_ERROR",
+        "Sign-up request failed. Please try again.",
+        true,
+      );
     }
 
     if (!password || password.length < 8) {
-      throw new ServiceError("VALIDATION_ERROR", "Password must be at least 8 characters.", false);
+      throw new ServiceError(
+        "VALIDATION_ERROR",
+        "Password must be at least 8 characters.",
+        false,
+      );
     }
 
     const session: AuthSession = {
-      user: { id: "u" + Math.random().toString(36).slice(2, 9), email, name },
+      user: {
+        id: "u" + Math.random().toString(36).slice(2, 9),
+        email,
+        name,
+        createdAt: new Date().toISOString(),
+      },
       token: "mock-jwt-" + Math.random().toString(36).slice(2, 9),
+      expiresAt: Date.now() + 1000 * 60 * 60 * 24 * 7,
     };
     localStorage.setItem(STORAGE_KEY, JSON.stringify(session));
     return session;
