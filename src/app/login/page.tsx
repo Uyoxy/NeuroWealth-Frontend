@@ -32,8 +32,8 @@ export default function LoginPage() {
       const mockToken = "GBTKU_DEMO_TOKEN_X3QR";
       signIn(mockToken, {
         id: "demo-user",
-        address: "GBTKU...X3QR",
         displayName: "Demo User",
+        walletAddress: "GDEMO...XLM",
         avatarInitials: "DU",
       });
       router.replace(from);

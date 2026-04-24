@@ -7,15 +7,11 @@
  */
 
 import { SESSION_STORAGE_KEY } from "./auth-constants";
-
-export interface User {
-  id: string;
-  email: string;
-  name: string;
-  avatar?: string;
-  walletAddress?: string;
-  createdAt: string;
-}
+import {
+  adaptMockAuthUser,
+  type MockAuthUserRecord,
+} from "./user";
+import type { User } from "@/types";
 
 export interface AuthSession {
   user: User;
@@ -23,7 +19,7 @@ export interface AuthSession {
   expiresAt: number;
 }
 
-const MOCK_USERS: Record<string, { password: string; user: User }> = {
+const MOCK_USERS: Record<string, { password: string; user: MockAuthUserRecord }> = {
   "demo@neurowealth.app": {
     password: "demo123",
     user: {
@@ -41,6 +37,51 @@ function generateToken(): string {
   return `mock_token_${Math.random().toString(36).slice(2)}`;
 }
 
+function isLegacyMockAuthUserRecord(value: unknown): value is MockAuthUserRecord {
+  if (!value || typeof value !== "object") {
+    return false;
+  }
+
+  const candidate = value as Partial<MockAuthUserRecord>;
+  return (
+    typeof candidate.id === "string" &&
+    typeof candidate.email === "string" &&
+    typeof candidate.name === "string"
+  );
+}
+
+function normalizeSession(value: unknown): AuthSession | null {
+  if (!value || typeof value !== "object") {
+    return null;
+  }
+
+  const candidate = value as Partial<AuthSession> & {
+    user?: User | MockAuthUserRecord;
+  };
+
+  if (typeof candidate.token !== "string" || typeof candidate.expiresAt !== "number") {
+    return null;
+  }
+
+  if (!candidate.user) {
+    return null;
+  }
+
+  const user = isLegacyMockAuthUserRecord(candidate.user)
+    ? adaptMockAuthUser(candidate.user)
+    : (candidate.user as User);
+
+  if (!user.id || !user.displayName) {
+    return null;
+  }
+
+  return {
+    user,
+    token: candidate.token,
+    expiresAt: candidate.expiresAt,
+  };
+}
+
 export const mockAuth = {
   /** Read the current session from localStorage (client-only). */
   getSession(): AuthSession | null {
@@ -48,7 +89,11 @@ export const mockAuth = {
     try {
       const raw = localStorage.getItem(SESSION_STORAGE_KEY);
       if (!raw) return null;
-      const session: AuthSession = JSON.parse(raw);
+      const session = normalizeSession(JSON.parse(raw));
+      if (!session) {
+        localStorage.removeItem(SESSION_STORAGE_KEY);
+        return null;
+      }
       if (Date.now() > session.expiresAt) {
         localStorage.removeItem(SESSION_STORAGE_KEY);
         return null;
@@ -71,7 +116,7 @@ export const mockAuth = {
       throw new Error("Invalid email or password");
     }
     const session: AuthSession = {
-      user: record.user,
+      user: adaptMockAuthUser(record.user),
       token: generateToken(),
       expiresAt: Date.now() + 7 * 24 * 60 * 60 * 1000, // 7 days
     };
@@ -90,7 +135,7 @@ export const mockAuth = {
     if (MOCK_USERS[email.toLowerCase()]) {
       throw new Error("An account with this email already exists");
     }
-    const user: User = {
+    const user: MockAuthUserRecord = {
       id: `usr_${Math.random().toString(36).slice(2)}`,
       email: email.toLowerCase(),
       name,
@@ -98,7 +143,7 @@ export const mockAuth = {
     };
     MOCK_USERS[email.toLowerCase()] = { password, user };
     const session: AuthSession = {
-      user,
+      user: adaptMockAuthUser(user),
       token: generateToken(),
       expiresAt: Date.now() + 7 * 24 * 60 * 60 * 1000,
     };

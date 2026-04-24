@@ -7,7 +7,7 @@ import React, {
   useEffect,
   useCallback,
 } from "react";
-import { User, AuthSession, mockAuth } from "@/lib/mock-auth";
+import { AuthSession, mockAuth } from "@/lib/mock-auth";
 
 import { useRouter } from "next/navigation";
 import {
@@ -15,6 +15,7 @@ import {
   SESSION_STORAGE_KEY,
   SIGN_IN_PATH,
 } from "@/lib/auth-constants";
+import type { User } from "@/types";
 
 interface AuthContextType {
   user: User | null;

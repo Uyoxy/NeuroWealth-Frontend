@@ -7,6 +7,7 @@ import React, {
   useState,
 } from "react";
 import type { AuthState, User } from "@/types";
+import { getUserInitials } from "@/lib/user";
 
 // ── Cookie helpers ────────────────────────────────────────────────────────────
 
@@ -41,11 +42,15 @@ const AuthContext = createContext<AuthContextValue | null>(null);
 // In production this would call /api/auth/me with the stored token.
 
 function mockUserFromToken(token: string): User {
+  const walletAddress = /^G[A-Z2-7]{20,}$/.test(token)
+    ? token
+    : "GDEMO...XLM";
+
   return {
     id: "mock-user-1",
-    address: token.startsWith("G") ? token : "GBTKU...X3QR",
     displayName: "Demo User",
-    avatarInitials: "DU",
+    walletAddress,
+    avatarInitials: getUserInitials("Demo User"),
   };
 }
 

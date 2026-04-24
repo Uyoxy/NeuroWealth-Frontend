@@ -1,11 +1,8 @@
-// ── Auth ──────────────────────────────────────────────────────────────────────
+import type { User } from "./user";
 
-export interface User {
-  id: string;
-  address: string; // Stellar wallet address (truncated display)
-  displayName?: string;
-  avatarInitials?: string;
-}
+export type { User } from "./user";
+
+// ── Auth ──────────────────────────────────────────────────────────────────────
 
 export interface AuthState {
   user: User | null;

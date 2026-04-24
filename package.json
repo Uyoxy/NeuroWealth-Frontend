@@ -8,6 +8,8 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint --max-warnings 100",
+    "typecheck": "tsc --noEmit",
+    "test": "TZ=UTC node --import tsx --test \"src/**/*.test.ts\"",
     "qa:visual-baseline": "node scripts/capture-visual-baselines.mjs"
   },
   "dependencies": {
@@ -38,6 +40,7 @@
     "playwright": "^1.58.2",
     "postcss": "^8.5.8",
     "tailwindcss": "^4.2.2",
+    "tsx": "^4.20.6",
     "typescript": "^5"
   }
 }
