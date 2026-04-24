@@ -110,12 +110,12 @@ export default function NotificationsPage() {
   };
 
   return (
-    <main className="space-y-6 px-6 py-8">
+    <div className="space-y-6 px-6 py-8">
       <div className="flex flex-col gap-2">
         <p className="text-xs font-semibold uppercase tracking-[0.22em] text-sky-300">
           Issue #88
         </p>
-        <h1 className="text-3xl font-bold text-slate-50">Toast and inline banner system</h1>
+        <h2 className="text-3xl font-bold text-slate-50">Toast and inline banner system</h2>
         <p className="max-w-3xl text-sm leading-6 text-slate-400">
           This page exercises the global toast queue, page-level banners, and mocked success,
           failure, and timeout flows. Toasts auto-dismiss within 3 to 6 seconds and pause while
@@ -257,6 +257,6 @@ export default function NotificationsPage() {
           </InlineBanner>
         ))}
       </div>
-    </main>
+    </div>
   );
 }

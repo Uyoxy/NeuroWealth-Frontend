@@ -1,6 +1,7 @@
 "use client";
 
 import { createContext, useCallback, useContext, useEffect, useState, ReactNode, useMemo } from "react";
+import { THEME_STORAGE_KEY } from "@/lib/theme-persistence";
 
 export type ThemeMode = "light" | "dark" | "system";
 
@@ -12,12 +13,10 @@ interface ThemeContextType {
 
 const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
 
-const STORAGE_KEY = "nw-theme";
-
 function getStoredTheme(): ThemeMode {
   if (typeof globalThis.window === "undefined") return "system";
   try {
-    const stored = globalThis.window.localStorage.getItem(STORAGE_KEY);
+    const stored = globalThis.window.localStorage.getItem(THEME_STORAGE_KEY);
     if (stored === "light" || stored === "dark" || stored === "system") {
       return stored;
     }
@@ -50,11 +49,13 @@ interface ThemeProviderProps {
 
 export function ThemeProvider({ children }: ThemeProviderProps) {
   const [theme, setThemeState] = useState<ThemeMode>(getStoredTheme);
-  const [resolvedTheme, setResolvedTheme] = useState<"light" | "dark">(() => resolveTheme(theme));
+  const [resolvedTheme, setResolvedTheme] = useState<"light" | "dark">(() =>
+    resolveTheme(getStoredTheme()),
+  );
 
   const setTheme = useCallback((newTheme: ThemeMode) => {
     setThemeState(newTheme);
-    globalThis.window?.localStorage.setItem(STORAGE_KEY, newTheme);
+    globalThis.window?.localStorage.setItem(THEME_STORAGE_KEY, newTheme);
     const resolved = resolveTheme(newTheme);
     setResolvedTheme(resolved);
     applyTheme(resolved);

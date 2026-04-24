@@ -377,7 +377,7 @@ export function TransactionFlow() {
   ].join(" ");
 
   return (
-    <main className={styles.page}>
+    <div className={styles.page}>
       <section className={styles.shell} data-theme={theme}>
         <div className={styles.content}>
           <div className={styles.topbar}>
@@ -386,7 +386,7 @@ export function TransactionFlow() {
                 <span className={styles.eyebrowDot} />
                 Transaction flows
               </span>
-              <h1 className={styles.heading}>Deposit and withdrawal flow</h1>
+              <h2 className={styles.heading}>Deposit and withdrawal flow</h2>
               <p className={styles.intro}>
                 Validate amounts and wallet conditions, confirm fees and request
                 references, then review pending, success, and failure states
@@ -1025,6 +1025,6 @@ export function TransactionFlow() {
           </div>
         </div>
       </section>
-    </main>
+    </div>
   );
 }

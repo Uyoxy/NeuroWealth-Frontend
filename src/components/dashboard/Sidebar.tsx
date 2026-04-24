@@ -21,7 +21,7 @@ export default function Sidebar() {
   return (
     <aside
       className="hidden md:flex flex-col fixed inset-y-0 left-0 w-64 bg-surface border-r border-surface-border z-30"
-      aria-label="Main navigation"
+      aria-label="Dashboard sidebar"
     >
       {/* Logo */}
       <div className="flex items-center gap-2.5 px-6 h-16 border-b border-surface-border shrink-0">
@@ -32,7 +32,7 @@ export default function Sidebar() {
       </div>
 
       {/* Navigation */}
-      <nav className="flex-1 px-3 py-4 space-y-1 overflow-y-auto" role="navigation">
+      <nav className="flex-1 px-3 py-4 space-y-1 overflow-y-auto" aria-label="Sidebar pages">
         <p className="px-3 mb-2 text-xs font-semibold text-text-muted uppercase tracking-wider">
           Menu
         </p>

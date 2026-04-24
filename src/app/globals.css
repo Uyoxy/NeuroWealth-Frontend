@@ -69,6 +69,18 @@ textarea {
   background: rgba(56, 189, 248, 0.24);
 }
 
+/* Issue #29 focus ring — shell chrome (classes used outside Tailwind tokens) */
+#main-content:focus-visible {
+  outline: 2px solid #0ea5e9;
+  outline-offset: 4px;
+  border-radius: 4px;
+}
+
+:where(.nav-link, .btn-ghost):focus-visible {
+  outline: 2px solid #0ea5e9;
+  outline-offset: 2px;
+}
+
 /* Skeleton shimmer animation */
 @keyframes skeletonShimmer {
   from {

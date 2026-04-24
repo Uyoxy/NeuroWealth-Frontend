@@ -2,6 +2,7 @@
 
 import { Bell } from "lucide-react";
 import { useAuth } from "@/context/AuthContext";
+import { DASHBOARD_ROUTE_TITLE_ID } from "@/lib/app-landmarks";
 import { usePathname } from "next/navigation";
 import { getRouteLabel } from "@/lib/routeMetadata";
 import { getUserInitials } from "@/lib/user";
@@ -27,7 +28,10 @@ export default function TopHeader() {
       {/* Left: Logo (mobile only) + page title */}
       <div className="flex items-center gap-3">
         {/* Page title */}
-        <h1 className="text-base font-semibold text-text-primary leading-none">
+        <h1
+          id={DASHBOARD_ROUTE_TITLE_ID}
+          className="text-base font-semibold text-text-primary leading-none"
+        >
           {title}
         </h1>
       </div>

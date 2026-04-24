@@ -286,7 +286,7 @@ export function PortfolioDashboard() {
     : [];
 
   return (
-    <main className={styles.page}>
+    <div className={styles.page}>
       <section className={styles.shell} data-theme={theme}>
         <div className={styles.content}>
           <div className={styles.topbar}>
@@ -295,7 +295,7 @@ export function PortfolioDashboard() {
                 <span className={styles.eyebrowDot} />
                 Portfolio widgets
               </span>
-              <h1 className={styles.heading}>NeuroWealth overview</h1>
+              <h2 className={styles.heading}>NeuroWealth overview</h2>
               <p className={styles.subheading}>
                 Total balance, yield, APY, strategy, allocation, and recent
                 activity in a single review surface with measurable light and
@@ -596,7 +596,7 @@ export function PortfolioDashboard() {
           )}
         </div>
       </section>
-    </main>
+    </div>
   );
 }
 

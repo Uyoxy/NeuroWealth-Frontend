@@ -1,3 +1,5 @@
+import { MAIN_CONTENT_LANDMARK_ID } from "@/lib/app-landmarks";
+
 export const dynamic = "force-dynamic";
 
 const colorTokens = [
@@ -282,7 +284,11 @@ function LightDarkPreview() {
 
 export default function DesignTokensDocsPage() {
   return (
-    <main className="min-h-screen bg-dark-900 px-4 py-8 text-slate-100 md:px-8 md:py-10">
+    <main
+      id={MAIN_CONTENT_LANDMARK_ID}
+      tabIndex={-1}
+      className="min-h-screen bg-dark-900 px-4 py-8 text-slate-100 md:px-8 md:py-10"
+    >
       <div className="mx-auto w-full max-w-7xl space-y-8">
         <header className="rounded-2xl border border-slate-700/40 bg-dark-800/70 p-6 md:p-8">
           <p className="text-xs font-semibold uppercase tracking-[0.2em] text-sky-300">Design System</p>

@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useAuth } from "@/context/AuthContext";
+import { MAIN_CONTENT_LANDMARK_ID } from "@/lib/app-landmarks";
 import { Loader2, Zap } from "lucide-react";
 
 export const dynamic = "force-dynamic";
@@ -45,7 +46,11 @@ export default function LoginPage() {
   }, [signIn, router, from]);
 
   return (
-    <div className="min-h-screen bg-app-bg flex items-center justify-center px-4">
+    <main
+      id={MAIN_CONTENT_LANDMARK_ID}
+      tabIndex={-1}
+      className="min-h-screen bg-app-bg flex items-center justify-center px-4"
+    >
       <div className="w-full max-w-sm">
         {/* Logo */}
         <div className="flex items-center justify-center gap-2 mb-8">
@@ -102,6 +107,6 @@ export default function LoginPage() {
           </p>
         </div>
       </div>
-    </div>
+    </main>
   );
 }

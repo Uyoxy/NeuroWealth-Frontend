@@ -368,14 +368,14 @@ function HistoryStateDemo() {
 
 export default function AsyncStatesPage() {
   return (
-    <main className="space-y-6 px-6 py-8">
+    <div className="space-y-6 px-6 py-8">
       <div className="flex flex-col gap-2">
         <p className="text-xs font-semibold uppercase tracking-[0.22em] text-sky-300">
           Issues #38 &amp; #48
         </p>
-        <h1 className="text-3xl font-bold text-slate-50">
+        <h2 className="text-3xl font-bold text-slate-50">
           Mock service layer &amp; async state system
-        </h1>
+        </h2>
         <p className="max-w-3xl text-sm leading-6 text-slate-400">
           Typed mock services for auth, portfolio, strategy, and transactions with simulated
           latency and failure rates. Each section below demonstrates loading skeletons, empty
@@ -401,6 +401,6 @@ export default function AsyncStatesPage() {
       <TransactionStateDemo />
       <HistoryStateDemo />
       <AuditStateDemo />
-    </main>
+    </div>
   );
 }

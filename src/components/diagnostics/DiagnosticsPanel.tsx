@@ -19,6 +19,17 @@ export function DiagnosticsPanel() {
     setIsVisible(window.location.search.includes("debug=true"));
   }, []);
 
+  useEffect(() => {
+    if (!isVisible || !isOpen) return;
+    const onKeyDown = (event: KeyboardEvent) => {
+      if (event.key === "Escape") {
+        setIsOpen(false);
+      }
+    };
+    window.addEventListener("keydown", onKeyDown);
+    return () => window.removeEventListener("keydown", onKeyDown);
+  }, [isOpen, isVisible]);
+
   // Only show in development, or in production when debug=true is present.
   if (!isVisible) {
     return null;
@@ -28,17 +39,34 @@ export function DiagnosticsPanel() {
     <div className="fixed bottom-4 right-4 z-[9999]">
       {!isOpen ? (
         <button
+          type="button"
           onClick={() => setIsOpen(true)}
           className="bg-slate-800 hover:bg-slate-700 text-slate-400 p-2 rounded-full border border-slate-600 shadow-2xl transition-all"
           title="Open Diagnostics"
+          aria-expanded={false}
+          aria-haspopup="dialog"
         >
           <span className="text-lg">🛠️</span>
         </button>
       ) : (
-        <div className="w-[400px] h-[500px] bg-slate-900 border border-slate-700 rounded-xl shadow-2xl flex flex-col overflow-hidden animate-in slide-in-from-bottom-4 zoom-in-95 duration-200">
+        <div
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="diagnostics-panel-title"
+          className="w-[400px] h-[500px] bg-slate-900 border border-slate-700 rounded-xl shadow-2xl flex flex-col overflow-hidden animate-in slide-in-from-bottom-4 zoom-in-95 duration-200"
+        >
           <div className="p-3 border-b border-slate-700 flex justify-between items-center bg-slate-800/50">
-            <h3 className="text-xs font-bold text-white uppercase tracking-widest">Diagnostics</h3>
-            <button onClick={() => setIsOpen(false)} className="text-slate-500 hover:text-white">✕</button>
+            <h3 id="diagnostics-panel-title" className="text-xs font-bold text-white uppercase tracking-widest">
+              Diagnostics
+            </h3>
+            <button
+              type="button"
+              onClick={() => setIsOpen(false)}
+              className="text-slate-500 hover:text-white rounded-md focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-400"
+              aria-label="Close diagnostics"
+            >
+              ✕
+            </button>
           </div>
 
           <div className="flex border-b border-slate-700 bg-slate-800/30">

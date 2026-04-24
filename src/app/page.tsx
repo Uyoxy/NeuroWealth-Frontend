@@ -2,6 +2,7 @@ import dynamicImport from "next/dynamic";
 import { Navbar } from "@/components/Navbar";
 import { HeroSection } from "@/features/landing/HeroSection";
 import { HomeFooter } from "@/features/landing/HomeFooter";
+import { MAIN_CONTENT_LANDMARK_ID } from "@/lib/app-landmarks";
 
 export const dynamic = "force-dynamic";
 
@@ -31,7 +32,7 @@ export default function Home() {
     <>
       <Navbar />
 
-      <main id="main-content">
+      <main id={MAIN_CONTENT_LANDMARK_ID} tabIndex={-1}>
         {/* Overview — eagerly loaded (above the fold) */}
         <HeroSection />
 

@@ -33,7 +33,7 @@ export default function SettingsLayout({
             </ul>
           </nav>
         </aside>
-        <main className="settings-main">{children}</main>
+        <div className="settings-main">{children}</div>
       </div>
 
       <style>{`
