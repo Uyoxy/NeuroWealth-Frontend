@@ -4,15 +4,8 @@ import { Bell } from "lucide-react";
 import { useAuth } from "@/context/AuthContext";
 import { DASHBOARD_ROUTE_TITLE_ID } from "@/lib/app-landmarks";
 import { usePathname } from "next/navigation";
-
-// Map routes to display titles
-const ROUTE_TITLES: Record<string, string> = {
-  "/dashboard": "Dashboard",
-  "/dashboard/portfolio": "Portfolio",
-  "/dashboard/activity": "Activity",
-  "/dashboard/strategy": "Strategy",
-  "/dashboard/settings": "Settings",
-};
+import { getRouteLabel } from "@/lib/routeMetadata";
+import { getUserInitials } from "@/lib/user";
 
 /** Longest-prefix wins so nested routes (e.g. settings/preferences) match the section title. */
 const ROUTE_PREFIX_TITLES: Array<{ prefix: string; title: string }> = [
@@ -31,7 +24,7 @@ function getDashboardTitle(pathname: string): string {
 export default function TopHeader() {
   const pathname = usePathname();
   const { user } = useAuth();
-  const title = getDashboardTitle(pathname);
+  const title = getRouteLabel(pathname);
 
   return (
     <header
@@ -76,7 +69,7 @@ export default function TopHeader() {
           className="md:hidden w-8 h-8 rounded-full bg-primary/20 flex items-center justify-center text-xs font-semibold text-primary"
           aria-hidden="true"
         >
-          {user?.avatarInitials ?? "??"}
+          {user?.avatarInitials ?? getUserInitials(user?.displayName ?? "")}
         </div>
       </div>
     </header>

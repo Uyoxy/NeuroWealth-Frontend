@@ -16,6 +16,40 @@ export interface Transaction {
   wallet: string;
 }
 
+export function filterTransactions(
+  transactions: Transaction[],
+  selectedFilters: string[],
+): Transaction[] {
+  if (selectedFilters.length === 0) {
+    return transactions;
+  }
+
+  const statusFilters = selectedFilters
+    .filter((filter) => filter.startsWith("status:"))
+    .map((filter) => filter.replace("status:", ""));
+  const typeFilters = selectedFilters
+    .filter((filter) => filter.startsWith("type:"))
+    .map((filter) => filter.replace("type:", ""));
+
+  return transactions.filter((transaction) => {
+    const statusOk =
+      statusFilters.length === 0 || statusFilters.includes(transaction.status);
+    const typeOk =
+      typeFilters.length === 0 || typeFilters.includes(transaction.type);
+
+    return statusOk && typeOk;
+  });
+}
+
+export function paginateTransactions(
+  transactions: Transaction[],
+  page: number,
+  itemsPerPage: number,
+): Transaction[] {
+  const start = (page - 1) * itemsPerPage;
+  return transactions.slice(start, start + itemsPerPage);
+}
+
 // Seeded mock data
 const STATUSES: TxStatus[] = ["completed", "pending", "failed", "cancelled"];
 const TYPES: TxType[] = ["transfer", "deposit", "withdrawal", "swap"];
@@ -62,21 +96,15 @@ export function useTransactionList(itemsPerPage = 8) {
   const [selectedFilters, setSelectedFilters] = useState<string[]>([]);
   const [page, setPage] = useState(1);
 
-  const filtered = useMemo(() => {
-    if (selectedFilters.length === 0) return MOCK_TRANSACTIONS;
-    return MOCK_TRANSACTIONS.filter((tx) => {
-      const statusFilters = selectedFilters.filter((f) => f.startsWith("status:")).map((f) => f.replace("status:", ""));
-      const typeFilters = selectedFilters.filter((f) => f.startsWith("type:")).map((f) => f.replace("type:", ""));
-      const statusOk = statusFilters.length === 0 || statusFilters.includes(tx.status);
-      const typeOk = typeFilters.length === 0 || typeFilters.includes(tx.type);
-      return statusOk && typeOk;
-    });
-  }, [selectedFilters]);
+  const filtered = useMemo(
+    () => filterTransactions(MOCK_TRANSACTIONS, selectedFilters),
+    [selectedFilters],
+  );
 
-  const paged = useMemo(() => {
-    const start = (page - 1) * itemsPerPage;
-    return filtered.slice(start, start + itemsPerPage);
-  }, [filtered, page, itemsPerPage]);
+  const paged = useMemo(
+    () => paginateTransactions(filtered, page, itemsPerPage),
+    [filtered, page, itemsPerPage],
+  );
 
   const handleFilterChange = (next: string[]) => {
     setSelectedFilters(next);

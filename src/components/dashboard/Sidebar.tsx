@@ -2,27 +2,11 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import {
-  BarChart2,
-  History,
-  LayoutDashboard,
-  LogOut,
-  Settings,
-  TrendingUp,
-  Zap,
-} from "lucide-react";
+import { LogOut, Zap } from "lucide-react";
 import { useAuth } from "@/context/AuthContext";
+import { dashboardNavigation } from "@/lib/routeMetadata";
+import { getUserAddressLabel, getUserInitials } from "@/lib/user";
 import { cn } from "@/lib/utils";
-
-// ── Nav items ─────────────────────────────────────────────────────────────────
-
-const NAV_ITEMS = [
-  { href: "/dashboard", label: "Dashboard", icon: LayoutDashboard, exact: true },
-  { href: "/dashboard/portfolio", label: "Portfolio", icon: BarChart2, exact: false },
-  { href: "/dashboard/activity", label: "Activity", icon: History, exact: false },
-  { href: "/dashboard/strategy", label: "Strategy", icon: TrendingUp, exact: false },
-  { href: "/dashboard/settings", label: "Settings", icon: Settings, exact: false },
-] as const;
 
 // ── Sidebar component ─────────────────────────────────────────────────────────
 
@@ -52,7 +36,7 @@ export default function Sidebar() {
         <p className="px-3 mb-2 text-xs font-semibold text-text-muted uppercase tracking-wider">
           Menu
         </p>
-        {NAV_ITEMS.map(({ href, label, icon: Icon, exact }) => (
+        {dashboardNavigation.map(({ href, label, icon: Icon, exact }) => (
           <Link
             key={href}
             href={href}
@@ -75,13 +59,15 @@ export default function Sidebar() {
             className="w-8 h-8 rounded-full bg-primary/20 flex items-center justify-center text-xs font-semibold text-primary shrink-0"
             aria-hidden="true"
           >
-            {user?.avatarInitials ?? "??"}
+            {user?.avatarInitials ?? getUserInitials(user?.displayName ?? "")}
           </div>
           <div className="flex-1 min-w-0">
             <p className="text-sm font-medium text-text-primary truncate">
               {user?.displayName ?? "User"}
             </p>
-            <p className="text-xs text-text-muted truncate">{user?.address}</p>
+            <p className="text-xs text-text-muted truncate">
+              {getUserAddressLabel(user ?? {})}
+            </p>
           </div>
         </div>
         <button

@@ -34,6 +34,7 @@ import {
   type TransactionFieldErrors,
 } from "./transactions";
 import type { AuthSession } from "./mock-auth";
+import { adaptMockAuthUser } from "./user";
 
 // ─── Shared error model ───────────────────────────────────────────────────────
 
@@ -113,12 +114,12 @@ export const mockAuthService: AuthService = {
     }
 
     const session: AuthSession = {
-      user: {
+      user: adaptMockAuthUser({
         id: "u1",
         email,
         name: email.split("@")[0],
         createdAt: new Date().toISOString(),
-      },
+      }),
       token: "mock-jwt-" + Math.random().toString(36).slice(2, 9),
       expiresAt: Date.now() + 1000 * 60 * 60 * 24 * 7,
     };
@@ -147,12 +148,12 @@ export const mockAuthService: AuthService = {
     }
 
     const session: AuthSession = {
-      user: {
+      user: adaptMockAuthUser({
         id: "u" + Math.random().toString(36).slice(2, 9),
         email,
         name,
         createdAt: new Date().toISOString(),
-      },
+      }),
       token: "mock-jwt-" + Math.random().toString(36).slice(2, 9),
       expiresAt: Date.now() + 1000 * 60 * 60 * 24 * 7,
     };

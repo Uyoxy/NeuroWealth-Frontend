@@ -8,6 +8,43 @@ export interface DateFilterable {
   [key: string]: unknown;
 }
 
+export function filterByDateRange<T extends DateFilterable>(
+  data: T[],
+  range: DateRange,
+): T[] {
+  if (!range.start && !range.end) return data;
+
+  return data.filter((item) => {
+    const dateValue = item.date instanceof Date ? item.date : new Date(item.date);
+    if (isNaN(dateValue.getTime())) return true;
+
+    const timestamp = dateValue.getTime();
+    const startOk =
+      !range.start || timestamp >= new Date(range.start).setHours(0, 0, 0, 0);
+    const endOk =
+      !range.end || timestamp <= new Date(range.end).setHours(23, 59, 59, 999);
+
+    return startOk && endOk;
+  });
+}
+
+export function filterByTimeRange<T extends { time: string }>(
+  data: T[],
+  from: { hours: number; minutes: number } | null,
+  to: { hours: number; minutes: number } | null,
+): T[] {
+  if (!from && !to) return data;
+
+  return data.filter((item) => {
+    const [hours, minutes] = item.time.split(":").map(Number);
+    const itemMinutes = hours * 60 + minutes;
+    const fromMinutes = from ? from.hours * 60 + from.minutes : 0;
+    const toMinutes = to ? to.hours * 60 + to.minutes : 1439;
+
+    return itemMinutes >= fromMinutes && itemMinutes <= toMinutes;
+  });
+}
+
 /**
  * useDateFilter — filters any dataset by a DateRange.
  * Pass your full dataset and a range; get back filtered items.
@@ -19,25 +56,16 @@ export function useDateFilter<T extends DateFilterable>(
   data: T[],
   range: DateRange
 ): { filtered: T[]; count: number; hasFilter: boolean } {
-  const filtered = useMemo(() => {
-    if (!range.start && !range.end) return data;
-    return data.filter((item) => {
-      const d = item.date instanceof Date ? item.date : new Date(item.date);
-      if (isNaN(d.getTime())) return true;
-      const t = d.getTime();
-      // ✅ Clone before calling .setHours() to avoid mutating the original Date objects
-      const startOk =
-        !range.start || t >= new Date(range.start).setHours(0, 0, 0, 0);
-      const endOk =
-        !range.end || t <= new Date(range.end).setHours(23, 59, 59, 999);
-      return startOk && endOk;
-    });
-  }, [data, range.start, range.end]);
+  const { start, end } = range;
+  const filtered = useMemo(
+    () => filterByDateRange(data, { start, end }),
+    [data, start, end],
+  );
 
   return {
     filtered,
     count: filtered.length,
-    hasFilter: !!(range.start || range.end),
+    hasFilter: !!(start || end),
   };
 }
 
@@ -50,14 +78,5 @@ export function useTimeFilter<T extends { time: string }>(
   from: { hours: number; minutes: number } | null,
   to: { hours: number; minutes: number } | null
 ): T[] {
-  return useMemo(() => {
-    if (!from && !to) return data;
-    return data.filter((item) => {
-      const [h, m] = item.time.split(":").map(Number);
-      const mins = h * 60 + m;
-      const fromMins = from ? from.hours * 60 + from.minutes : 0;
-      const toMins = to ? to.hours * 60 + to.minutes : 1439;
-      return mins >= fromMins && mins <= toMins;
-    });
-  }, [data, from, to]);
+  return useMemo(() => filterByTimeRange(data, from, to), [data, from, to]);
 }
