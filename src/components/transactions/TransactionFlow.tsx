@@ -699,6 +699,7 @@ export function TransactionFlow() {
                         className={`${styles.button} ${styles.buttonPrimary}`}
                         disabled={isSubmitting}
                         type="submit"
+                        data-qa="transaction-review-button"
                       >
                         {isSubmitting
                           ? "Preparing..."
@@ -790,6 +791,7 @@ export function TransactionFlow() {
                         className={`${styles.button} ${styles.buttonPrimary}`}
                         onClick={handleConfirm}
                         type="button"
+                        data-qa="transaction-confirm-button"
                       >
                         {context.confirmActionLabel}
                       </button>

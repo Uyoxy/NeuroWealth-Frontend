@@ -131,6 +131,11 @@ Funds sent to your wallet. Arrived in 4 seconds.
 
 ## Getting Started
 
+### Prerequisites
+
+- **Node.js**: 20.x or higher
+- **Yarn**: 1.22.22 (managed via Corepack)
+
 ### Package Manager
 
 This project uses **Yarn** as the package manager. The version is specified in `package.json`:
@@ -152,8 +157,27 @@ yarn dev              # Start development server
 yarn build            # Build for production
 yarn start            # Start production server
 yarn lint             # Run ESLint
+yarn typecheck        # Run TypeScript type checking
+yarn test             # Run unit tests
+yarn analyze          # Run bundle analyzer (ANALYZE=true next build)
 yarn qa:visual-baseline  # Capture visual test baselines
 ```
+
+### Bundle Analysis
+
+To analyze your production bundle:
+
+```bash
+ANALYZE=true yarn build
+```
+
+Or use the convenience script:
+
+```bash
+yarn analyze
+```
+
+This generates a bundle analysis report in `.next/analyze/`. The output is git-ignored and intended for local development use only.
 
 ### Setup Instructions
 
@@ -195,12 +219,27 @@ NEXT_PUBLIC_API_URL=http://localhost:3001
 NEXT_PUBLIC_STELLAR_NETWORK=testnet
 NEXT_PUBLIC_STELLAR_HORIZON_URL=https://horizon-testnet.stellar.org
 
+# Demo Seed (for consistent mock data in demos/screenshots)
+# Set to any string (e.g., "demo-123") to get deterministic random values
+# Leave unset to use normal random behavior
+NEXT_PUBLIC_DEMO_SEED=
+
 # Server-only (do not expose)
 # NEUROWEALTH_API_BASE_URL=http://localhost:8000
 # NEUROWEALTH_PORTFOLIO_PATH=/portfolio/overview
 # NEUROWEALTH_TRANSACTIONS_PATH=/transactions
 AUTH_SECRET=change-me-in-production
 ```
+
+### Demo Seed for Consistent Mock Data
+
+When running demos or capturing screenshots, set `NEXT_PUBLIC_DEMO_SEED` to any string value to get deterministic random values from mock services. This ensures consistent data across runs:
+
+```bash
+NEXT_PUBLIC_DEMO_SEED=demo-123 yarn dev
+```
+
+Without this variable set, mock services use normal random behavior.
 
 ### Database Setup
 
@@ -257,3 +296,41 @@ The deposit detection system monitors user Stellar wallet addresses for incoming
 - [Environment](docs/env.md): server-only vs `NEXT_PUBLIC_*` env, and future Edge runtime constraints.
 - [Third-party scripts](docs/third-party-scripts.md): how to add analytics/SDK scripts using `next/script` without hurting LCP.
 - [Security Policy](SECURITY.md): private vulnerability reporting process and response expectations.
+
+## Pull Request Guidelines
+
+### Before Submitting
+
+1. **Run linting and type checking**
+   ```bash
+   yarn lint
+   yarn typecheck
+   ```
+
+2. **Build the project**
+   ```bash
+   yarn build
+   ```
+
+3. **Add `data-qa` attributes** to critical E2E flows
+   - Primary CTAs
+   - Wallet connect buttons
+   - Transaction submit buttons
+   - See issue #160 for naming pattern
+
+### PR Expectations
+
+- **Branch protection**: Direct pushes to `main` are not allowed. All changes must go through pull requests.
+- **Issue linkage**: Link your PR to related issues using the issue tracker.
+- **Review process**: All PRs require at least one approval before merging.
+- **Tests**: Ensure new features include appropriate tests (unit or E2E).
+- **Documentation**: Update relevant documentation for new features or breaking changes.
+
+### Issue Templates
+
+Use the appropriate issue template when reporting bugs or requesting features:
+- Bug Report
+- Feature Request
+- Enhancement
+
+See the [issue queue](https://github.com/NeuroWealth/NeuroWealth-Frontend/issues) for open issues and priorities.
