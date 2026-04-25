@@ -38,6 +38,8 @@ These must not be exposed to the browser:
 - `NEUROWEALTH_TRANSACTIONS_PATH` (optional)
 - `AUTH_SECRET`
 
+For detailed API integration documentation, see `docs/api-integration.md`.
+
 ## Edge runtime and middleware constraints (future)
 
 If/when this repo introduces Next.js Middleware or Edge Route Handlers, keep in mind:
