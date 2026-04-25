@@ -20,6 +20,7 @@ import {
   formatTimestamp,
 } from "@/lib/formatters";
 import { useSandbox, ScenarioType } from "@/contexts/SandboxContext";
+import { AllocationChart } from "./AllocationChart";
 
 type ThemeMode = "light" | "dark";
 
@@ -432,24 +433,19 @@ export function PortfolioDashboard() {
                       />
                     </div>
                   ) : portfolio && portfolio.allocation.length > 0 ? (
-                    <div className={styles.allocationLayout}>
-                      <div
-                        className={styles.donut}
-                        style={{
-                          background: buildDonutBackground(
-                            portfolio.allocation,
-                          ),
-                        }}
-                      >
-                        <div className={styles.donutInner}>
-                          <span className={styles.donutLabel}>Allocated</span>
-                          <p className={styles.donutValue}>
-                            {formatCurrency(portfolio.summary.totalBalance)}
-                          </p>
-                        </div>
-                      </div>
+                      <div className={styles.allocationLayout}>
+                        <AllocationChart 
+                          data={portfolio.allocation.map(item => ({
+                            name: item.label,
+                            value: item.amount,
+                            tone: item.tone
+                          }))}
+                          height={200}
+                          innerRadius={60}
+                          outerRadius={90}
+                        />
 
-                      <div className={styles.allocationList}>
+                        <div className={styles.allocationList}>
                         {portfolio.allocation.map((item) => {
                           const changeTone = getValueTone(item.change);
                           const changeClassName =

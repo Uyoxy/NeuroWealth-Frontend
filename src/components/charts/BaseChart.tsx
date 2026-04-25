@@ -14,6 +14,7 @@ export function BaseChart({ children, height = chartDimensions.height, className
   const [responsiveConfig, setResponsiveConfig] = useState(() => 
     typeof window !== "undefined" ? getResponsiveConfig(window.innerWidth) : getResponsiveConfig(1024)
   );
+  const [prefersReducedMotion, setPrefersReducedMotion] = useState(false);
 
   useEffect(() => {
     if (typeof window === "undefined") return;
@@ -22,9 +23,19 @@ export function BaseChart({ children, height = chartDimensions.height, className
       setResponsiveConfig(getResponsiveConfig(window.innerWidth));
     };
     
+    const mediaQuery = window.matchMedia("(prefers-reduced-motion: reduce)");
+    const handleMotionPreference = () => setPrefersReducedMotion(mediaQuery.matches);
+    
     handleResize();
+    handleMotionPreference();
+    
     window.addEventListener("resize", handleResize);
-    return () => window.removeEventListener("resize", handleResize);
+    mediaQuery.addEventListener("change", handleMotionPreference);
+    
+    return () => {
+      window.removeEventListener("resize", handleResize);
+      mediaQuery.removeEventListener("change", handleMotionPreference);
+    };
   }, []);
 
   return (
@@ -67,4 +78,19 @@ export function ChartTooltip({ active, payload, label, formatter }: ChartTooltip
       })}
     </div>
   );
+}
+
+export function usePrefersReducedMotion() {
+  const [prefersReducedMotion, setPrefersReducedMotion] = useState(false);
+
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    const mediaQuery = window.matchMedia("(prefers-reduced-motion: reduce)");
+    const handler = () => setPrefersReducedMotion(mediaQuery.matches);
+    handler();
+    mediaQuery.addEventListener("change", handler);
+    return () => mediaQuery.removeEventListener("change", handler);
+  }, []);
+
+  return prefersReducedMotion;
 }
