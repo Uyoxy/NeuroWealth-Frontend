@@ -24,7 +24,8 @@
     "react": "^18",
     "react-dom": "^18",
     "recharts": "^3.8.1",
-    "tailwind-merge": "^2.2.1"
+    "tailwind-merge": "^2.2.1",
+    "zod": "^3.22.4"
   },
   "overrides": {
     "csstype": "3.1.3"
