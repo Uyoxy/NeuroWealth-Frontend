@@ -1,0 +1,56 @@
+name: Feature Request
+description: Propose product or UX capability for the NeuroWealth web app
+title: "[Feature] "
+labels:
+  - enhancement
+  - frontend
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Describe the user outcome and constraints. Link mockups or prior discussion if any.
+
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problem or opportunity
+      description: What user pain or gap does this address?
+    validations:
+      required: true
+
+  - type: textarea
+    id: proposal
+    attributes:
+      label: Proposed solution
+      description: High-level behavior, scope, and what is explicitly out of scope.
+    validations:
+      required: true
+
+  - type: textarea
+    id: acceptance
+    attributes:
+      label: Acceptance criteria
+      description: Verifiable bullets (what “done” looks like).
+      placeholder: |
+        - [ ] …
+        - [ ] …
+    validations:
+      required: true
+
+  - type: dropdown
+    id: priority
+    attributes:
+      label: Suggested priority
+      options:
+        - P1 — high
+        - P2 — medium
+        - P0 — urgent
+        - P3 — low
+    validations:
+      required: true
+
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternatives considered
+      description: Optional — other approaches you rejected and why.

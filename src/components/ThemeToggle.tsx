@@ -3,14 +3,6 @@
 import { useTheme } from "@/contexts/ThemeProvider";
 
 export function ThemeToggle() {
-  const [isDark, setIsDark] = useState(() => {
-    if (typeof window === "undefined") return true;
-    return localStorage.getItem("nw-theme") !== "light";
-  });
-
-  useEffect(() => {
-    document.documentElement.classList.toggle("dark", isDark);
-  }, [isDark]);
   const { theme, resolvedTheme, setTheme } = useTheme();
 
   function toggle() {
@@ -19,20 +11,21 @@ export function ThemeToggle() {
     } else if (theme === "dark") {
       setTheme("light");
     } else {
-      // If system, toggle to opposite of current resolved theme
       setTheme(resolvedTheme === "light" ? "dark" : "light");
     }
   }
 
   return (
     <button
+      type="button"
       onClick={toggle}
-      className="rounded-lg p-2 text-slate-400 hover:bg-white/5 hover:text-white transition-colors"
-      aria-label={resolvedTheme === "dark" ? "Switch to light mode" : "Switch to dark mode"}
+      className="rounded-lg p-2 text-slate-400 transition-colors hover:bg-white/5 hover:text-white"
+      aria-label={
+        resolvedTheme === "dark" ? "Switch to light mode" : "Switch to dark mode"
+      }
       title={resolvedTheme === "dark" ? "Light mode" : "Dark mode"}
     >
       {resolvedTheme === "dark" ? (
-        /* sun icon */
         <svg
           xmlns="http://www.w3.org/2000/svg"
           width="18"
@@ -49,7 +42,6 @@ export function ThemeToggle() {
           <path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41" />
         </svg>
       ) : (
-        /* moon icon */
         <svg
           xmlns="http://www.w3.org/2000/svg"
           width="18"

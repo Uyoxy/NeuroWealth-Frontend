@@ -30,6 +30,8 @@ export function I18nProvider({ children }: { children: ReactNode }) {
   const [locale, setLocaleState] = useState<AppLocale>("en");
 
   useEffect(() => {
+    if (typeof window === "undefined") return;
+
     const stored = window.localStorage.getItem(LOCALE_STORAGE_KEY);
     if (stored && isSupportedLocale(stored)) {
       setLocaleState(stored);
@@ -43,8 +45,14 @@ export function I18nProvider({ children }: { children: ReactNode }) {
   }, []);
 
   useEffect(() => {
+    if (typeof window === "undefined") return;
+
     setActiveLocale(locale);
-    document.documentElement.lang = localeToIntl[locale];
+
+    if (typeof document !== "undefined") {
+      document.documentElement.lang = localeToIntl[locale];
+    }
+
     window.localStorage.setItem(LOCALE_STORAGE_KEY, locale);
   }, [locale]);
 
@@ -58,7 +66,7 @@ export function I18nProvider({ children }: { children: ReactNode }) {
       setLocale,
       messages: dictionaries[locale],
     }),
-    [locale, setLocale]
+    [locale, setLocale],
   );
 
   return <I18nContext.Provider value={value}>{children}</I18nContext.Provider>;

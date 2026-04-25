@@ -3,6 +3,8 @@
 import { useEffect, useState } from "react";
 import { AlertCircle, Bell, Mail, Save, ShieldAlert, X } from "lucide-react";
 import { useToast } from "@/components/notifications/ToastProvider";
+
+export const dynamic = "force-dynamic";
 import { Button, Card, InlineBanner } from "@/components/ui";
 import { SettingsSectionSkeleton } from "@/components/ui/Skeleton";
 import { mockAudit } from "@/lib/mock-audit";

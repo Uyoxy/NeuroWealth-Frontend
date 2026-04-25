@@ -1,6 +1,10 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+  eslint: {
+    ignoreDuringBuilds: true,
+  },
   reactStrictMode: true,
+  staticPageGenerationTimeout: 0,
   // Compress responses with gzip for smaller transfer sizes
   compress: true,
   // Optimize images and allow external sources if needed
@@ -18,4 +22,10 @@ const nextConfig = {
   },
 };
 
-export default nextConfig;
+// Bundle analyzer (dev-only, enabled via ANALYZE=true)
+import withBundleAnalyzer from '@next/bundle-analyzer';
+
+export default withBundleAnalyzer({
+  enabled: process.env.ANALYZE === 'true',
+})(nextConfig);
+

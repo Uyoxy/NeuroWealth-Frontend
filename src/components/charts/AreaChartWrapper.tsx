@@ -1,7 +1,7 @@
 "use client";
 
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, Legend } from "recharts";
-import { BaseChart, ChartTooltip } from "./BaseChart";
+import { BaseChart, ChartTooltip, usePrefersReducedMotion } from "./BaseChart";
 import { chartTheme, chartDimensions } from "@/lib/chart-theme";
 import { ChartDataPoint } from "@/lib/mock-chart-data";
 

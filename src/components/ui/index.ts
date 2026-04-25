@@ -4,7 +4,7 @@
 export * from "./Badge";
 export * from "./Button";
 export * from "./Card";
-export * from "./EmptyState";
+export { EmptyState, default as EmptyStateCompact } from "./EmptyState";
 export * from "./ErrorBlock";
 export * from "./ErrorPage";
 export * from "./FormErrors";

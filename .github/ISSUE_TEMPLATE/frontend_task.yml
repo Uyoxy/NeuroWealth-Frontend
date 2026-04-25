@@ -1,0 +1,70 @@
+name: Frontend Task
+description: Planned UI, mock-data, or tooling work with clear acceptance criteria (backlog-style)
+title: ""
+labels:
+  - frontend
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Use this for scoped engineering tasks. Prefer measurable acceptance criteria and label the issue after creation using **Suggested labels** below.
+
+  - type: dropdown
+    id: epic
+    attributes:
+      label: Track / epic
+      description: Matches the rebuild backlog groupings where applicable.
+      options:
+        - Foundation
+        - Product Surfaces
+        - Integration
+        - Quality and Delivery
+        - Page Design Issues (Dummy Data Only)
+        - Other
+    validations:
+      required: true
+
+  - type: textarea
+    id: description
+    attributes:
+      label: Description
+      description: Scope, UI/data assumptions, dependencies. Use bullet lists.
+    validations:
+      required: true
+
+  - type: textarea
+    id: design_spec
+    attributes:
+      label: Design specification (required for UI work)
+      description: |
+        Objective tokens only — palette (hex), typography (family, weights, sizes), spacing, motion, component states, and accessibility targets (e.g. WCAG AA).
+      placeholder: |
+        - Palette: …
+        - Typography: …
+        - Spacing / radii / elevation: …
+        - Component states: …
+        - Accessibility: …
+
+  - type: textarea
+    id: acceptance
+    attributes:
+      label: Acceptance criteria
+      description: Checklist items that must be true to close the issue.
+      placeholder: |
+        - [ ] …
+        - [ ] …
+    validations:
+      required: true
+
+  - type: textarea
+    id: labels_hint
+    attributes:
+      label: Suggested GitHub labels
+      description: Comma-separated label names (create labels in the repo if missing).
+      placeholder: frontend, dashboard, priority-high
+
+  - type: textarea
+    id: artifacts
+    attributes:
+      label: PR / QA artifacts
+      description: Screenshots, GIFs, Lighthouse notes, or links expected in the PR.

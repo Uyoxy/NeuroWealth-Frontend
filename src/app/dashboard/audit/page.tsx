@@ -4,6 +4,8 @@ import { Navbar } from "@/components/Navbar";
 import { Suspense } from "react";
 import { AuditTableSkeleton } from "@/components/ui/Skeleton";
 
+export const dynamic = "force-dynamic";
+
 export default function AuditPage() {
   return (
     <ProtectedRoute>

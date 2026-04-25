@@ -2,6 +2,8 @@
 
 import { useState, useEffect, useCallback } from "react";
 import { Navbar } from "@/components/Navbar";
+
+export const dynamic = "force-dynamic";
 import {
   User,
   Globe,

@@ -3,6 +3,7 @@ import { BarChart2 } from "lucide-react";
 import PortfolioLoading from "./loading";
 import EmptyState from "@/components/ui/EmptyState";
 
+export const dynamic = "force-dynamic";
 export const metadata = { title: "Portfolio — NeuroWealth" };
 
 // Placeholder — will be replaced when Issue 5 (portfolio widgets) is implemented.

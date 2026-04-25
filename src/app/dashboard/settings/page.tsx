@@ -2,6 +2,7 @@ import { Suspense } from "react";
 import { Bell, Globe, Shield, Wallet } from "lucide-react";
 import SettingsLoading from "./loading";
 
+export const dynamic = "force-dynamic";
 export const metadata = { title: "Settings — NeuroWealth" };
 
 function SettingsRow({

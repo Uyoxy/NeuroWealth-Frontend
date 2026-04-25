@@ -16,6 +16,7 @@
 "use client";
 
 import { logger } from "./logger";
+import { random as seededRandom } from "./seeded-rng";
 import {
   buildScenarioPayload,
   normalizePortfolioPayload,
@@ -34,6 +35,7 @@ import {
   type TransactionFieldErrors,
 } from "./transactions";
 import type { AuthSession } from "./mock-auth";
+import { adaptMockAuthUser } from "./user";
 
 // ─── Shared error model ───────────────────────────────────────────────────────
 
@@ -68,7 +70,7 @@ export interface SimulationOptions {
 function shouldFail(outcome: SimulationOptions["outcome"] = "auto"): boolean {
   if (outcome === "success") return false;
   if (outcome === "failure") return true;
-  return Math.random() < 0.15;
+  return seededRandom() < 0.15;
 }
 
 async function delay(ms: number): Promise<void> {
@@ -78,8 +80,17 @@ async function delay(ms: number): Promise<void> {
 // ─── Auth service ─────────────────────────────────────────────────────────────
 
 export interface AuthService {
-  signIn(email: string, password: string, opts?: SimulationOptions): Promise<AuthSession>;
-  signUp(email: string, name: string, password: string, opts?: SimulationOptions): Promise<AuthSession>;
+  signIn(
+    email: string,
+    password: string,
+    opts?: SimulationOptions,
+  ): Promise<AuthSession>;
+  signUp(
+    email: string,
+    name: string,
+    password: string,
+    opts?: SimulationOptions,
+  ): Promise<AuthSession>;
   signOut(): void;
   getSession(): AuthSession | null;
 }
@@ -92,7 +103,11 @@ export const mockAuthService: AuthService = {
     await delay(opts.latencyMs ?? 800);
 
     if (shouldFail(opts.outcome)) {
-      throw new ServiceError("NETWORK_ERROR", "Sign-in request failed. Please try again.", true);
+      throw new ServiceError(
+        "NETWORK_ERROR",
+        "Sign-in request failed. Please try again.",
+        true,
+      );
     }
 
     if (password !== "password123") {
@@ -100,8 +115,14 @@ export const mockAuthService: AuthService = {
     }
 
     const session: AuthSession = {
-      user: { id: "u1", email, name: email.split("@")[0] },
-      token: "mock-jwt-" + Math.random().toString(36).slice(2, 9),
+      user: adaptMockAuthUser({
+        id: "u1",
+        email,
+        name: email.split("@")[0],
+        createdAt: new Date().toISOString(),
+      }),
+      token: "mock-jwt-" + seededRandom().toString(36).slice(2, 9),
+      expiresAt: Date.now() + 1000 * 60 * 60 * 24 * 7,
     };
     localStorage.setItem(STORAGE_KEY, JSON.stringify(session));
     return session;
@@ -112,16 +133,30 @@ export const mockAuthService: AuthService = {
     await delay(opts.latencyMs ?? 1000);
 
     if (shouldFail(opts.outcome)) {
-      throw new ServiceError("NETWORK_ERROR", "Sign-up request failed. Please try again.", true);
+      throw new ServiceError(
+        "NETWORK_ERROR",
+        "Sign-up request failed. Please try again.",
+        true,
+      );
     }
 
     if (!password || password.length < 8) {
-      throw new ServiceError("VALIDATION_ERROR", "Password must be at least 8 characters.", false);
+      throw new ServiceError(
+        "VALIDATION_ERROR",
+        "Password must be at least 8 characters.",
+        false,
+      );
     }
 
     const session: AuthSession = {
-      user: { id: "u" + Math.random().toString(36).slice(2, 9), email, name },
-      token: "mock-jwt-" + Math.random().toString(36).slice(2, 9),
+      user: adaptMockAuthUser({
+        id: "u" + seededRandom().toString(36).slice(2, 9),
+        email,
+        name,
+        createdAt: new Date().toISOString(),
+      }),
+      token: "mock-jwt-" + seededRandom().toString(36).slice(2, 9),
+      expiresAt: Date.now() + 1000 * 60 * 60 * 24 * 7,
     };
     localStorage.setItem(STORAGE_KEY, JSON.stringify(session));
     return session;

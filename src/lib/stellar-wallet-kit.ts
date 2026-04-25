@@ -11,6 +11,11 @@ import {
 } from "@creit.tech/stellar-wallets-kit";
 
 const INJECTED_WALLETS = ["freighter", "albedo", "lobstr"] as unknown as string[];
+const RAW_NETWORK = (process.env.NEXT_PUBLIC_STELLAR_NETWORK || "testnet").toLowerCase();
+const KIT_NETWORK =
+  RAW_NETWORK === "mainnet" || RAW_NETWORK === "public"
+    ? WalletNetwork.PUBLIC
+    : WalletNetwork.TESTNET;
 
 let kitInstance: StellarWalletsKit | null = null;
 
@@ -30,7 +35,7 @@ export const getKit = (): StellarWalletsKit => {
     if (walletList.includes('hana')) modules.push(new HanaModule());
 
     kitInstance = new StellarWalletsKit({
-      network:  WalletNetwork.TESTNET,
+      network: KIT_NETWORK,
       selectedWalletId: FREIGHTER_ID,
       modules: modules.length > 0 ? modules : [new FreighterModule(), new AlbedoModule(), new LobstrModule()],
     });

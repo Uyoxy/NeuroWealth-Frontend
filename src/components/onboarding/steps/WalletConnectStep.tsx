@@ -165,7 +165,7 @@ export default function WalletConnectStep({ onNext, onSkip, onBack }: WalletConn
           )}
         </Button>
         
-        <Button variant="secondary" onClick={onSkip}>
+        <Button variant="secondary" onClick={onSkip} data-qa="wallet-skip-button">
           Skip for Now
         </Button>
       </div>

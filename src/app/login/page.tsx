@@ -2,11 +2,14 @@
 
 import { useCallback, useEffect, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
-import { useAuth } from "@/context/AuthContext";
+import { useAuth } from "@/contexts";
+import { MAIN_CONTENT_LANDMARK_ID } from "@/lib/app-landmarks";
 import { Loader2, Zap } from "lucide-react";
 
+export const dynamic = "force-dynamic";
+
 export default function LoginPage() {
-  const { signIn, isAuthenticated } = useAuth();
+  const { signIn, user, loading } = useAuth();
   const router = useRouter();
   const searchParams = useSearchParams();
   const from = searchParams.get("from") ?? "/dashboard";
@@ -16,24 +19,18 @@ export default function LoginPage() {
 
   // If already authenticated, bounce to dashboard
   useEffect(() => {
-    if (isAuthenticated) router.replace(from);
-  }, [isAuthenticated, router, from]);
+    if (!loading && user) {
+      router.replace(from);
+    }
+  }, [loading, user, router, from]);
 
   const handleDemoSignIn = useCallback(async () => {
     setIsLoading(true);
     setError(null);
 
     try {
-      // In production: call POST /api/auth/login and receive a real JWT.
-      // For now we use a deterministic mock token.
       await new Promise((r) => setTimeout(r, 800)); // simulate network latency
-      const mockToken = "GBTKU_DEMO_TOKEN_X3QR";
-      signIn(mockToken, {
-        id: "demo-user",
-        address: "GBTKU...X3QR",
-        displayName: "Demo User",
-        avatarInitials: "DU",
-      });
+      await signIn("demo@neurowealth.app", "password123");
       router.replace(from);
     } catch {
       setError("Sign-in failed. Please try again.");
@@ -43,7 +40,11 @@ export default function LoginPage() {
   }, [signIn, router, from]);
 
   return (
-    <div className="min-h-screen bg-app-bg flex items-center justify-center px-4">
+    <main
+      id={MAIN_CONTENT_LANDMARK_ID}
+      tabIndex={-1}
+      className="min-h-screen bg-app-bg flex items-center justify-center px-4"
+    >
       <div className="w-full max-w-sm">
         {/* Logo */}
         <div className="flex items-center justify-center gap-2 mb-8">
@@ -100,6 +101,6 @@ export default function LoginPage() {
           </p>
         </div>
       </div>
-    </div>
+    </main>
   );
 }

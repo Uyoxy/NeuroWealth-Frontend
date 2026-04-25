@@ -1,6 +1,8 @@
 import { Lock } from "lucide-react";
 import { ErrorPage } from "@/components/ui/ErrorPage";
 
+export const dynamic = "force-dynamic";
+
 export default function UnauthorizedPage() {
   return (
     <ErrorPage

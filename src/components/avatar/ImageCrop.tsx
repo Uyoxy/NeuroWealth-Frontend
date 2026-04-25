@@ -152,6 +152,9 @@ export default function ImageCrop({
         ref={containerRef}
         style={{ position: "relative", userSelect: "none", borderRadius: 8, overflow: "hidden", background: "#000" }}
       >
+        {/* eslint-disable-next-line @next/next/no-img-element -- 
+            Exception: Raw <img> required for canvas-based cropping logic (drawImage) 
+            where naturalWidth/Height and direct ref access are essential. */}
         <img
           ref={imgRef}
           src={src}

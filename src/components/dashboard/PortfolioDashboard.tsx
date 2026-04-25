@@ -19,7 +19,9 @@ import {
   formatSyncLabel,
   formatTimestamp,
 } from "@/lib/formatters";
+import { ApiRequestError, apiRequest } from "@/lib/api-client";
 import { useSandbox, ScenarioType } from "@/contexts/SandboxContext";
+import { AllocationChart } from "./AllocationChart";
 
 type ThemeMode = "light" | "dark";
 
@@ -203,18 +205,15 @@ export function PortfolioDashboard() {
       setError(null);
 
       try {
-        const response = await fetch(`/api/portfolio?scenario=${scenario}`, {
+        const payload = await apiRequest<PortfolioPayload>(
+          `/api/portfolio?scenario=${scenario}`,
+          {
           cache: "no-store",
           signal: controller.signal,
-        });
+            timeoutMs: 12000,
+          },
+        );
 
-        if (!response.ok) {
-          throw new Error(
-            `Unable to load portfolio widgets (${response.status})`,
-          );
-        }
-
-        const payload = (await response.json()) as PortfolioPayload;
         setPortfolio(payload);
       } catch (loadError) {
         if (controller.signal.aborted) {
@@ -222,7 +221,7 @@ export function PortfolioDashboard() {
         }
 
         const message =
-          loadError instanceof Error
+          loadError instanceof ApiRequestError || loadError instanceof Error
             ? loadError.message
             : "Unable to load portfolio widgets.";
 
@@ -286,7 +285,7 @@ export function PortfolioDashboard() {
     : [];
 
   return (
-    <main className={styles.page}>
+    <div className={styles.page}>
       <section className={styles.shell} data-theme={theme}>
         <div className={styles.content}>
           <div className={styles.topbar}>
@@ -295,7 +294,7 @@ export function PortfolioDashboard() {
                 <span className={styles.eyebrowDot} />
                 Portfolio widgets
               </span>
-              <h1 className={styles.heading}>NeuroWealth overview</h1>
+              <h2 className={styles.heading}>NeuroWealth overview</h2>
               <p className={styles.subheading}>
                 Total balance, yield, APY, strategy, allocation, and recent
                 activity in a single review surface with measurable light and
@@ -432,24 +431,19 @@ export function PortfolioDashboard() {
                       />
                     </div>
                   ) : portfolio && portfolio.allocation.length > 0 ? (
-                    <div className={styles.allocationLayout}>
-                      <div
-                        className={styles.donut}
-                        style={{
-                          background: buildDonutBackground(
-                            portfolio.allocation,
-                          ),
-                        }}
-                      >
-                        <div className={styles.donutInner}>
-                          <span className={styles.donutLabel}>Allocated</span>
-                          <p className={styles.donutValue}>
-                            {formatCurrency(portfolio.summary.totalBalance)}
-                          </p>
-                        </div>
-                      </div>
+                      <div className={styles.allocationLayout}>
+                        <AllocationChart 
+                          data={portfolio.allocation.map(item => ({
+                            name: item.label,
+                            value: item.amount,
+                            tone: item.tone
+                          }))}
+                          height={200}
+                          innerRadius={60}
+                          outerRadius={90}
+                        />
 
-                      <div className={styles.allocationList}>
+                        <div className={styles.allocationList}>
                         {portfolio.allocation.map((item) => {
                           const changeTone = getValueTone(item.change);
                           const changeClassName =
@@ -596,7 +590,7 @@ export function PortfolioDashboard() {
           )}
         </div>
       </section>
-    </main>
+    </div>
   );
 }
 

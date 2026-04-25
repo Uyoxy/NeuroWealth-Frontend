@@ -3,6 +3,7 @@ import { History } from "lucide-react";
 import ActivityLoading from "./loading";
 import EmptyState from "@/components/ui/EmptyState";
 
+export const dynamic = "force-dynamic";
 export const metadata = { title: "Activity — NeuroWealth" };
 
 const FILTER_TABS = ["All", "Deposits", "Withdrawals", "Yields", "Rebalances"] as const;

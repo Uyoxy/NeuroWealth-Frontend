@@ -3,6 +3,8 @@
 import { useState, useEffect } from "react";
 import { Lock, Shield, AlertCircle, CheckCircle2, Save, X } from "lucide-react";
 import { Button } from "@/components/ui/Button";
+
+export const dynamic = "force-dynamic";
 import { mockAudit } from "@/lib/mock-audit";
 import { SettingsSectionSkeleton } from "@/components/ui/Skeleton";
 

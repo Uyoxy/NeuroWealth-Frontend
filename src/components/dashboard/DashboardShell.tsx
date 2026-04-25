@@ -1,6 +1,6 @@
 "use client";
 
-import { AuthProvider } from "@/context/AuthContext";
+import { DASHBOARD_ROUTE_TITLE_ID, MAIN_CONTENT_LANDMARK_ID } from "@/lib/app-landmarks";
 import Sidebar from "./Sidebar";
 import TopHeader from "./TopHeader";
 import MobileBottomNav from "./MobileBottomNav";
@@ -31,14 +31,14 @@ interface DashboardShellProps {
  */
 export default function DashboardShell({ children }: DashboardShellProps) {
   return (
-    <AuthProvider>
+    <>
       {/* Desktop sidebar */}
       <Sidebar />
 
       {/* Top header — spans full width minus sidebar on desktop */}
       <TopHeader />
 
-      {/* Main content area */}
+      {/* Main content area — single document main; route title lives in TopHeader (aria-labelledby). */}
       <main
         className="
           pt-16        /* clear fixed header */
@@ -47,7 +47,9 @@ export default function DashboardShell({ children }: DashboardShellProps) {
           min-h-screen
           bg-app-bg
         "
-        id="main-content"
+        id={MAIN_CONTENT_LANDMARK_ID}
+        tabIndex={-1}
+        aria-labelledby={DASHBOARD_ROUTE_TITLE_ID}
       >
         <div className="px-4 md:px-6 py-6 max-w-7xl mx-auto">
           {children}
@@ -56,6 +58,6 @@ export default function DashboardShell({ children }: DashboardShellProps) {
 
       {/* Mobile bottom navigation */}
       <MobileBottomNav />
-    </AuthProvider>
+    </>
   );
 }

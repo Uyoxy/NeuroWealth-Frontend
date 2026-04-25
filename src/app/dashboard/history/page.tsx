@@ -6,6 +6,8 @@ import { Suspense, useState } from "react";
 import { useState, useEffect } from "react";
 import { useSearchParams } from "next/navigation";
 import { Clock, AlertTriangle, Loader2 } from "lucide-react";
+
+export const dynamic = "force-dynamic";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { TableSkeleton } from "@/components/ui/Skeleton";
 import { useSandbox } from "@/contexts/SandboxContext";

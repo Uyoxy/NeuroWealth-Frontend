@@ -4,7 +4,7 @@ import { AlertTriangle } from "lucide-react";
 import { ErrorPage } from "@/components/ui/ErrorPage";
 
 export default function GlobalError({
-  error,
+  error: _error,
   reset,
 }: {
   error: Error & { digest?: string };
@@ -13,11 +13,11 @@ export default function GlobalError({
   return (
     <ErrorPage
       statusCode={500}
-      title="Something went wrong"
-      description="An unexpected error occurred. Our team has been notified. You can try again or head back to the dashboard."
+      title="We ran into an unexpected issue"
+      description="The page could not finish loading. Your account and funds remain safe. Try again now or return home."
       icon={<AlertTriangle size={32} />}
-      primaryAction={{ label: "Try again", href: "#" }}
-      secondaryAction={{ label: "Back to home", href: "/", onClick: reset }}
+      primaryAction={{ label: "Back to home", href: "/" }}
+      secondaryAction={{ label: "Try again", onClick: reset }}
     />
   );
 }

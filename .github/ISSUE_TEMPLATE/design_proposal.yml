@@ -1,0 +1,63 @@
+name: Design Proposal
+description: Propose UX, UI, or visual direction for NeuroWealth Web
+title: "Design Proposal: "
+labels:
+  - design
+  - ux
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Capture measurable design intent so engineering can implement without ambiguity.
+
+  - type: textarea
+    id: summary
+    attributes:
+      label: Summary
+      description: Brief overview of the proposed change.
+    validations:
+      required: true
+
+  - type: textarea
+    id: goals
+    attributes:
+      label: Problem, goals, and constraints
+      description: User goals, business constraints, and non-goals.
+    validations:
+      required: true
+
+  - type: textarea
+    id: visual
+    attributes:
+      label: Visual direction
+      description: References, mood boards, color system, typography scale.
+    validations:
+      required: true
+
+  - type: textarea
+    id: components
+    attributes:
+      label: Components and patterns
+      description: New or updated components; loading / empty / error / success; responsive behavior; accessibility (contrast, focus, keyboard).
+
+  - type: textarea
+    id: artifacts
+    attributes:
+      label: Artifacts
+      description: Figma links, wireframes, exported snapshots (PNG/PDF). Redact confidential content.
+
+  - type: textarea
+    id: risks
+    attributes:
+      label: Open questions and risks
+      description: Tradeoffs, unknowns, dependencies on backend or wallet work.
+
+  - type: checkboxes
+    id: acceptance
+    attributes:
+      label: Acceptance criteria (design review)
+      options:
+        - label: WCAG AA contrast targets identified for relevant text and controls
+        - label: Responsive specs cover primary breakpoints used by the app
+        - label: Links to Figma or equivalent and key snapshots included
+        - label: Aligns with existing design tokens / backlog specs where applicable

@@ -1,25 +1,28 @@
-import dynamic from "next/dynamic";
+import dynamicImport from "next/dynamic";
 import { Navbar } from "@/components/Navbar";
 import { HeroSection } from "@/features/landing/HeroSection";
 import { HomeFooter } from "@/features/landing/HomeFooter";
+import { MAIN_CONTENT_LANDMARK_ID } from "@/lib/app-landmarks";
 
-const FeaturesSection = dynamic(
+export const dynamic = "force-dynamic";
+
+const FeaturesSection = dynamicImport(
   () => import("@/features/landing/FeaturesSection").then((m) => m.FeaturesSection),
   { ssr: true }
 );
-const HowItWorksSection = dynamic(
+const HowItWorksSection = dynamicImport(
   () => import("@/features/landing/HowItWorksSection").then((m) => m.HowItWorksSection),
   { ssr: true }
 );
-const StrategiesSection = dynamic(
+const StrategiesSection = dynamicImport(
   () => import("@/features/landing/StrategiesSection").then((m) => m.StrategiesSection),
   { ssr: true }
 );
-const SecuritySection = dynamic(
+const SecuritySection = dynamicImport(
   () => import("@/features/landing/SecuritySection").then((m) => m.SecuritySection),
   { ssr: true }
 );
-const CtaSection = dynamic(
+const CtaSection = dynamicImport(
   () => import("@/features/landing/CtaSection").then((m) => m.CtaSection),
   { ssr: true }
 );
@@ -29,7 +32,7 @@ export default function Home() {
     <>
       <Navbar />
 
-      <main id="main-content">
+      <main id={MAIN_CONTENT_LANDMARK_ID} tabIndex={-1}>
         {/* Overview — eagerly loaded (above the fold) */}
         <HeroSection />
 

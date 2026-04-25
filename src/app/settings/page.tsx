@@ -1,7 +1,7 @@
-'use client';
-
 import { Card } from '@/components/ui/Card';
 import OnboardingSettings from '@/components/settings/OnboardingSettings';
+
+export const dynamic = "force-dynamic";
 
 export default function SettingsPage() {
   return (

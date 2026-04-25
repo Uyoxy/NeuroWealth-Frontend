@@ -4,6 +4,8 @@ import { useEffect, useState } from 'react';
 import OnboardingFlow from '@/components/onboarding/OnboardingFlow';
 import { OnboardingStepSkeleton } from '@/components/ui/Skeleton';
 
+export const dynamic = "force-dynamic";
+
 export default function OnboardingPage() {
   const [shouldShowOnboarding, setShouldShowOnboarding] = useState(true);
   const [pageLoading, setPageLoading] = useState(true);

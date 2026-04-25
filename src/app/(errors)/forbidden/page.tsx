@@ -1,6 +1,8 @@
 import { ShieldOff } from "lucide-react";
 import { ErrorPage } from "@/components/ui/ErrorPage";
 
+export const dynamic = "force-dynamic";
+
 export default function ForbiddenPage() {
   return (
     <ErrorPage

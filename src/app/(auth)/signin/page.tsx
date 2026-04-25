@@ -3,7 +3,7 @@
 import { useState, type FormEvent } from "react";
 import Link from "next/link";
 import { CheckCircle2 } from "lucide-react";
-import { useAuth } from "@/contexts/AuthContext";
+import { useAuth } from "@/contexts";
 import { mockAudit } from "@/lib/mock-audit";
 import { Button, Card, FieldError, FormErrorSummary } from "@/components/ui";
 import {
@@ -14,6 +14,9 @@ import {
   required,
   type ValidationErrors,
 } from "@/lib/form-validation";
+import { MAIN_CONTENT_LANDMARK_ID } from "@/lib/app-landmarks";
+
+export const dynamic = "force-dynamic";
 
 type SignInField = "email" | "password" | "form";
 type SignInState = "idle" | "loading" | "success";
@@ -83,7 +86,11 @@ export default function SignInPage() {
   const summaryErrors = submitted ? getErrorList(errors) : [];
 
   return (
-    <main className="flex min-h-screen items-center justify-center bg-[linear-gradient(135deg,#020617_0%,#0f172a_100%)] px-4 py-10">
+    <main
+      id={MAIN_CONTENT_LANDMARK_ID}
+      tabIndex={-1}
+      className="flex min-h-screen items-center justify-center bg-[linear-gradient(135deg,#020617_0%,#0f172a_100%)] px-4 py-10"
+    >
       <Card className="w-full max-w-md space-y-6 border-slate-700/50 bg-dark-800/80 p-8">
         <header className="space-y-2 text-center">
           <h1 className="text-3xl font-bold text-slate-50">Welcome Back</h1>

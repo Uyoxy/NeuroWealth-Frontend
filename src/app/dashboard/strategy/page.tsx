@@ -6,6 +6,7 @@ import type { Strategy } from "@/types";
 import { StrategySelector } from "@/components/strategies/StrategySelector";
 
 
+export const dynamic = "force-dynamic";
 export const metadata = { title: "Strategy — NeuroWealth" };
 
 // ── Static strategy definitions ───────────────────────────────────────────────

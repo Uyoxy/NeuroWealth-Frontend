@@ -96,11 +96,11 @@ export function Navbar() {
             <div className="flex items-center gap-3 ml-2 pl-4 border-l border-white/10">
               <div className="flex flex-col items-end">
                 <span className="text-[10px] text-slate-500 uppercase font-bold leading-none">{messages.navbar.account}</span>
-                <span className="text-xs text-white font-medium">{user.name}</span>
+                <span className="text-xs text-white font-medium">{user.displayName}</span>
               </div>
               <button
                 onClick={signOut}
-                aria-label={`Sign out of ${user.name}'s account`}
+                aria-label={`Sign out of ${user.displayName}'s account`}
                 className="text-[10px] text-slate-500 hover:text-red-400 transition-colors uppercase font-bold"
               >
                 {messages.navbar.signOut}

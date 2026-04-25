@@ -3,6 +3,8 @@
 import { useState, useEffect } from "react";
 import { Globe, Clock, DollarSign, Save, X, AlertCircle, CheckCircle2, Sun, Moon, Monitor } from "lucide-react";
 import { Button } from "@/components/ui/Button";
+
+export const dynamic = "force-dynamic";
 import { mockAudit } from "@/lib/mock-audit";
 import { SettingsSectionSkeleton } from "@/components/ui/Skeleton";
 import { useTheme, ThemeMode } from "@/contexts/ThemeProvider";

@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useRef, useEffect } from "react";
+import React, { useState, useRef, useEffect, useMemo, useCallback } from "react";
 
 export interface TimeValue { hours: number; minutes: number; }
 
@@ -42,12 +42,20 @@ export default function TimePicker({ value, onChange, step = 15, use24h = false,
   const ref = useRef<HTMLDivElement>(null);
   const listRef = useRef<HTMLUListElement>(null);
 
-  const slots = buildSlots(step, use24h);
-  const filtered = search ? slots.filter(s => s.label.toLowerCase().includes(search.toLowerCase())) : slots;
-  const formatted = value ? fmt(value.hours, value.minutes, use24h) : "";
+  const slots = useMemo(() => buildSlots(step, use24h), [step, use24h]);
+  const filtered = useMemo(() => 
+    search ? slots.filter(s => s.label.toLowerCase().includes(search.toLowerCase())) : slots,
+    [search, slots]
+  );
+  const formatted = useMemo(() => 
+    value ? fmt(value.hours, value.minutes, use24h) : "",
+    [value, use24h]
+  );
 
   useEffect(() => {
-    const handler = (e: MouseEvent) => { if (ref.current && !ref.current.contains(e.target as Node)) setOpen(false); };
+    const handler = (e: MouseEvent) => { 
+      if (ref.current && !ref.current.contains(e.target as Node)) setOpen(false); 
+    };
     document.addEventListener("mousedown", handler);
     return () => document.removeEventListener("mousedown", handler);
   }, []);
@@ -56,12 +64,18 @@ export default function TimePicker({ value, onChange, step = 15, use24h = false,
   useEffect(() => {
     if (open && value && listRef.current) {
       const idx = slots.findIndex(s => s.value.hours === value.hours && s.value.minutes === value.minutes);
-      const item = listRef.current.children[idx] as HTMLElement;
-      item?.scrollIntoView({ block: "center" });
+      if (idx !== -1) {
+        const item = listRef.current.children[idx] as HTMLElement;
+        item?.scrollIntoView({ block: "center" });
+      }
     }
-  }, [open]);
+  }, [open, value, slots]);
 
-  const select = (tv: TimeValue) => { onChange?.(tv); setOpen(false); setSearch(""); };
+  const select = useCallback((tv: TimeValue) => { 
+    onChange?.(tv); 
+    setOpen(false); 
+    setSearch(""); 
+  }, [onChange]);
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === "Escape") setOpen(false);

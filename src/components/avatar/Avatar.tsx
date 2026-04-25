@@ -1,6 +1,7 @@
 "use client";
 
 import React from "react";
+import Image from "next/image";
 
 export type AvatarSize = 24 | 32 | 40 | 64;
 export type AvatarVariant = "image" | "initials" | "placeholder";
@@ -100,11 +101,13 @@ export default function Avatar({
         role={onClick ? "button" : undefined}
         tabIndex={onClick ? 0 : undefined}
       >
-        <img
+        <Image
           src={src}
           alt={alt ?? name ?? "avatar"}
           onError={() => setImgError(true)}
-          style={{ width: "100%", height: "100%", objectFit: "cover" }}
+          width={size}
+          height={size}
+          style={{ objectFit: "cover" }}
         />
       </span>
     );
