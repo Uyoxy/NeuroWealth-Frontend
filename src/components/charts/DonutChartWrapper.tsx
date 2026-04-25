@@ -1,7 +1,7 @@
 "use client";
 
 import { PieChart, Pie, Cell, Tooltip, Legend } from "recharts";
-import { BaseChart, ChartTooltip } from "./BaseChart";
+import { BaseChart, ChartTooltip, usePrefersReducedMotion } from "./BaseChart";
 import { chartTheme, chartDimensions, getChartColor } from "@/lib/chart-theme";
 import { ChartDataPoint } from "@/lib/mock-chart-data";
 import { ChartTone } from "@/lib/portfolio";
@@ -23,6 +23,8 @@ export function DonutChartWrapper({
   showLegend = false,
   formatter,
 }: DonutChartWrapperProps) {
+  const prefersReducedMotion = usePrefersReducedMotion();
+
   return (
     <BaseChart height={height}>
       <PieChart>
@@ -34,6 +36,7 @@ export function DonutChartWrapper({
           outerRadius={outerRadius}
           paddingAngle={2}
           dataKey="value"
+          isAnimationActive={!prefersReducedMotion}
         >
           {data.map((entry, index) => (
             <Cell

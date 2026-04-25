@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useRef, useState, useCallback, useId } from "react";
+import Image from "next/image";
 
 export interface UploadFile {
   id: string;
@@ -193,7 +194,16 @@ export default function FileUpload({
                 display: "flex", alignItems: "center", justifyContent: "center",
               }}>
                 {f.previewUrl
-                  ? <img src={f.previewUrl} alt="" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+                  ? (
+                    <Image
+                      src={f.previewUrl}
+                      alt=""
+                      width={36}
+                      height={36}
+                      unoptimized
+                      style={{ objectFit: "cover" }}
+                    />
+                  )
                   : <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#6b7280" strokeWidth={1.5}><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
                 }
               </div>
