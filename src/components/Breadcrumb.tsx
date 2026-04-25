@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useRef, useEffect } from "react";
-import type { BreadcrumbProps, BreadcrumbItem } from "@/types/breadcrumb.types";
+import { BreadcrumbProps, BreadcrumbItem } from "../types/breadcrumb.types";
 
 // ─── Separator Icon (12–16px per spec) ────────────────────────────────────────
 const SeparatorIcon = () => (
