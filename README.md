@@ -189,32 +189,17 @@ The app will be available at `http://localhost:3000`
 ### Required Environment Variables
 
 ```bash
-# Meta WhatsApp Cloud API
-WHATSAPP_APP_SECRET=your_meta_app_secret_here
-WHATSAPP_VERIFY_TOKEN=your_custom_verify_token_here
-WHATSAPP_ACCESS_TOKEN=EAA...your_token_here
-WHATSAPP_PHONE_NUMBER_ID=1015554021640186
-WHATSAPP_WABA_ID=871074939257642
+# Public (embedded in browser bundle)
+NEXT_PUBLIC_WEBHOOK_URL=http://localhost:2000
+NEXT_PUBLIC_API_URL=http://localhost:3001
+NEXT_PUBLIC_STELLAR_NETWORK=testnet
+NEXT_PUBLIC_STELLAR_HORIZON_URL=https://horizon-testnet.stellar.org
 
-# Server
-PORT=3000
-NODE_ENV=development
-LOG_LEVEL=info
-
-# PostgreSQL Database
-DB_HOST=localhost
-DB_PORT=5432
-DB_NAME=neurowealth
-DB_USER=postgres
-DB_PASSWORD=your_database_password_here
-
-# Stellar Network
-STELLAR_NETWORK=testnet  # or 'mainnet'
-STELLAR_HORIZON_URL=https://horizon-testnet.stellar.org
-
-# Wallet Encryption
-# Generate with: node -e "console.log(require('crypto').randomBytes(32).toString('hex'))"
-WALLET_ENCRYPTION_KEY=your_64_character_hex_string_here
+# Server-only (do not expose)
+# NEUROWEALTH_API_BASE_URL=http://localhost:8000
+# NEUROWEALTH_PORTFOLIO_PATH=/portfolio/overview
+# NEUROWEALTH_TRANSACTIONS_PATH=/transactions
+AUTH_SECRET=change-me-in-production
 ```
 
 ### Database Setup
@@ -232,10 +217,10 @@ WALLET_ENCRYPTION_KEY=your_64_character_hex_string_here
 
 ### Stellar Network Configuration
 
-- **Testnet**: Use `https://horizon-testnet.stellar.org` for development
-- **Mainnet**: Use `https://horizon.stellar.org` for production
+Network switching for the frontend is controlled via `NEXT_PUBLIC_STELLAR_NETWORK` and `NEXT_PUBLIC_STELLAR_HORIZON_URL`.
 
-The deposit monitor will automatically connect to the configured Horizon endpoint and stream payment events for all registered user wallet addresses.
+See:
+- [Networks](docs/networks.md)
 
 ## Deposit Detection System
 
@@ -269,4 +254,6 @@ The deposit detection system monitors user Stellar wallet addresses for incoming
 ## Documentation
 
 - [Networks](docs/networks.md): frontend network switching config and current mainnet scope boundaries.
+- [Environment](docs/env.md): server-only vs `NEXT_PUBLIC_*` env, and future Edge runtime constraints.
+- [Third-party scripts](docs/third-party-scripts.md): how to add analytics/SDK scripts using `next/script` without hurting LCP.
 - [Security Policy](SECURITY.md): private vulnerability reporting process and response expectations.
