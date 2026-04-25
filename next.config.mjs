@@ -1,3 +1,5 @@
+
+
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   eslint: {
@@ -21,6 +23,6 @@ const nextConfig = {
     optimizePackageImports: ["lucide-react"],
   },
 };
-const nextConfig = {};
 
 export default nextConfig;
+
