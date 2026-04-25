@@ -234,6 +234,7 @@ export default function FirstDepositStep({ onNext, onSkip, onBack }: FirstDeposi
           onClick={handleDeposit}
           disabled={!finalAmount || finalAmount < 10 || isDepositing}
           className="flex-1 sm:flex-initial min-w-[140px]"
+          data-qa="deposit-submit-button"
         >
           {isDepositing ? (
             <span className="flex items-center gap-2">
@@ -248,7 +249,7 @@ export default function FirstDepositStep({ onNext, onSkip, onBack }: FirstDeposi
           )}
         </Button>
         
-        <Button variant="secondary" onClick={onSkip}>
+        <Button variant="secondary" onClick={onSkip} data-qa="deposit-skip-button">
           Skip for Now
         </Button>
       </div>

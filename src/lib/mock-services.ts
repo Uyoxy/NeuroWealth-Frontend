@@ -16,6 +16,7 @@
 "use client";
 
 import { logger } from "./logger";
+import { random as seededRandom } from "./seeded-rng";
 import {
   buildScenarioPayload,
   normalizePortfolioPayload,
@@ -69,7 +70,7 @@ export interface SimulationOptions {
 function shouldFail(outcome: SimulationOptions["outcome"] = "auto"): boolean {
   if (outcome === "success") return false;
   if (outcome === "failure") return true;
-  return Math.random() < 0.15;
+  return seededRandom() < 0.15;
 }
 
 async function delay(ms: number): Promise<void> {
@@ -120,7 +121,7 @@ export const mockAuthService: AuthService = {
         name: email.split("@")[0],
         createdAt: new Date().toISOString(),
       }),
-      token: "mock-jwt-" + Math.random().toString(36).slice(2, 9),
+      token: "mock-jwt-" + seededRandom().toString(36).slice(2, 9),
       expiresAt: Date.now() + 1000 * 60 * 60 * 24 * 7,
     };
     localStorage.setItem(STORAGE_KEY, JSON.stringify(session));
@@ -149,12 +150,12 @@ export const mockAuthService: AuthService = {
 
     const session: AuthSession = {
       user: adaptMockAuthUser({
-        id: "u" + Math.random().toString(36).slice(2, 9),
+        id: "u" + seededRandom().toString(36).slice(2, 9),
         email,
         name,
         createdAt: new Date().toISOString(),
       }),
-      token: "mock-jwt-" + Math.random().toString(36).slice(2, 9),
+      token: "mock-jwt-" + seededRandom().toString(36).slice(2, 9),
       expiresAt: Date.now() + 1000 * 60 * 60 * 24 * 7,
     };
     localStorage.setItem(STORAGE_KEY, JSON.stringify(session));

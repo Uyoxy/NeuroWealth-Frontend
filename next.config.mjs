@@ -22,5 +22,10 @@ const nextConfig = {
   },
 };
 
-export default nextConfig;
+// Bundle analyzer (dev-only, enabled via ANALYZE=true)
+const withBundleAnalyzer = require('@next/bundle-analyzer')({
+  enabled: process.env.ANALYZE === 'true',
+});
+
+export default withBundleAnalyzer(nextConfig);
 
