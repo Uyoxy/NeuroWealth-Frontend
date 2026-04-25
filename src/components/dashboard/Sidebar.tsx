@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { LogOut, Zap } from "lucide-react";
-import { useAuth } from "@/context/AuthContext";
+import { useAuth } from "@/contexts";
 import { dashboardNavigation } from "@/lib/routeMetadata";
 import { getUserAddressLabel, getUserInitials } from "@/lib/user";
 import { cn } from "@/lib/utils";

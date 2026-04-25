@@ -19,6 +19,7 @@ import {
   formatSyncLabel,
   formatTimestamp,
 } from "@/lib/formatters";
+import { ApiRequestError, apiRequest } from "@/lib/api-client";
 import { useSandbox, ScenarioType } from "@/contexts/SandboxContext";
 import { AllocationChart } from "./AllocationChart";
 
@@ -204,18 +205,15 @@ export function PortfolioDashboard() {
       setError(null);
 
       try {
-        const response = await fetch(`/api/portfolio?scenario=${scenario}`, {
+        const payload = await apiRequest<PortfolioPayload>(
+          `/api/portfolio?scenario=${scenario}`,
+          {
           cache: "no-store",
           signal: controller.signal,
-        });
+            timeoutMs: 12000,
+          },
+        );
 
-        if (!response.ok) {
-          throw new Error(
-            `Unable to load portfolio widgets (${response.status})`,
-          );
-        }
-
-        const payload = (await response.json()) as PortfolioPayload;
         setPortfolio(payload);
       } catch (loadError) {
         if (controller.signal.aborted) {
@@ -223,7 +221,7 @@ export function PortfolioDashboard() {
         }
 
         const message =
-          loadError instanceof Error
+          loadError instanceof ApiRequestError || loadError instanceof Error
             ? loadError.message
             : "Unable to load portfolio widgets.";
 

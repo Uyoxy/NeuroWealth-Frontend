@@ -1,7 +1,7 @@
 "use client";
 
 import { Bell } from "lucide-react";
-import { useAuth } from "@/context/AuthContext";
+import { useAuth } from "@/contexts";
 import { DASHBOARD_ROUTE_TITLE_ID } from "@/lib/app-landmarks";
 import { usePathname } from "next/navigation";
 import { getRouteLabel } from "@/lib/routeMetadata";

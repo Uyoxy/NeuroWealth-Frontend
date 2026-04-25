@@ -9,6 +9,7 @@ import {
   errorResponse,
   successResponse,
 } from "@/lib/api-response";
+import { portfolioQuerySchema, zodErrorToDetails } from "@/lib/validation/api";
 import { NextRequest, NextResponse } from "next/server";
 
 function resolveEndpoint(baseUrl: string, pathOrUrl: string): string {
@@ -25,7 +26,22 @@ function resolveEndpoint(baseUrl: string, pathOrUrl: string): string {
 }
 
 export async function GET(request: NextRequest) {
-  const scenario = parseScenario(request.nextUrl.searchParams.get("scenario"));
+  const parsedQuery = portfolioQuerySchema.safeParse({
+    scenario: request.nextUrl.searchParams.get("scenario") ?? undefined,
+  });
+
+  if (!parsedQuery.success) {
+    return NextResponse.json(
+      errorResponse(
+        ERROR_CODE.VALIDATION_ERROR,
+        "Query validation failed.",
+        zodErrorToDetails(parsedQuery.error),
+      ),
+      { status: HTTP_STATUS.BAD_REQUEST },
+    );
+  }
+
+  const scenario = parseScenario(parsedQuery.data.scenario ?? null);
   const apiBaseUrl = process.env.NEUROWEALTH_API_BASE_URL;
   const portfolioPath =
     process.env.NEUROWEALTH_PORTFOLIO_PATH ?? "/portfolio/overview";
