@@ -265,3 +265,8 @@ The deposit detection system monitors user Stellar wallet addresses for incoming
 - **Deposit Recorder**: Records deposits in database with idempotency
 - **Deployment Coordinator**: Emits deployment events and handles confirmations
 - **Deposit Messaging**: Sends WhatsApp notifications for deposit lifecycle events
+
+## Documentation
+
+- [Networks](docs/networks.md): frontend network switching config and current mainnet scope boundaries.
+- [Security Policy](SECURITY.md): private vulnerability reporting process and response expectations.
