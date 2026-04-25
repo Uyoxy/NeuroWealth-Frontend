@@ -13,11 +13,11 @@ export default function DashboardError({
   return (
     <ErrorPage
       statusCode={500}
-      title="Dashboard error"
-      description="Something went wrong loading the dashboard. Your funds are safe. Try refreshing or come back in a moment."
+      title="Dashboard unavailable"
+      description="We are having trouble loading this dashboard view right now. Your funds and wallet connection remain safe."
       icon={<AlertTriangle size={32} />}
-      primaryAction={{ label: "Try again", href: "#" }}
-      secondaryAction={{ label: "Back to home", href: "/", onClick: reset }}
+      primaryAction={{ label: "Back to dashboard home", href: "/dashboard" }}
+      secondaryAction={{ label: "Try again", onClick: reset }}
     />
   );
 }

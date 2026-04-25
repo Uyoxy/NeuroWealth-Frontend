@@ -2,6 +2,7 @@ import React from "react";
 import type { LucideIcon } from "lucide-react";
 import {
   Activity,
+  AlertTriangle,
   Bell,
   Blocks,
   BookOpenText,
@@ -50,6 +51,9 @@ const appRouteDefinitions: AppRouteDefinition[] = [
   { href: "/dashboard/activity", label: "Activity", icon: Activity, dashboardNav: {} },
   { href: "/dashboard/async-states", label: "Async States", icon: Blocks },
   { href: "/dashboard/audit", label: "Audit Trail", icon: Newspaper },
+  { href: "/dashboard/dev-errors", label: "Dev Errors", icon: AlertTriangle },
+  { href: "/dashboard/dev-errors/boundary-error", label: "Boundary Error", icon: AlertTriangle },
+  { href: "/dashboard/dev-errors/route-error", label: "Route Error", icon: AlertTriangle },
   { href: "/dashboard/history", label: "History", icon: History },
   { href: "/dashboard/notifications", label: "Notifications", icon: Bell },
   { href: "/dashboard/portfolio", label: "Portfolio", icon: Wallet, dashboardNav: {} },
