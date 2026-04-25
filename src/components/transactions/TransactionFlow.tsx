@@ -22,6 +22,7 @@ import {
   TransactionReceipt,
   validateTransactionValues,
 } from "@/lib/transactions";
+import { ApiRequestError, apiRequest } from "@/lib/api-client";
 import { useSandbox } from "@/contexts/SandboxContext";
 
 type ThemeMode = "light" | "dark";
@@ -60,6 +61,32 @@ function getInputStateClassName(
 
 function sanitizeAmount(value: string): string {
   return value.replace(/[^\d.]/g, "");
+}
+
+function detailsToFieldErrors(
+  details?: Record<string, string | string[]>,
+): TransactionFieldErrors {
+  if (!details) {
+    return {};
+  }
+
+  const readValue = (key: string): string | undefined => {
+    const value = details[key];
+
+    if (Array.isArray(value)) {
+      return value[0];
+    }
+
+    return typeof value === "string" ? value : undefined;
+  };
+
+  return {
+    amount: readValue("amount") ?? readValue("values.amount"),
+    walletAddress: readValue("walletAddress") ?? readValue("values.walletAddress"),
+    walletConnected:
+      readValue("walletConnected") ?? readValue("values.walletConnected"),
+    form: readValue("form") ?? readValue("body"),
+  };
 }
 
 export function TransactionFlow() {
@@ -239,37 +266,31 @@ export function TransactionFlow() {
     setRequestMessage(null);
 
     try {
-      const response = await fetch("/api/transactions", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
+      const payload = await apiRequest<{ quote: TransactionQuote }>(
+        "/api/transactions",
+        {
+          method: "POST",
+          body: {
+            intent: "quote",
+            kind,
+            values: formValues,
+          },
+          timeoutMs: 12000,
         },
-        body: JSON.stringify({
-          intent: "quote",
-          kind,
-          values: formValues,
-        }),
-      });
+      );
 
-      const payload = await response.json();
-
-      if (!response.ok) {
-        const errorPayload = payload as {
-          message?: string;
-          fieldErrors?: TransactionFieldErrors;
-        };
-        setFieldErrors(errorPayload.fieldErrors ?? {});
+      setFieldErrors({});
+      setQuote(payload.quote);
+      setStage("confirm");
+    } catch (error) {
+      if (error instanceof ApiRequestError) {
+        setFieldErrors(detailsToFieldErrors(error.details));
         setRequestMessage(
-          errorPayload.message ?? "Unable to prepare the confirmation step.",
+          error.message ?? "Unable to prepare the confirmation step.",
         );
         return;
       }
 
-      const successPayload = payload as { quote: TransactionQuote };
-      setFieldErrors({});
-      setQuote(successPayload.quote);
-      setStage("confirm");
-    } catch {
       setRequestMessage(
         "Quote request failed. Check your connection and try again.",
       );
@@ -287,43 +308,27 @@ export function TransactionFlow() {
     setRequestMessage(null);
 
     try {
-      const response = await fetch("/api/transactions", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
+      const payload = await apiRequest<{ pending: PendingTransaction }>(
+        "/api/transactions",
+        {
+          method: "POST",
+          body: {
+            intent: "submit",
+            kind,
+            values: formValues,
+          },
+          timeoutMs: 12000,
         },
-        body: JSON.stringify({
-          intent: "submit",
-          kind,
-          values: formValues,
-        }),
-      });
+      );
 
-      const payload = await response.json();
-
-      if (!response.ok) {
-        const errorPayload = payload as {
-          message?: string;
-          fieldErrors?: TransactionFieldErrors;
-        };
-        setFieldErrors(errorPayload.fieldErrors ?? {});
-        setRequestMessage(
-          errorPayload.message ??
-            "Submission failed before reaching the network.",
-        );
-        setStage("form");
-        return;
-      }
-
-      const successPayload = payload as { pending: PendingTransaction };
-      setPending(successPayload.pending);
-      setQuote(successPayload.pending.quote);
+      setPending(payload.pending);
+      setQuote(payload.pending.quote);
       setStage("pending");
 
       timeoutRef.current = window.setTimeout(() => {
         const nextReceipt = buildTransactionReceipt(
-          successPayload.pending,
-          successPayload.pending.nextStatus === "failure"
+          payload.pending,
+          payload.pending.nextStatus === "failure"
             ? "failure"
             : "success",
         );
@@ -331,9 +336,16 @@ export function TransactionFlow() {
         setReceipt(nextReceipt);
         setStage(nextReceipt.status);
         setIsSubmitting(false);
-      }, successPayload.pending.completionDelayMs);
-    } catch {
-      setRequestMessage("Submission failed before reaching the network.");
+      }, payload.pending.completionDelayMs);
+    } catch (error) {
+      if (error instanceof ApiRequestError) {
+        setFieldErrors(detailsToFieldErrors(error.details));
+        setRequestMessage(
+          error.message ?? "Submission failed before reaching the network.",
+        );
+      } else {
+        setRequestMessage("Submission failed before reaching the network.");
+      }
       setStage("form");
     } finally {
       setIsSubmitting(false);

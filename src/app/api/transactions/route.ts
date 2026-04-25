@@ -2,7 +2,6 @@ import {
   buildPendingTransaction,
   buildTransactionQuote,
   parseTransactionKind,
-  TransactionRequestPayload,
   validateTransactionValues,
 } from "@/lib/transactions";
 import {
@@ -11,6 +10,10 @@ import {
   errorResponse,
   successResponse,
 } from "@/lib/api-response";
+import {
+  transactionRequestSchema,
+  zodErrorToDetails,
+} from "@/lib/validation/api";
 import { NextResponse } from "next/server";
 
 function resolveEndpoint(baseUrl: string, pathOrUrl: string): string {
@@ -27,13 +30,39 @@ function resolveEndpoint(baseUrl: string, pathOrUrl: string): string {
 }
 
 export async function POST(request: Request) {
-  const payload = (await request.json()) as Partial<TransactionRequestPayload>;
-  const kind = parseTransactionKind(payload.kind ?? null);
-  const values = payload.values ?? {
-    amount: "",
-    walletAddress: "",
-    walletConnected: false,
-  };
+  let rawPayload: unknown;
+
+  try {
+    rawPayload = await request.json();
+  } catch {
+    return NextResponse.json(
+      errorResponse(
+        ERROR_CODE.VALIDATION_ERROR,
+        "Request body must be valid JSON.",
+        {
+          body: ["Malformed JSON payload."],
+        },
+      ),
+      { status: HTTP_STATUS.BAD_REQUEST },
+    );
+  }
+
+  const parsedPayload = transactionRequestSchema.safeParse(rawPayload);
+
+  if (!parsedPayload.success) {
+    return NextResponse.json(
+      errorResponse(
+        ERROR_CODE.VALIDATION_ERROR,
+        "Request body validation failed.",
+        zodErrorToDetails(parsedPayload.error),
+      ),
+      { status: HTTP_STATUS.BAD_REQUEST },
+    );
+  }
+
+  const payload = parsedPayload.data;
+  const kind = parseTransactionKind(payload.kind);
+  const values = payload.values;
   const apiBaseUrl = process.env.NEUROWEALTH_API_BASE_URL;
   const transactionPath =
     process.env.NEUROWEALTH_TRANSACTIONS_PATH ?? "/transactions";
@@ -90,7 +119,7 @@ export async function POST(request: Request) {
         "Fix the highlighted fields and try again.",
         errors,
       ),
-      { status: HTTP_STATUS.UNPROCESSABLE_ENTITY },
+      { status: HTTP_STATUS.BAD_REQUEST },
     );
   }
 
