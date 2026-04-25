@@ -3,7 +3,7 @@
 import { useMemo, useState, type FormEvent } from "react";
 import Link from "next/link";
 import { Check, CheckCircle2, X } from "lucide-react";
-import { useAuth } from "@/contexts/AuthContext";
+import { useAuth } from "@/contexts";
 import { mockAudit } from "@/lib/mock-audit";
 import { Button, Card, FieldError, FormErrorSummary, SectionError } from "@/components/ui";
 import {

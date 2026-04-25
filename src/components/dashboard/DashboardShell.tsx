@@ -1,6 +1,5 @@
 "use client";
 
-import { AuthProvider } from "@/context/AuthContext";
 import { DASHBOARD_ROUTE_TITLE_ID, MAIN_CONTENT_LANDMARK_ID } from "@/lib/app-landmarks";
 import Sidebar from "./Sidebar";
 import TopHeader from "./TopHeader";
@@ -32,7 +31,7 @@ interface DashboardShellProps {
  */
 export default function DashboardShell({ children }: DashboardShellProps) {
   return (
-    <AuthProvider>
+    <>
       {/* Desktop sidebar */}
       <Sidebar />
 
@@ -59,6 +58,6 @@ export default function DashboardShell({ children }: DashboardShellProps) {
 
       {/* Mobile bottom navigation */}
       <MobileBottomNav />
-    </AuthProvider>
+    </>
   );
 }
