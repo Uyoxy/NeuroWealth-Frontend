@@ -1,14 +1,17 @@
 import { ChartTone } from "@/lib/portfolio";
+import { CVD_PALETTES } from "@/lib/chart-colors-cvd";
 
 // Chart theme configuration
+// Issue #163: Colors are CVD-safe and tested for WCAG AA contrast
 export const chartTheme = {
-  // Color palette using approved tokens
+  // Color palette using CVD-safe tokens
+  // Primary palette: Blue/Orange/Teal (safe for deuteranopia, protanopia, tritanopia)
   colors: {
-    primary: "var(--chart-primary)",
-    accent: "var(--chart-accent)",
-    warning: "var(--chart-warning)",
-    "neutral-strong": "var(--chart-neutral-strong)",
-    "neutral-soft": "var(--chart-neutral-soft)",
+    primary: CVD_PALETTES.primary.blue,           // #0369a1 - Sky blue
+    accent: CVD_PALETTES.primary.orange,          // #ea580c - Vibrant orange
+    warning: CVD_PALETTES.primary.teal,           // #0d9488 - Teal
+    "neutral-strong": CVD_PALETTES.neutral.strong,
+    "neutral-soft": CVD_PALETTES.neutral.soft,
   } as Record<ChartTone, string>,
 
   // Grid configuration
