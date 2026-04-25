@@ -3,15 +3,7 @@
 import React from "react";
 import FilterChips from "./FilterChips";
 import Pagination from "./Pagination";
-<<<<<<< HEAD
-import {
-  useTransactionList,
-  buildFilterOptions,
-  MOCK_TRANSACTIONS,
-} from "@/hooks/useTransactionList";
-=======
 import { useTransactionList, buildFilterOptions, MOCK_TRANSACTIONS } from "../../hooks/useTransactionList";
->>>>>>> 3fecff1 (resolved import modules error)
 
 const STATUS_COLORS: Record<string, { bg: string; color: string }> = {
   completed: { bg: "rgba(16,185,129,0.12)", color: "#10b981" },

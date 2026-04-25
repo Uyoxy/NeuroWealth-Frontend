@@ -24,7 +24,7 @@ export function usePortfolio(address: string | null) {
       .then((data) => setPortfolio(data))
       .catch(() => setError("Failed to load portfolio"))
       .finally(() => setLoading(false));
-  }, [address, env.apiUrl]);
+  }, [address]);
 
   return { portfolio, loading, error };
 }
