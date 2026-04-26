@@ -6,8 +6,6 @@ import { useAuth } from "@/contexts";
 import { MAIN_CONTENT_LANDMARK_ID } from "@/lib/app-landmarks";
 import { Loader2, Zap } from "lucide-react";
 
-export const dynamic = "force-dynamic";
-
 export default function LoginPage() {
   const { signIn, user, loading } = useAuth();
   const router = useRouter();
