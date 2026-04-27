@@ -148,7 +148,7 @@ export function CommandPalette() {
         >
           {filteredCommands.length === 0 && (
             <li className="p-4 text-center text-slate-500 text-sm">
-              No results found for "{query}"
+              No results found for &quot;{query}&quot;
             </li>
           )}
           {filteredCommands.map((command, index) => {
