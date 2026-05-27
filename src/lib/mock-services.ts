@@ -36,6 +36,7 @@ import {
 } from "./transactions";
 import type { AuthSession } from "./mock-auth";
 import { adaptMockAuthUser } from "./user";
+import { STORAGE_KEYS } from "./storage-keys";
 
 // ─── Shared error model ───────────────────────────────────────────────────────
 
@@ -200,6 +201,55 @@ export const mockPortfolioService: PortfolioService = {
 
     const raw = buildScenarioPayload("live");
     return normalizePortfolioPayload(raw, "demo");
+  },
+};
+
+// ─── Profile service ─────────────────────────────────────────────────────────
+
+export interface ProfileData {
+  displayName: string;
+  locale: string;
+  timezone: string;
+  currencyFormat: string;
+}
+
+export const DEFAULT_PROFILE: ProfileData = {
+  displayName: "",
+  locale: "en-US",
+  timezone: "UTC",
+  currencyFormat: "USD",
+};
+
+export interface ProfileService {
+  saveProfile(data: ProfileData, opts?: SimulationOptions): Promise<void>;
+  loadProfile(): ProfileData;
+}
+
+const PROFILE_STORAGE_KEY = STORAGE_KEYS.PROFILE;
+
+export const mockProfileService: ProfileService = {
+  async saveProfile(data, opts = {}) {
+    logger.info("mockProfileService.saveProfile");
+    await delay(opts.latencyMs ?? 800);
+
+    if (shouldFail(opts.outcome)) {
+      throw new ServiceError(
+        "NETWORK_ERROR",
+        "Network error — please try again.",
+        true,
+      );
+    }
+
+    localStorage.setItem(PROFILE_STORAGE_KEY, JSON.stringify(data));
+  },
+
+  loadProfile(): ProfileData {
+    if (typeof window === "undefined") return DEFAULT_PROFILE;
+    try {
+      const raw = localStorage.getItem(PROFILE_STORAGE_KEY);
+      if (raw) return { ...DEFAULT_PROFILE, ...JSON.parse(raw) };
+    } catch {}
+    return DEFAULT_PROFILE;
   },
 };
 

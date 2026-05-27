@@ -18,14 +18,7 @@ import {
 } from "lucide-react";
 import { ProfileFormSkeleton } from "@/components/ui/Skeleton";
 
-// ─── Types ────────────────────────────────────────────────────────────────────
-
-interface ProfileData {
-  displayName: string;
-  locale: string;
-  timezone: string;
-  currencyFormat: string;
-}
+import { ProfileData, DEFAULT_PROFILE, mockProfileService } from "@/lib/mock-services";
 
 interface ValidationErrors {
   displayName?: string;
@@ -79,39 +72,6 @@ const CURRENCY_FORMATS = [
   { value: "BRL", label: "BRL — Brazilian Real (R$)" },
   { value: "CAD", label: "CAD — Canadian Dollar (CA$)" },
 ];
-
-const STORAGE_KEY = "neurowealth_profile";
-
-const DEFAULT_PROFILE: ProfileData = {
-  displayName: "",
-  locale: "en-US",
-  timezone: "UTC",
-  currencyFormat: "USD",
-};
-
-// ─── Mock API ─────────────────────────────────────────────────────────────────
-
-function mockSaveProfile(data: ProfileData): Promise<void> {
-  return new Promise((resolve, reject) => {
-    setTimeout(() => {
-      // Simulate occasional network errors (10% chance)
-      if (Math.random() < 0.1) {
-        reject(new Error("Network error — please try again."));
-      } else {
-        localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
-        resolve();
-      }
-    }, 800);
-  });
-}
-
-function mockLoadProfile(): ProfileData {
-  try {
-    const raw = localStorage.getItem(STORAGE_KEY);
-    if (raw) return { ...DEFAULT_PROFILE, ...JSON.parse(raw) };
-  } catch {}
-  return DEFAULT_PROFILE;
-}
 
 // ─── Validation ───────────────────────────────────────────────────────────────
 
@@ -199,7 +159,7 @@ export default function ProfilePage() {
   useEffect(() => {
     // Simulate async profile load
     const timer = setTimeout(() => {
-      const loaded = mockLoadProfile();
+      const loaded = mockProfileService.loadProfile();
       setSaved(loaded);
       setDraft(loaded);
       setProfileLoading(false);
@@ -247,7 +207,7 @@ export default function ProfilePage() {
     setSaveError("");
 
     try {
-      await mockSaveProfile(draft);
+      await mockProfileService.saveProfile(draft);
       setSaved(draft);
       setSaveStatus("success");
       setEditing(false);
