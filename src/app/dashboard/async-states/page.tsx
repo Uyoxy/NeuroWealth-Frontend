@@ -3,6 +3,7 @@
 export const dynamic = "force-dynamic";
 
 import { useCallback, useEffect, useMemo, useState } from "react";
+import { notFound } from "next/navigation";
 import {
   Activity,
   BarChart3,
@@ -23,6 +24,8 @@ import {
   TransactionFormSkeleton,
 } from "@/components/ui/Skeleton";
 import { Button, Card, InlineBanner } from "@/components/ui";
+
+const DEV_ASYNC_STATES_ENABLED = process.env.NODE_ENV !== "production";
 
 // ─── Section wrapper ──────────────────────────────────────────────────────────
 
@@ -367,6 +370,10 @@ function HistoryStateDemo() {
 // ─── Page ─────────────────────────────────────────────────────────────────────
 
 export default function AsyncStatesPage() {
+  if (!DEV_ASYNC_STATES_ENABLED) {
+    notFound();
+  }
+
   return (
     <div className="space-y-6 px-6 py-8">
       <div className="flex flex-col gap-2">

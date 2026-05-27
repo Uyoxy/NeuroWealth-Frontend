@@ -1,8 +1,9 @@
 "use client";
 
-import React, { useEffect, useState, useRef } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
-import { Search, Home, BookOpen, Settings, User } from "lucide-react";
+import { Search, Settings } from "lucide-react";
+import { commandPaletteRoutes } from "@/lib/routeMetadata";
 import { cn } from "@/lib/utils";
 
 type Command = {
@@ -31,38 +32,31 @@ export function CommandPalette() {
     return () => document.removeEventListener("keydown", down);
   }, []);
 
-  const routes = [
-    { id: "route-dashboard", name: "Dashboard", path: "/dashboard", icon: Home },
-    { id: "route-profile", name: "Profile", path: "/profile", icon: User },
-    { id: "route-docs", name: "Documentation", path: "/docs", icon: BookOpen },
-    { id: "route-settings", name: "Settings", path: "/settings", icon: Settings },
-  ];
-
   const mockActions = [
     { id: "action-logout", name: "Mock: Logout", action: () => alert("Logged Out") },
     { id: "action-theme", name: "Mock: Toggle Theme", action: () => alert("Theme Toggled") },
   ];
 
   const allCommands: Command[] = [
-    ...routes.map((r) => ({
-      ...r,
+    ...commandPaletteRoutes.map((route) => ({
+      ...route,
       action: () => {
-        router.push(r.path);
+        router.push(route.path);
         setIsOpen(false);
       },
     })),
-    ...mockActions.map((a) => ({
-      ...a,
+    ...mockActions.map((action) => ({
+      ...action,
       icon: Settings,
       action: () => {
-        a.action();
+        action.action();
         setIsOpen(false);
       },
     })),
   ];
 
   const filteredCommands = allCommands.filter((command) =>
-    command.name.toLowerCase().includes(query.toLowerCase())
+    command.name.toLowerCase().includes(query.toLowerCase()),
   );
 
   useEffect(() => {
@@ -81,14 +75,20 @@ export function CommandPalette() {
     if (listRef.current && isOpen && filteredCommands.length > 0) {
       const activeElement = listRef.current.children[selectedIndex] as HTMLElement;
       if (activeElement) {
-        activeElement.scrollIntoView({
-          block: "nearest",
-        });
+        activeElement.scrollIntoView({ block: "nearest" });
       }
     }
   }, [selectedIndex, isOpen, filteredCommands.length]);
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
+    if (filteredCommands.length === 0) {
+      if (e.key === "Escape") {
+        e.preventDefault();
+        setIsOpen(false);
+      }
+      return;
+    }
+
     if (e.key === "ArrowDown") {
       e.preventDefault();
       setSelectedIndex((prev) => (prev + 1) % filteredCommands.length);
@@ -110,25 +110,25 @@ export function CommandPalette() {
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-[9999] flex items-start justify-center pt-[10vh] sm:pt-[20vh] px-0 sm:px-4">
-      <div 
-        className="fixed inset-0 bg-black/60 backdrop-blur-sm" 
-        onClick={() => setIsOpen(false)} 
-        aria-hidden="true" 
+    <div className="fixed inset-0 z-[9999] flex items-start justify-center px-0 pt-[10vh] sm:px-4 sm:pt-[20vh]">
+      <div
+        className="fixed inset-0 bg-black/60 backdrop-blur-sm"
+        onClick={() => setIsOpen(false)}
+        aria-hidden="true"
       />
       <div
         role="dialog"
         aria-modal="true"
         aria-label="Command Palette"
-        className="relative w-full max-w-full sm:max-w-[640px] bg-slate-900 border border-slate-800 sm:rounded-xl shadow-2xl overflow-hidden animate-in fade-in zoom-in-95 duration-200"
+        className="relative w-full max-w-full overflow-hidden border border-slate-800 bg-slate-900 shadow-2xl animate-in fade-in zoom-in-95 duration-200 sm:max-w-[640px] sm:rounded-xl"
       >
-        <div className="flex items-center border-b border-slate-800 px-4 min-h-[56px]">
-          <Search className="w-5 h-5 text-slate-400 mr-3 shrink-0" />
+        <div className="flex min-h-[56px] items-center border-b border-slate-800 px-4">
+          <Search className="mr-3 h-5 w-5 shrink-0 text-slate-400" />
           <input
             ref={inputRef}
             type="text"
             placeholder="Search routes and actions... (Cmd+K)"
-            className="flex-1 bg-transparent border-none outline-none text-slate-200 placeholder:text-slate-500 pt-[1px]"
+            className="flex-1 border-none bg-transparent pt-[1px] text-slate-200 outline-none placeholder:text-slate-500"
             value={query}
             onChange={(e) => setQuery(e.target.value)}
             onKeyDown={handleKeyDown}
@@ -144,10 +144,10 @@ export function CommandPalette() {
           id="command-palette-results"
           ref={listRef}
           role="listbox"
-          className="max-h-[300px] sm:max-h-[400px] overflow-y-auto p-2"
+          className="max-h-[300px] overflow-y-auto p-2 sm:max-h-[400px]"
         >
           {filteredCommands.length === 0 && (
-            <li className="p-4 text-center text-slate-500 text-sm">
+            <li className="p-4 text-center text-sm text-slate-500">
               No results found for &quot;{query}&quot;
             </li>
           )}
@@ -160,15 +160,15 @@ export function CommandPalette() {
                 role="option"
                 aria-selected={isSelected}
                 className={cn(
-                  "flex items-center px-4 py-2 min-h-[44px] cursor-pointer rounded-md text-sm transition-colors",
+                  "flex min-h-[44px] cursor-pointer items-center rounded-md px-4 py-2 text-sm transition-colors",
                   isSelected
                     ? "bg-slate-800 text-sky-400"
-                    : "text-slate-400 hover:bg-slate-800/50 hover:text-slate-200"
+                    : "text-slate-400 hover:bg-slate-800/50 hover:text-slate-200",
                 )}
                 onClick={() => command.action()}
                 onMouseEnter={() => setSelectedIndex(index)}
               >
-                <command.icon className="w-4 h-4 mr-3 shrink-0" />
+                <command.icon className="mr-3 h-4 w-4 shrink-0" />
                 <span>{command.name}</span>
               </li>
             );

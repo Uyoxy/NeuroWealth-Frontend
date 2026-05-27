@@ -10,6 +10,7 @@ import { useAuth, useI18n, useWallet, useWalletConfig } from "@/contexts";
 import { Button } from "./ui/Button";
 import { LocaleSwitcher } from "./LocaleSwitcher";
 import { GlobalSearch } from "./search/GlobalSearch";
+import { siteNavigationLinks } from "@/lib/routeMetadata";
 
 function truncateAddress(address: string) {
   if (!address || address.length < 12) return address;
@@ -31,6 +32,8 @@ export function Navbar() {
   const config = useWalletConfig();
   const networkLabel = formatNetworkLabel(config?.network);
   const [isMobileSearchOpen, setIsMobileSearchOpen] = useState(false);
+  const getNavLabel = (key: "features" | "howItWorks" | "strategies" | "help") =>
+    messages.navbar[key];
 
   useEffect(() => {
     if (!isMobileSearchOpen) return;
@@ -48,10 +51,11 @@ export function Navbar() {
         </Link>
 
         <div className="hidden md:flex items-center gap-6 text-sm text-slate-400">
-          <Link href="#features" className="hover:text-white transition-colors">{messages.navbar.features}</Link>
-          <Link href="#how-it-works" className="hover:text-white transition-colors">{messages.navbar.howItWorks}</Link>
-          <Link href="#strategies" className="hover:text-white transition-colors">{messages.navbar.strategies}</Link>
-          <Link href="/help" className="hover:text-white transition-colors">{messages.navbar.help}</Link>
+          {siteNavigationLinks.map((link) => (
+            <Link key={link.href} href={link.href} className="hover:text-white transition-colors">
+              {getNavLabel(link.labelKey)}
+            </Link>
+          ))}
         </div>
 
         <div className="hidden md:block md:flex-1 md:max-w-xl">
@@ -72,9 +76,17 @@ export function Navbar() {
 
           <LocaleSwitcher />
 
-          <Link href="/help" className="md:hidden text-sm text-slate-400 hover:text-white transition-colors">
-            {messages.navbar.help}
-          </Link>
+          {siteNavigationLinks
+            .filter((link) => link.mobile)
+            .map((link) => (
+              <Link
+                key={link.href}
+                href={link.href}
+                className="md:hidden text-sm text-slate-400 hover:text-white transition-colors"
+              >
+                {getNavLabel(link.labelKey)}
+              </Link>
+            ))}
 
           {!isRestoring && connected && publicKey && (
             <div className="hidden sm:flex items-center gap-2">
