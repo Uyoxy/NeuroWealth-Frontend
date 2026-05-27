@@ -6,34 +6,17 @@ import { Search, X } from "lucide-react";
 import WalletConnectButton from "./WalletConnectButton";
 import { ThemeToggle } from "./ThemeToggle";
 import { NotificationToggle } from "./notifications/NotificationToggle";
-import { useAuth, useI18n, useWallet, useWalletConfig } from "@/contexts";
+import { useAuth, useI18n } from "@/contexts";
 import { Button } from "./ui/Button";
 import { LocaleSwitcher } from "./LocaleSwitcher";
 import { GlobalSearch } from "./search/GlobalSearch";
-import { siteNavigationLinks } from "@/lib/routeMetadata";
-
-function truncateAddress(address: string) {
-  if (!address || address.length < 12) return address;
-  return `${address.slice(0, 6)}...${address.slice(-4)}`;
-}
-
-function formatNetworkLabel(network?: string) {
-  if (!network) return "UNKNOWN";
-  const normalized = network.toLowerCase();
-  if (normalized.includes("test")) return "TESTNET";
-  if (normalized.includes("public")) return "PUBLIC";
-  return network;
-}
+import { NavLinks, NavMobileLinks } from "./navbar/NavLinks";
+import { NavWalletStatus } from "./navbar/NavWalletStatus";
 
 export function Navbar() {
   const { user, signOut } = useAuth();
   const { messages } = useI18n();
-  const { connected, isRestoring, publicKey } = useWallet();
-  const config = useWalletConfig();
-  const networkLabel = formatNetworkLabel(config?.network);
   const [isMobileSearchOpen, setIsMobileSearchOpen] = useState(false);
-  const getNavLabel = (key: "features" | "howItWorks" | "strategies" | "help") =>
-    messages.navbar[key];
 
   useEffect(() => {
     if (!isMobileSearchOpen) return;
@@ -50,13 +33,7 @@ export function Navbar() {
           <span aria-hidden="true" className="text-brand-400">&#x2B21;</span> NeuroWealth
         </Link>
 
-        <div className="hidden md:flex items-center gap-6 text-sm text-slate-400">
-          {siteNavigationLinks.map((link) => (
-            <Link key={link.href} href={link.href} className="hover:text-white transition-colors">
-              {getNavLabel(link.labelKey)}
-            </Link>
-          ))}
-        </div>
+        <NavLinks />
 
         <div className="hidden md:block md:flex-1 md:max-w-xl">
           <GlobalSearch placeholder="Search pages, actions, or records" />
@@ -76,29 +53,8 @@ export function Navbar() {
 
           <LocaleSwitcher />
 
-          {siteNavigationLinks
-            .filter((link) => link.mobile)
-            .map((link) => (
-              <Link
-                key={link.href}
-                href={link.href}
-                className="md:hidden text-sm text-slate-400 hover:text-white transition-colors"
-              >
-                {getNavLabel(link.labelKey)}
-              </Link>
-            ))}
-
-          {!isRestoring && connected && publicKey && (
-            <div className="hidden sm:flex items-center gap-2">
-              <span className="inline-flex items-center rounded-full border border-cyan-500/30 bg-cyan-500/10 px-3 py-1.5 text-xs font-semibold tracking-wide text-cyan-300">
-                {networkLabel}
-              </span>
-              <span className="inline-flex items-center gap-2 rounded-full border border-emerald-500/30 bg-emerald-500/10 px-4 py-1.5 text-xs font-mono text-emerald-400">
-                <span className="h-1.5 w-1.5 rounded-full bg-emerald-400" />
-                {truncateAddress(publicKey)}
-              </span>
-            </div>
-          )}
+          <NavMobileLinks />
+          <NavWalletStatus />
 
           <NotificationToggle />
           <ThemeToggle />
