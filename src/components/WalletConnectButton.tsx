@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { useWallet } from '@/contexts';
+import { NetworkMismatchWarning } from '@/components/wallet/NetworkMismatchWarning';
 
 const WalletIcon = () => (
   <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -20,7 +21,7 @@ interface WalletConnectButtonProps {
   theme?: 'light' | 'dark';
 }
 export default function WalletConnectButton({ theme = 'light' }: WalletConnectButtonProps) {
-  const { connected, isRestoring, connect, disconnect, walletName } = useWallet();
+  const { connected, isRestoring, connect, disconnect, walletName, networkStatus } = useWallet();
   const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
@@ -115,30 +116,35 @@ export default function WalletConnectButton({ theme = 'light' }: WalletConnectBu
   };
 
   return (
-    isRestoring ? (
-      <button
-        disabled
-        className="px-6 py-2.5 text-sm font-medium rounded-full bg-black text-white opacity-75 cursor-not-allowed"
-      >
-        <span className="flex items-center gap-2">
-          <LoaderIcon />
-        </span>
-      </button>
-    ) : (
-    <button 
-      onClick={handleClick}
-      disabled={isLoading}
-      className={`px-6 py-2.5 text-sm font-medium rounded-full transition-colors ${
-        theme === 'light' 
-          ? 'bg-black text-white hover:bg-gray-800' 
-          : 'bg-white text-black hover:bg-gray-200'
-      } ${isLoading ? 'opacity-75 cursor-not-allowed' : ''}`}
-    >
-      <span className="flex items-center gap-2">
-        {getIcon()}
-        {getButtonText()}
-      </span>
-    </button>
-    )
+    <div className="flex flex-col items-end gap-2">
+      {connected && networkStatus.hasMismatch && (
+        <NetworkMismatchWarning status={networkStatus} compact />
+      )}
+      {isRestoring ? (
+        <button
+          disabled
+          className="px-6 py-2.5 text-sm font-medium rounded-full bg-black text-white opacity-75 cursor-not-allowed"
+        >
+          <span className="flex items-center gap-2">
+            <LoaderIcon />
+          </span>
+        </button>
+      ) : (
+        <button
+          onClick={handleClick}
+          disabled={isLoading}
+          className={`px-6 py-2.5 text-sm font-medium rounded-full transition-colors ${
+            theme === 'light'
+              ? 'bg-black text-white hover:bg-gray-800'
+              : 'bg-white text-black hover:bg-gray-200'
+          } ${isLoading ? 'opacity-75 cursor-not-allowed' : ''}`}
+        >
+          <span className="flex items-center gap-2">
+            {getIcon()}
+            {getButtonText()}
+          </span>
+        </button>
+      )}
+    </div>
   );
 }
