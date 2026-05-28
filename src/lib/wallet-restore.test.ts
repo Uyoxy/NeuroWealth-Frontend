@@ -207,10 +207,10 @@ test("wallet-restore: non-404 balance error → restored with accountNotFound=fa
   assert.equal(spies.clear.calls.length, 0);
 });
 
-test("wallet-restore: balance loader throws a non-object → still resolves to restored with empty balances", async () => {
+test("wallet-restore: balance loader rejects with a plain Error (no .response) → still resolves to restored with empty balances", async () => {
   const { deps } = buildHarness({
     loadBalances: spy(async (_pk: string): Promise<Balance[]> => {
-      throw "string error"; // eslint-disable-line @typescript-eslint/no-throw-literal
+      throw new Error("plain error without a response field");
     }),
   });
 
