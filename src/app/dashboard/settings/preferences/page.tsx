@@ -9,6 +9,7 @@ import { mockAuditService } from "@/lib/mock-audit";
 import { SettingsSectionSkeleton } from "@/components/ui/Skeleton";
 import { useTheme, ThemeMode } from "@/contexts/ThemeProvider";
 import { useI18n } from "@/contexts/I18nContext";
+import { LOCALE_OPTIONS as LOCALES } from "@/lib/locale-options";
 
 interface PreferencesData {
   locale: string;
@@ -16,17 +17,6 @@ interface PreferencesData {
   currencyFormat: string;
   theme: ThemeMode;
 }
-
-const LOCALES = [
-  { value: "en-US", label: "English (United States)" },
-  { value: "en-GB", label: "English (United Kingdom)" },
-  { value: "fr-FR", label: "French (France)" },
-  { value: "de-DE", label: "German (Germany)" },
-  { value: "es-ES", label: "Spanish (Spain)" },
-  { value: "pt-BR", label: "Portuguese (Brazil)" },
-  { value: "ja-JP", label: "Japanese (Japan)" },
-  { value: "zh-CN", label: "Chinese (Simplified)" },
-];
 
 const TIMEZONES = [
   { value: "UTC", label: "UTC — Coordinated Universal Time" },

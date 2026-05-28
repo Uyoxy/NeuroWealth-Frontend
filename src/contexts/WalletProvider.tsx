@@ -30,15 +30,14 @@ import {
 } from "@/lib/wallet-network-detection";
 import { formatConfiguredNetworkLabel } from "@/lib/stellar-network";
 import { logger } from "@/lib/logger";
+import {
+  attemptWalletRestore,
+  type Balance,
+} from "@/lib/wallet-restore";
+
+export type { Balance };
 
 const Server = Horizon.Server;
-
-export interface Balance {
-  balance: string;
-  asset_type: string;
-  asset_code?: string;
-  asset_issuer?: string;
-}
 
 export interface PaymentOptions {
   to: string;
@@ -262,50 +261,37 @@ export function WalletProvider({
     const autoReconnect = async () => {
       if (typeof window === "undefined") return;
 
-      const saved = readPersistedWalletState();
-
-      if (saved) {
-        try {
+      const outcome = await attemptWalletRestore({
+        readPersisted: readPersistedWalletState,
+        resolveKitAddress: async (providerId) => {
           const currentKit = kit();
-          currentKit.setWallet(saved.providerId);
+          currentKit.setWallet(providerId);
           const { address } = await currentKit.getAddress();
+          return address;
+        },
+        loadBalances: async (publicKey) => {
+          const account = await server.accounts().accountId(publicKey).call();
+          return account.balances;
+        },
+        persist: persistWalletState,
+        clear: clearPersistedWalletState,
+        networkPassphrase: network,
+      });
 
-          if (address === saved.publicKey) {
-            setPublicKey(address);
-            setWalletName(saved.displayName);
-            setWalletProviderId(saved.providerId);
-            setConnected(true);
-            await refreshNetworkStatus(saved.providerId);
-
-            persistWalletState({
-              ...saved,
-              networkPassphrase: network,
-            });
-
-            try {
-              const account = await server.accounts().accountId(address).call();
-              setBalances(account.balances);
-            } catch (error: unknown) {
-              if (
-                error &&
-                typeof error === "object" &&
-                "response" in error &&
-                (error as { response?: { status?: number } }).response
-                  ?.status === 404
-              ) {
-                logger.info(
-                  `Account ${address} not found. Fund it to activate.`,
-                );
-                setBalances([]);
-              } else {
-                setBalances([]);
-              }
-            }
-          }
-        } catch {
-          logger.warn("Auto-reconnect failed");
-          clearPersistedWalletState();
+      if (outcome.kind === "restored") {
+        setPublicKey(outcome.publicKey);
+        setWalletName(outcome.displayName);
+        setWalletProviderId(outcome.providerId);
+        setConnected(true);
+        await refreshNetworkStatus(outcome.providerId);
+        setBalances(outcome.balances);
+        if (outcome.accountNotFound) {
+          logger.info(
+            `Account ${outcome.publicKey} not found. Fund it to activate.`,
+          );
         }
+      } else if (outcome.kind === "kit-error") {
+        logger.warn("Auto-reconnect failed");
       }
 
       setIsRestoring(false);

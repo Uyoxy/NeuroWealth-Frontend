@@ -37,6 +37,10 @@ export const STORAGE_KEYS = {
   WALLET_NETWORK: "nw_wallet_network",
   WALLET_PROVIDER: "nw_wallet_provider",
   WALLET_DISPLAY_NAME: "nw_wallet_display_name",
+
+  // UI translation locale (I18nContext). Distinct from the BCP47 locale stored
+  // inside the PROFILE / PREFERENCES blobs — see src/lib/locale-options.ts.
+  LOCALE: "neurowealth.locale",
 } as const;
 
 /** Legacy keys used before centralization; migrated on read. */
