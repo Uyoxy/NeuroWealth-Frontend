@@ -67,7 +67,7 @@ function setupFocusTrapElements() {
 
   [trigger, container, first, last].forEach((element) => connectedElements.add(element));
   activeElement = trigger;
-  globalThis.HTMLElement = FakeElement as typeof HTMLElement;
+  globalThis.HTMLElement = FakeElement as unknown as typeof HTMLElement;
 
   const ownerDocument = {
     get activeElement() {
@@ -120,12 +120,14 @@ test("createFocusTrap keeps Tab focus inside the container", () => {
 
   const cleanup = createFocusTrap(setup.container, setup.ownerDocument);
 
+  const fakeContainer = setup.container as unknown as FakeElement;
+
   setup.last.focus();
-  assert.equal(setup.container.dispatchTab(), true);
+  assert.equal(fakeContainer.dispatchTab(), true);
   assert.equal(setup.activeElement, setup.first);
 
   setup.first.focus();
-  assert.equal(setup.container.dispatchTab(true), true);
+  assert.equal(fakeContainer.dispatchTab(true), true);
   assert.equal(setup.activeElement, setup.last);
 
   cleanup();
