@@ -178,6 +178,7 @@ export default function WalletConnectButton({
         <button
           onClick={handleClick}
           disabled={isLoading}
+          data-qa="wallet-connect-button"
           className={`px-6 py-2.5 text-sm font-medium rounded-full transition-colors ${
             theme === "light"
               ? "bg-black text-white hover:bg-gray-800"

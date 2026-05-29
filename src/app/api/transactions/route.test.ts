@@ -1,0 +1,130 @@
+import assert from "node:assert/strict";
+import test from "node:test";
+
+import { POST } from "./route";
+import { NextRequest } from "next/server";
+
+function makePostRequest(body: unknown, scenario?: string): NextRequest {
+  const url = scenario
+    ? `http://localhost:3000/api/transactions?scenario=${scenario}`
+    : "http://localhost:3000/api/transactions";
+  return new NextRequest(url, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(body),
+  });
+}
+
+const VALID_STELLAR_ADDRESS = "GB4Q5QW7GWXW2P2UAEY6SVS2XHNRDXQ6T7MIP72N6YLHH6GXQK4YAP5G";
+
+const validDeposit = {
+  intent: "quote",
+  kind: "deposit",
+  values: {
+    amount: "100",
+    walletAddress: VALID_STELLAR_ADDRESS,
+    walletConnected: true,
+  },
+};
+
+const validWithdrawal = {
+  intent: "quote",
+  kind: "withdrawal",
+  values: {
+    amount: "50",
+    walletAddress: VALID_STELLAR_ADDRESS,
+    walletConnected: true,
+  },
+};
+
+test("POST /api/transactions returns 200 for valid deposit quote", async () => {
+  const req = makePostRequest(validDeposit);
+  const res = await POST(req);
+  const body = await res.json();
+
+  assert.equal(res.status, 200);
+  assert.equal(body.success, true);
+  assert.ok(body.data.quote);
+});
+
+test("POST /api/transactions returns 200 for valid withdrawal quote", async () => {
+  const req = makePostRequest(validWithdrawal);
+  const res = await POST(req);
+  const body = await res.json();
+
+  assert.equal(res.status, 200);
+  assert.equal(body.success, true);
+  assert.ok(body.data.quote);
+});
+
+test("POST /api/transactions returns 200 for submit intent", async () => {
+  const req = makePostRequest({ ...validDeposit, intent: "submit" });
+  const res = await POST(req);
+  const body = await res.json();
+
+  assert.equal(res.status, 200);
+  assert.equal(body.success, true);
+  assert.ok(body.data.pending);
+});
+
+test("POST /api/transactions returns 400 for missing kind", async () => {
+  const req = makePostRequest({
+    intent: "quote",
+    values: { amount: "100", walletAddress: "GABC123", walletConnected: true },
+  });
+  const res = await POST(req);
+  const body = await res.json();
+
+  assert.equal(res.status, 400);
+  assert.equal(body.success, false);
+  assert.equal(body.error.code, "VALIDATION_ERROR");
+});
+
+test("POST /api/transactions returns 400 for invalid kind", async () => {
+  const req = makePostRequest({
+    intent: "quote",
+    kind: "invalid",
+    values: { amount: "100", walletAddress: "GABC123", walletConnected: true },
+  });
+  const res = await POST(req);
+  const body = await res.json();
+
+  assert.equal(res.status, 400);
+  assert.equal(body.success, false);
+});
+
+test("POST /api/transactions returns 400 for missing values", async () => {
+  const req = makePostRequest({ intent: "quote", kind: "deposit" });
+  const res = await POST(req);
+  const body = await res.json();
+
+  assert.equal(res.status, 400);
+  assert.equal(body.success, false);
+});
+
+test("POST /api/transactions returns 400 for malformed JSON body", async () => {
+  const req = new NextRequest("http://localhost:3000/api/transactions", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: "not-json",
+  });
+  const res = await POST(req);
+  const body = await res.json();
+
+  assert.equal(res.status, 400);
+  assert.equal(body.success, false);
+});
+
+test("POST /api/transactions simulation failure returns failure outcome", async () => {
+  const req = makePostRequest({
+    ...validDeposit,
+    intent: "submit",
+    simulation: "failure",
+  });
+  const res = await POST(req);
+  const body = await res.json();
+
+  assert.equal(res.status, 200);
+  assert.equal(body.success, true);
+  assert.ok(body.data.pending);
+});

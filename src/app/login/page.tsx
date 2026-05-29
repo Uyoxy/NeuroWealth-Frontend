@@ -74,6 +74,7 @@ function LoginContent() {
           <button
             onClick={handleDemoSignIn}
             disabled={isLoading}
+            data-qa="login-demo-button"
             className="btn-primary w-full flex items-center justify-center gap-2 py-3 text-sm"
             aria-label="Continue with demo account"
           >
