@@ -1,21 +1,19 @@
-import SkeletonBlock from "@/components/skeletons/SkeletonBlock";
-import SkeletonStatCard from "@/components/skeletons/SkeletonStatCard";
-import SkeletonAllocationWidget from "@/components/skeletons/SkeletonAllocationWidget";
+import { Skeleton, StatCardSkeleton, AllocationWidgetSkeleton } from "@/components/ui/Skeleton";
 
 export default function PortfolioLoading() {
   return (
     <div className="space-y-6 animate-fade-in" aria-busy="true" aria-label="Loading portfolio">
       {/* Stat cards */}
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-        {[1, 2, 3].map((i) => <SkeletonStatCard key={i} />)}
+        {[1, 2, 3].map((i) => <StatCardSkeleton key={i} />)}
       </div>
       {/* Chart placeholder */}
       <div className="card">
-        <SkeletonBlock className="h-3.5 w-36 mb-5" />
-        <SkeletonBlock className="h-48 w-full rounded-lg" />
+        <Skeleton height={14} width="36%" style={{ marginBottom: 20 }} />
+        <Skeleton height={192} width="100%" radius={8} />
       </div>
       {/* Allocation */}
-      <SkeletonAllocationWidget />
+      <AllocationWidgetSkeleton />
     </div>
   );
 }

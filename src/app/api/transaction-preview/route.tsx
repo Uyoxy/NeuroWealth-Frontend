@@ -58,7 +58,7 @@ export async function GET(request: Request) {
   const snapshot = buildPreviewSnapshot(kind, preview);
   const chips = buildStatusChips(kind, snapshot.form);
 
-  return new ImageResponse(
+  const imageResponse = new ImageResponse(
     <div
       style={{
         width: "100%",
@@ -543,4 +543,12 @@ export async function GET(request: Request) {
       height: 1000,
     },
   );
+
+  // Add cache headers to avoid regenerating images on every request
+  imageResponse.headers.set(
+    "Cache-Control",
+    "public, s-maxage=86400, max-age=3600"
+  );
+
+  return imageResponse;
 }

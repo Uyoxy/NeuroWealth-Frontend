@@ -63,7 +63,7 @@ export async function GET(request: Request) {
     notice: null,
   });
 
-  return new ImageResponse(
+  const imageResponse = new ImageResponse(
     <div
       style={{
         width: "100%",
