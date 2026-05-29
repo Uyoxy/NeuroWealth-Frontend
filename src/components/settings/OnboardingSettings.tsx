@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import { Card } from '@/components/ui/Card';
 import { Button } from '@/components/ui/Button';
+import { useToast } from '@/components/notifications/ToastProvider';
 import { STORAGE_KEYS } from '@/lib/storage-keys';
 const ONBOARDING_STATE_STORAGE_KEY = STORAGE_KEYS.ONBOARDING_STATE;
 const ONBOARDING_STRATEGY_STORAGE_KEY = STORAGE_KEYS.ONBOARDING_USER_STRATEGY;
@@ -17,6 +18,7 @@ interface OnboardingState {
 export default function OnboardingSettings() {
   const [onboardingState, setOnboardingState] = useState<OnboardingState | null>(null);
   const [isResetting, setIsResetting] = useState(false);
+  const { pushToast } = useToast();
 
   useEffect(() => {
     loadOnboardingState();
@@ -57,7 +59,11 @@ export default function OnboardingSettings() {
       globalThis.location.href = '/onboarding';
     } catch (error) {
       console.error('Failed to reset onboarding:', error);
-      alert('Failed to reset onboarding. Please try again.');
+      pushToast({
+        title: 'Failed to reset onboarding',
+        description: 'Please try again.',
+        variant: 'error',
+      });
     } finally {
       setIsResetting(false);
     }

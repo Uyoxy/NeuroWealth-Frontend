@@ -9,6 +9,7 @@ export interface UploadFile {
   progress: number;        // 0–100
   status: "pending" | "uploading" | "done" | "cancelled" | "error";
   previewUrl?: string;
+  errorMessage?: string;
 }
 
 export interface FileUploadProps {
@@ -75,14 +76,23 @@ export default function FileUpload({
   const abortMap = useRef<Map<string, AbortController>>(new Map());
 
   const startUpload = useCallback((file: File) => {
-    if (file.size > maxSizeMB * 1024 * 1024) {
-      alert(`File exceeds ${maxSizeMB}MB limit.`);
-      return;
-    }
     const id = crypto.randomUUID();
     const previewUrl = file.type.startsWith("image/") ? URL.createObjectURL(file) : undefined;
-    const entry: UploadFile = { id, file, progress: 0, status: "uploading", previewUrl };
 
+    if (file.size > maxSizeMB * 1024 * 1024) {
+      const entry: UploadFile = {
+        id,
+        file,
+        progress: 0,
+        status: "error",
+        previewUrl,
+        errorMessage: `File exceeds ${maxSizeMB}MB limit.`,
+      };
+      setFiles((prev) => [...prev, entry]);
+      return;
+    }
+
+    const entry: UploadFile = { id, file, progress: 0, status: "uploading", previewUrl };
     setFiles((prev) => [...prev, entry]);
 
     const ac = new AbortController();
@@ -238,7 +248,9 @@ export default function FileUpload({
                   <span style={{ fontSize: 11, color: "#6b7280" }}>cancelled</span>
                 )}
                 {f.status === "error" && (
-                  <span style={{ fontSize: 11, color: "#ef4444" }}>upload failed</span>
+                  <span style={{ fontSize: 11, color: "#ef4444" }}>
+                    {f.errorMessage || "upload failed"}
+                  </span>
                 )}
               </div>
 
