@@ -4,10 +4,12 @@ import { useState } from "react";
 import { useToast } from "@/components/notifications/ToastProvider";
 import { InlineBanner } from "@/components/ui/InlineBanner";
 import { Button } from "@/components/ui/Button";
+import { NotificationCenter } from "@/components/notifications/NotificationCenter";
 
 export default function NotificationsDemo() {
   const { pushToast, dismissToast, setLimit, limit, toasts } = useToast();
   const [showBanner, setShowBanner] = useState<"success" | "info" | "warning" | "error" | null>(null);
+  const [showNotificationCenter, setShowNotificationCenter] = useState(false);
 
   const handleToast = (variant: "success" | "info" | "warning" | "error") => {
     const messages = {
@@ -118,6 +120,27 @@ export default function NotificationsDemo() {
           )}
         </section>
 
+        {/* Notification Center Section */}
+        <section className="space-y-4">
+          <h2 className="text-xl font-semibold text-white">Notification Center</h2>
+          <div className="bg-dark-800 rounded-xl border border-white/10 p-6 space-y-4">
+            <div className="flex items-center justify-between">
+              <div>
+                <h3 className="text-white font-medium">In-App Notification Center</h3>
+                <p className="text-slate-400 text-sm">View and manage transaction and system event notifications</p>
+              </div>
+              <Button onClick={() => setShowNotificationCenter(!showNotificationCenter)} variant="ghost">
+                {showNotificationCenter ? "Hide" : "Show"} Center
+              </Button>
+            </div>
+            {showNotificationCenter && (
+              <div className="mt-4 flex justify-center">
+                <NotificationCenter />
+              </div>
+            )}
+          </div>
+        </section>
+
         {/* Accessibility Notes */}
         <section className="space-y-4">
           <h2 className="text-xl font-semibold text-white">Accessibility Features</h2>
@@ -148,6 +171,13 @@ export default function NotificationsDemo() {
               <div>
                 <h3 className="text-white font-medium">Auto-Dismiss (3-6s)</h3>
                 <p className="text-slate-400 text-sm">Toasts automatically dismiss after 3-6 seconds (configurable)</p>
+              </div>
+            </div>
+            <div className="flex items-start gap-3">
+              <div className="w-2 h-2 rounded-full bg-emerald-400 mt-2" />
+              <div>
+                <h3 className="text-white font-medium">44px Touch Target</h3>
+                <p className="text-slate-400 text-sm">Preference toggle controls meet minimum touch target requirements</p>
               </div>
             </div>
           </div>
