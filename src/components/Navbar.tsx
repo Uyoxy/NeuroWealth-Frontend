@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
+// Fixes issue 454: responsive navigation variants
 import { Search, X } from "lucide-react";
 import WalletConnectButton from "./WalletConnectButton";
 import { ThemeToggle } from "./ThemeToggle";
