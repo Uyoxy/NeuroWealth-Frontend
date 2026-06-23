@@ -5,7 +5,7 @@ import { STORAGE_KEYS } from "@/lib/storage-keys";
 import { logger } from "@/lib/logger";
 
 export type ScenarioType = "success" | "empty" | "loading" | "partial-failure" | "timeout";
-type ModuleType = "portfolio" | "history" | "transactions";
+export type ModuleType = "portfolio" | "history" | "transactions" | "notifications";
 
 interface ScenarioState {
   [key: string]: ScenarioType;
@@ -23,6 +23,7 @@ const defaultScenarios: ScenarioState = {
   portfolio: "success",
   history: "success",
   transactions: "success",
+  notifications: "success",
 };
 const SANDBOX_STORAGE_KEY = STORAGE_KEYS.SANDBOX_SCENARIOS;
 

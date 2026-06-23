@@ -7,7 +7,7 @@ import { STORAGE_KEYS } from "@/lib/storage-keys";
 import { logger } from "@/lib/logger";
 
 type ScenarioType = "success" | "empty" | "loading" | "partial-failure" | "timeout";
-type ModuleType = "portfolio" | "history" | "transactions";
+type ModuleType = "portfolio" | "history" | "transactions" | "notifications";
 
 interface ScenarioState {
   [key: string]: ScenarioType;
@@ -25,6 +25,7 @@ const MODULE_LABELS: Record<ModuleType, string> = {
   portfolio: "Portfolio",
   history: "History",
   transactions: "Transactions",
+  notifications: "Notifications",
 };
 const SANDBOX_STORAGE_KEY = STORAGE_KEYS.SANDBOX_SCENARIOS;
 
@@ -35,6 +36,7 @@ export default function SandboxClientPage() {
     portfolio: "success",
     history: "success",
     transactions: "success",
+    notifications: "success",
   });
   const [isClient, setIsClient] = useState(false);
 
@@ -67,6 +69,7 @@ export default function SandboxClientPage() {
       portfolio: "success",
       history: "success",
       transactions: "success",
+      notifications: "success",
     };
     setScenarios(defaultScenarios);
   };
@@ -159,6 +162,7 @@ export default function SandboxClientPage() {
                     portfolio: "success",
                     history: "success",
                     transactions: "success",
+                    notifications: "success",
                   });
                 }}
                 className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors"
@@ -171,6 +175,7 @@ export default function SandboxClientPage() {
                     portfolio: "empty",
                     history: "empty",
                     transactions: "empty",
+                    notifications: "empty",
                   });
                 }}
                 className="px-4 py-2 bg-yellow-600 text-white rounded-lg hover:bg-yellow-700 transition-colors"
@@ -183,6 +188,7 @@ export default function SandboxClientPage() {
                     portfolio: "loading",
                     history: "loading",
                     transactions: "loading",
+                    notifications: "loading",
                   });
                 }}
                 className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
@@ -195,6 +201,7 @@ export default function SandboxClientPage() {
                     portfolio: "partial-failure",
                     history: "partial-failure",
                     transactions: "partial-failure",
+                    notifications: "partial-failure",
                   });
                 }}
                 className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors"
