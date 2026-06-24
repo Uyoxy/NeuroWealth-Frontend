@@ -29,7 +29,11 @@
   --motion-duration-180: 180ms;
   --motion-duration-240: 240ms;
   --motion-easing-standard: cubic-bezier(0.25, 0.46, 0.45, 0.94);
-  /* Reduced motion preference */
+  /* Skeleton shimmer tokens — consumed by Skeleton.module.css
+   * Duration 1.4 s satisfies the 1.2–1.8 s design spec requirement. */
+  --skeleton-base: rgba(30, 41, 59, 0.85);
+  --skeleton-shine: rgba(71, 85, 105, 0.55);
+  --skeleton-duration: 1.4s;
 }
 
 @media (prefers-reduced-motion: reduce) {
