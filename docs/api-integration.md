@@ -25,6 +25,45 @@ See `docs/env.md` for complete environment variable documentation.
 
 ## API Endpoints
 
+### Request Body Limits
+
+JSON write routes enforce a 100 KB request body limit before schema validation.
+This application-level limit is intentionally below Vercel Functions' documented
+4.5 MB request/response payload cap while matching the small payloads expected by
+the transaction and strategy flows.
+
+Affected frontend routes:
+
+- `POST /api/transactions`
+- `PUT /api/strategy`
+
+Oversized requests return `413 Payload Too Large` with the standard envelope:
+
+```json
+{
+  "success": false,
+  "error": {
+    "code": "PAYLOAD_TOO_LARGE",
+    "message": "Request body must not exceed 100 KB."
+  }
+}
+```
+
+Malformed JSON returns `400 Bad Request` before route-specific validation:
+
+```json
+{
+  "success": false,
+  "error": {
+    "code": "VALIDATION_ERROR",
+    "message": "Request body must be valid JSON.",
+    "details": {
+      "body": ["Malformed JSON payload."]
+    }
+  }
+}
+```
+
 ### 1. Portfolio Overview
 
 **Frontend Route:** `GET /api/portfolio?scenario=live`
