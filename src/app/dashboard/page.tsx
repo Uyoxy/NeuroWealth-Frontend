@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { Suspense } from "react";
-import { PortfolioDashboard } from "@/components/dashboard/PortfolioDashboard";
+import { RealtimeDashboard } from "@/components/dashboard/RealtimeDashboard";
 import { ProtectedRoute } from "@/components/auth/ProtectedRoute";
 import { DashboardSkeleton } from "@/components/ui/Skeleton";
 
@@ -17,7 +17,7 @@ export default function DashboardPage() {
   return (
     <ProtectedRoute>
       <Suspense fallback={<DashboardSkeleton />}>
-        <PortfolioDashboard />
+        <RealtimeDashboard />
       </Suspense>
     </ProtectedRoute>
   );
