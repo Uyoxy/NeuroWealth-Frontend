@@ -21,6 +21,18 @@ Run tests:
 yarn test
 ```
 
+Inspect bundle size locally:
+
+```bash
+yarn analyze
+```
+
+This runs a production build with the Next.js bundle analyzer enabled via `ANALYZE=true`.
+The report is written under `.next/analyze/`, which is already ignored by git.
+
+Use this command when checking for bundle regressions before merging. We do not run it in CI
+because analyzer builds are slower than the normal test/lint/build pipeline.
+
 ## What this repo contains
 
 - Next.js 14 app under `src/app`
@@ -120,6 +132,8 @@ The mock auth flow stores the session in `localStorage` using `SESSION_STORAGE_K
 
 - Follow existing patterns for components and hooks.
 - Tests live next to logic under `src/` and run via `yarn test`.
+- For bundle-size checks, run `yarn analyze` locally and review the generated report before
+  changing code that affects route or vendor bundles.
 
 ## License
 
