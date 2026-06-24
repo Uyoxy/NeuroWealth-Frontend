@@ -149,3 +149,27 @@ export function formatSyncLabel(value: string): string {
   const prefix = dictionaries[getActiveLocale()].formatters.updatedPrefix;
   return `${prefix} ${getTimestampFormatter().format(new Date(value))}`;
 }
+
+function getDateFormatter(options?: Intl.DateTimeFormatOptions) {
+  return new Intl.DateTimeFormat(getActiveIntlLocale(), {
+    month: "short",
+    day: "numeric",
+    year: "numeric",
+    ...options,
+  });
+}
+
+function getNumberFormatter(options?: Intl.NumberFormatOptions) {
+  return new Intl.NumberFormat(getActiveIntlLocale(), {
+    ...options,
+  });
+}
+
+export function formatDate(value: string | Date, options?: Intl.DateTimeFormatOptions): string {
+  const date = typeof value === "string" ? new Date(value) : value;
+  return getDateFormatter(options).format(date);
+}
+
+export function formatNumber(value: number, options?: Intl.NumberFormatOptions): string {
+  return getNumberFormatter(options).format(value);
+}

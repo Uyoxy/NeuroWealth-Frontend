@@ -38,6 +38,15 @@ export interface AppMessages {
     switcherLabel: string;
     options: Record<AppLocale, string>;
   };
+  common: {
+    comingSoon: string;
+    loading: string;
+    retry: string;
+    save: string;
+    cancel: string;
+    edit: string;
+    open: string;
+  };
   navbar: {
     features: string;
     howItWorks: string;
@@ -213,6 +222,15 @@ export const dictionaries: Record<AppLocale, AppMessages> = {
         en: "English",
         fr: "Français",
       },
+    },
+    common: {
+      comingSoon: "Coming soon",
+      loading: "Loading...",
+      retry: "Retry",
+      save: "Save",
+      cancel: "Cancel",
+      edit: "Edit",
+      open: "Open",
     },
     navbar: {
       features: "Features",
@@ -511,6 +529,15 @@ export const dictionaries: Record<AppLocale, AppMessages> = {
         en: "Anglais",
         fr: "Français",
       },
+    },
+    common: {
+      comingSoon: "Bientôt disponible",
+      loading: "Chargement...",
+      retry: "Réessayer",
+      save: "Enregistrer",
+      cancel: "Annuler",
+      edit: "Modifier",
+      open: "Ouvrir",
     },
     navbar: {
       features: "Fonctionnalités",

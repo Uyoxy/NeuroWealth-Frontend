@@ -43,6 +43,13 @@ function applyTheme(resolvedTheme: "light" | "dark") {
   root.classList.add(resolvedTheme);
 }
 
+function addTransitionClass() {
+  if (typeof globalThis.window === "undefined") return;
+  const root = globalThis.window.document.documentElement;
+  root.classList.add("theme-transitioning");
+  setTimeout(() => root.classList.remove("theme-transitioning"), 200);
+}
+
 interface ThemeProviderProps {
   readonly children: ReactNode;
 }
@@ -58,6 +65,7 @@ export function ThemeProvider({ children }: ThemeProviderProps) {
     globalThis.window?.localStorage.setItem(THEME_STORAGE_KEY, newTheme);
     const resolved = resolveTheme(newTheme);
     setResolvedTheme(resolved);
+    addTransitionClass();
     applyTheme(resolved);
   }, []);
 

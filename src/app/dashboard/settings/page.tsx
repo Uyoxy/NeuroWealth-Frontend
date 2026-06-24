@@ -1,7 +1,8 @@
 import { Suspense } from "react";
 import Link from "next/link";
-import { Bell, ChevronRight, Globe, Shield, UserRound, Wallet } from "lucide-react";
+import { Bell, ChevronRight, Globe, Monitor, Palette, Shield, UserRound, Wallet } from "lucide-react";
 import SettingsLoading from "./loading";
+import { ThemeSettings } from "@/components/settings/ThemeSettings";
 
 export const dynamic = "force-dynamic";
 export const metadata = { title: "Settings — NeuroWealth" };
@@ -80,6 +81,14 @@ function SettingsContent() {
           Manage your account preferences and connected wallet.
         </p>
       </div>
+
+      <SettingsSection title="Appearance" icon={Palette}>
+        <SettingsRow
+          label="Theme"
+          description="Choose between light, dark, or system preference."
+          action={<ThemeSettings />}
+        />
+      </SettingsSection>
 
       <SettingsSection title="Profile" icon={UserRound}>
         <SettingsRow
