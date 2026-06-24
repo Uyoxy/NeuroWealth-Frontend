@@ -6,6 +6,7 @@ import { useAuth } from "@/contexts";
 import { MAIN_CONTENT_LANDMARK_ID } from "@/lib/app-landmarks";
 import { Loader2, Zap, Eye, EyeOff, Github, Chrome } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { FormField } from "@/components/ui";
 
 export const dynamic = "force-dynamic";
 
@@ -148,97 +149,93 @@ function LoginContent() {
 
           {/* Login form */}
           <form onSubmit={handleSubmit} noValidate className="space-y-4">
-            {/* Email */}
-            <div className="space-y-1">
-              <label
-                htmlFor="email"
-                className="block text-sm font-medium text-text-primary"
-              >
-                Email address
-              </label>
-              <input
-                id="email"
-                type="email"
-                autoComplete="email"
-                value={email}
-                onChange={(e) => {
-                  setEmail(e.target.value);
-                  setEmailError(null);
-                  setFormError(null);
-                  if (state === "error") setState("idle");
-                }}
-                disabled={isLoading || isSuccess}
-                aria-describedby={emailError ? "email-error" : undefined}
-                aria-invalid={!!emailError}
-                placeholder="you@example.com"
-                className={cn(
-                  "w-full rounded-lg border bg-surface px-3 py-2 text-sm text-text-primary placeholder:text-text-muted outline-none transition-colors",
-                  "focus:ring-2 focus:ring-primary/40 focus:border-primary/60",
-                  emailError
-                    ? "border-error focus:ring-error/30"
-                    : "border-border",
-                  (isLoading || isSuccess) && "opacity-50 cursor-not-allowed",
-                )}
-              />
-              {emailError && (
-                <p id="email-error" role="alert" className="text-[14px] text-error">
-                  {emailError}
-                </p>
-              )}
-            </div>
-
-            {/* Password */}
-            <div className="space-y-1">
-              <label
-                htmlFor="password"
-                className="block text-sm font-medium text-text-primary"
-              >
-                Password
-              </label>
-              <div className="relative">
+            <FormField
+              id="email"
+              label="Email address"
+              error={emailError ?? undefined}
+              className="space-y-1"
+              labelClassName="block text-sm font-medium text-text-primary"
+              errorCompact
+              errorIcon={false}
+            >
+              {({ id, "aria-describedby": ariaDescribedBy, "aria-invalid": ariaInvalid }) => (
                 <input
-                  id="password"
-                  type={showPassword ? "text" : "password"}
-                  autoComplete="current-password"
-                  value={password}
+                  id={id}
+                  type="email"
+                  autoComplete="email"
+                  value={email}
                   onChange={(e) => {
-                    setPassword(e.target.value);
-                    setPasswordError(null);
+                    setEmail(e.target.value);
+                    setEmailError(null);
                     setFormError(null);
                     if (state === "error") setState("idle");
                   }}
                   disabled={isLoading || isSuccess}
-                  aria-describedby={passwordError ? "password-error" : undefined}
-                  aria-invalid={!!passwordError}
-                  placeholder="••••••••"
+                  aria-describedby={ariaDescribedBy}
+                  aria-invalid={ariaInvalid}
+                  placeholder="you@example.com"
                   className={cn(
-                    "w-full rounded-lg border bg-surface px-3 py-2 pr-10 text-sm text-text-primary placeholder:text-text-muted outline-none transition-colors",
+                    "w-full rounded-lg border bg-surface px-3 py-2 text-sm text-text-primary placeholder:text-text-muted outline-none transition-colors",
                     "focus:ring-2 focus:ring-primary/40 focus:border-primary/60",
-                    passwordError
+                    emailError
                       ? "border-error focus:ring-error/30"
                       : "border-border",
                     (isLoading || isSuccess) && "opacity-50 cursor-not-allowed",
                   )}
                 />
-                <button
-                  type="button"
-                  onClick={() => setShowPassword((v) => !v)}
-                  aria-label={showPassword ? "Hide password" : "Show password"}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-text-muted hover:text-text-secondary transition-colors"
-                >
-                  {showPassword ? (
-                    <EyeOff className="w-4 h-4" aria-hidden="true" />
-                  ) : (
-                    <Eye className="w-4 h-4" aria-hidden="true" />
-                  )}
-                </button>
-              </div>
-              {passwordError && (
-                <p id="password-error" role="alert" className="text-[14px] text-error">
-                  {passwordError}
-                </p>
               )}
-            </div>
+            </FormField>
+
+            <FormField
+              id="password"
+              label="Password"
+              error={passwordError ?? undefined}
+              className="space-y-1"
+              labelClassName="block text-sm font-medium text-text-primary"
+              errorCompact
+              errorIcon={false}
+            >
+              {({ id, "aria-describedby": ariaDescribedBy, "aria-invalid": ariaInvalid }) => (
+                <div className="relative">
+                  <input
+                    id={id}
+                    type={showPassword ? "text" : "password"}
+                    autoComplete="current-password"
+                    value={password}
+                    onChange={(e) => {
+                      setPassword(e.target.value);
+                      setPasswordError(null);
+                      setFormError(null);
+                      if (state === "error") setState("idle");
+                    }}
+                    disabled={isLoading || isSuccess}
+                    aria-describedby={ariaDescribedBy}
+                    aria-invalid={ariaInvalid}
+                    placeholder="••••••••"
+                    className={cn(
+                      "w-full rounded-lg border bg-surface px-3 py-2 pr-10 text-sm text-text-primary placeholder:text-text-muted outline-none transition-colors",
+                      "focus:ring-2 focus:ring-primary/40 focus:border-primary/60",
+                      passwordError
+                        ? "border-error focus:ring-error/30"
+                        : "border-border",
+                      (isLoading || isSuccess) && "opacity-50 cursor-not-allowed",
+                    )}
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowPassword((v) => !v)}
+                    aria-label={showPassword ? "Hide password" : "Show password"}
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-text-muted hover:text-text-secondary transition-colors"
+                  >
+                    {showPassword ? (
+                      <EyeOff className="w-4 h-4" aria-hidden="true" />
+                    ) : (
+                      <Eye className="w-4 h-4" aria-hidden="true" />
+                    )}
+                  </button>
+                </div>
+              )}
+            </FormField>
 
             {/* Submit */}
             <button
