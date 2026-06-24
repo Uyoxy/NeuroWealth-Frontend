@@ -138,6 +138,10 @@ The mock auth flow stores the session in `localStorage` using `SESSION_STORAGE_K
   action, for example `landing-primary-cta-button`, `wallet-connect-button`, and
   `transaction-submit-button`.
 
+## Security
+
+To report a vulnerability or for our handling and response expectations, see [SECURITY.md](SECURITY.md). Please do not file public issues for security reports.
+
 ## License
 
 Internal/demo project — see repository owner for license details.
