@@ -44,7 +44,7 @@ function LoginContent() {
       tabIndex={-1}
       className="min-h-screen bg-app-bg flex items-center justify-center px-4"
     >
-      <div className="w-full max-w-sm">
+      <div className="w-full max-w-[420px]">
         <div className="flex items-center justify-center gap-2 mb-8">
           <div className="w-9 h-9 rounded-lg bg-primary/20 flex items-center justify-center">
             <Zap className="w-5 h-5 text-primary" />
@@ -75,7 +75,7 @@ function LoginContent() {
             onClick={handleDemoSignIn}
             disabled={isLoading}
             data-qa="login-demo-button"
-            className="btn-primary w-full flex items-center justify-center gap-2 py-3 text-sm"
+            className="btn-primary w-full flex items-center justify-center gap-2 min-h-11 py-3 text-sm"
             aria-label="Continue with demo account"
           >
             {isLoading ? (

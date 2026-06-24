@@ -174,7 +174,7 @@ export default function SignUpPage() {
       tabIndex={-1}
       className="flex min-h-screen items-center justify-center bg-[linear-gradient(135deg,#020617_0%,#0f172a_100%)] px-4 py-10"
     >
-      <Card className="w-full max-w-xl space-y-6 border-slate-700/50 bg-dark-800/80 p-8">
+      <Card className="w-full max-w-[420px] space-y-6 border-slate-700/50 bg-dark-800/80 p-8">
         <header className="space-y-2 text-center">
           <h1 className="text-3xl font-bold text-slate-50">Create Account</h1>
           <p className="text-sm text-slate-400">
@@ -219,10 +219,10 @@ export default function SignUpPage() {
               disabled={isLoading || isSuccess}
               aria-invalid={Boolean(errors.name)}
               aria-describedby={errors.name ? "signup-name-error" : undefined}
-              className={`w-full rounded-xl border bg-slate-950/40 px-4 py-3 text-sm text-slate-100 outline-none transition ${
+              className={`w-full min-h-11 rounded-xl border bg-slate-950/40 px-4 py-3 text-sm text-slate-100 outline-none transition ${
                 errors.name
-                  ? "border-red-500/60 focus:border-red-500 focus:ring-2 focus:ring-red-500/15"
-                  : "border-slate-700/60 focus:border-sky-400 focus:ring-2 focus:ring-sky-400/15"
+                  ? "border-red-500/60 focus:border-red-500 focus:ring-2 focus:ring-red-500"
+                  : "border-slate-700/60 focus:border-sky-400 focus:ring-2 focus:ring-sky-400"
               }`}
               placeholder="John Doe"
             />
@@ -253,10 +253,10 @@ export default function SignUpPage() {
                   errors.email ? "signup-email-error" : undefined,
                 )}
                 aria-busy={emailValidating}
-                className={`w-full rounded-xl border bg-slate-950/40 px-4 py-3 text-sm text-slate-100 outline-none transition ${
+                className={`w-full min-h-11 rounded-xl border bg-slate-950/40 px-4 py-3 text-sm text-slate-100 outline-none transition ${
                   errors.email
-                    ? "border-red-500/60 focus:border-red-500 focus:ring-2 focus:ring-red-500/15"
-                    : "border-slate-700/60 focus:border-sky-400 focus:ring-2 focus:ring-sky-400/15"
+                    ? "border-red-500/60 focus:border-red-500 focus:ring-2 focus:ring-red-500"
+                    : "border-slate-700/60 focus:border-sky-400 focus:ring-2 focus:ring-sky-400"
                 }`}
                 placeholder="name@example.com"
               />
@@ -299,10 +299,10 @@ export default function SignUpPage() {
                     "signup-password-strength",
                     errors.password ? "signup-password-error" : undefined,
                   )}
-                  className={`w-full rounded-xl border bg-slate-950/40 px-4 py-3 text-sm text-slate-100 outline-none transition ${
+                  className={`w-full min-h-11 rounded-xl border bg-slate-950/40 px-4 py-3 text-sm text-slate-100 outline-none transition ${
                     errors.password
-                      ? "border-red-500/60 focus:border-red-500 focus:ring-2 focus:ring-red-500/15"
-                      : "border-slate-700/60 focus:border-sky-400 focus:ring-2 focus:ring-sky-400/15"
+                      ? "border-red-500/60 focus:border-red-500 focus:ring-2 focus:ring-red-500"
+                      : "border-slate-700/60 focus:border-sky-400 focus:ring-2 focus:ring-sky-400"
                   }`}
                   placeholder="Create a strong password"
                 />
