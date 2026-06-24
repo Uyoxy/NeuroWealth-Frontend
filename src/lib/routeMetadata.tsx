@@ -1,3 +1,14 @@
+/**
+ * Route metadata: single source of truth for breadcrumbs and navigation labels.
+ *
+ * When adding a new route to the app (especially under /dashboard):
+ * 1. Create the folder in src/app/<path>/
+ * 2. Add a corresponding entry in appRouteDefinitions below
+ * 3. Include a label so breadcrumbs and navigation stay in sync
+ *
+ * This ensures new routes don't silently lose their labels.
+ */
+
 import React from "react";
 import type { LucideIcon } from "lucide-react";
 import {
@@ -236,4 +247,18 @@ export function buildBreadcrumbsFromPath(
   });
 
   return items;
+}
+
+/** Verify all app routes are defined in routeMetadata. Call in tests or dev-time checks. */
+export function validateRouteMetadataCompleteness(): {
+  missingPaths: string[];
+  valid: boolean;
+} {
+  const expectedPaths = appRouteDefinitions.map((def) => def.href);
+  const missingPaths = expectedPaths.filter((path) => !routeMetadata[path]);
+
+  return {
+    missingPaths,
+    valid: missingPaths.length === 0,
+  };
 }
