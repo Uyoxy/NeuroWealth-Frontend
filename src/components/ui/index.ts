@@ -17,6 +17,8 @@ export type { ModalSize } from "./Modal";
 export * from "./Switch";
 export * from "./Tooltip";
 export { Drawer } from "./Drawer";
+export { DataTable } from "./DataTable";
+export type { DataTableColumn, DataTableProps } from "./DataTable";
 // Skeleton loading components
 export {
   Skeleton,
