@@ -1,5 +1,6 @@
 import { BaseAdapter } from "./base-adapter";
 import { ServiceResponse, PaginatedResponse, PaginationParams } from "./types";
+import { random } from "../seeded-rng";
 
 export interface Strategy {
   id: string;
@@ -107,7 +108,7 @@ export class StrategyService extends BaseAdapter {
       const performance: StrategyPerformance[] = [];
       for (let i = 30; i >= 0; i--) {
         const date = new Date(Date.now() - i * 24 * 60 * 60 * 1000);
-        const apy = strategy.expectedApy * (1 + (Math.random() - 0.5) * 0.2);
+        const apy = strategy.expectedApy * (1 + (random() - 0.5) * 0.2);
         const totalValue = 10000 * (1 + apy / 100 * (30 - i) / 365);
         performance.push({
           strategyId: strategy.id,

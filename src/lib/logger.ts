@@ -1,3 +1,5 @@
+import { random } from "./seeded-rng";
+
 export type LogLevel = "info" | "warn" | "error";
 
 export interface LogEntry {
@@ -46,7 +48,7 @@ export const scrubPII = (data: any): any => {
 };
 
 const createEntry = (level: LogLevel, message: string, context?: any): LogEntry => ({
-  id: Math.random().toString(36).substring(7),
+  id: random().toString(36).substring(7),
   timestamp: new Date().toISOString(),
   level,
   message,

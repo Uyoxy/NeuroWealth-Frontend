@@ -1,5 +1,6 @@
 import { BaseAdapter } from "./base-adapter";
 import { ServiceResponse, PaginatedResponse, PaginationParams } from "./types";
+import { random } from "../seeded-rng";
 
 export interface Transaction {
   id: string;
@@ -53,7 +54,7 @@ export class TransactionService extends BaseAdapter {
         status: "completed",
         fromAddress: "GD...1234",
         toAddress: "GA...5678",
-        txHash: "0x" + Math.random().toString(16).substr(2, 64),
+        txHash: "0x" + random().toString(16).substr(2, 64),
         fee: 0.01,
         createdAt: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000).toISOString(),
         completedAt: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000 + 5000).toISOString(),
@@ -66,7 +67,7 @@ export class TransactionService extends BaseAdapter {
         asset: "USDC",
         status: "completed",
         toAddress: "GA...9012",
-        txHash: "0x" + Math.random().toString(16).substr(2, 64),
+        txHash: "0x" + random().toString(16).substr(2, 64),
         fee: 0.02,
         createdAt: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000).toISOString(),
         completedAt: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000 + 10000).toISOString(),
@@ -249,7 +250,7 @@ export class TransactionService extends BaseAdapter {
     }
 
     // Simulate 90% success rate
-    const isSuccess = Math.random() < 0.9;
+    const isSuccess = random() < 0.9;
 
     transaction.status = isSuccess ? "processing" : "failed";
     this.mockTransactions.set(userId, transactions);
@@ -264,7 +265,7 @@ export class TransactionService extends BaseAdapter {
       if (updatedTransaction) {
         updatedTransaction.status = "completed";
         updatedTransaction.completedAt = new Date().toISOString();
-        updatedTransaction.txHash = "0x" + Math.random().toString(16).substr(2, 64);
+        updatedTransaction.txHash = "0x" + random().toString(16).substr(2, 64);
         this.mockTransactions.set(userId, updatedTransactions);
       }
     }

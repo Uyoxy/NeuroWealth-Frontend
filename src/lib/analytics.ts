@@ -1,4 +1,5 @@
 import { logger, scrubPII } from "./logger";
+import { random } from "./seeded-rng";
 
 export interface AnalyticsEvent {
   id: string;
@@ -26,7 +27,7 @@ export const analytics = {
   track: (name: string, params?: Record<string, any>) => {
     const safeParams = params ? scrubPII(params) : undefined;
     const event: AnalyticsEvent = {
-      id: Math.random().toString(36).substring(7),
+      id: random().toString(36).substring(7),
       name,
       timestamp: new Date().toISOString(),
       params: safeParams,

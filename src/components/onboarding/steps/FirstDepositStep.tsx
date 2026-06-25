@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { Button } from '@/components/ui/Button';
+import { random } from '@/lib/seeded-rng';
 
 interface FirstDepositStepProps {
   onNext: () => void;
@@ -69,7 +70,7 @@ export default function FirstDepositStep({ onNext, onSkip, onBack }: FirstDeposi
       await new Promise(resolve => setTimeout(resolve, 3000));
       
       // Simulate random success/failure (95% success rate)
-      if (Math.random() > 0.05) {
+      if (random() > 0.05) {
         // Save deposit record
         const depositRecord = {
           amount: finalAmount,

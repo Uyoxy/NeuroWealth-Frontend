@@ -1,5 +1,6 @@
 import { BaseAdapter } from "./base-adapter";
 import { ServiceResponse } from "./types";
+import { random } from "../seeded-rng";
 
 export interface LoginCredentials {
   email: string;
@@ -159,7 +160,7 @@ export class AuthService extends BaseAdapter {
   }
 
   private generateToken(): string {
-    return `token_${Date.now()}_${Math.random().toString(36).substr(2, 16)}`;
+    return `token_${Date.now()}_${random().toString(36).substr(2, 16)}`;
   }
 }
 

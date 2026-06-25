@@ -5,6 +5,7 @@ import {
   ServiceConfig,
   ServiceErrorCode,
 } from "./types";
+import { random, randomInt as seededRandomInt } from "../seeded-rng";
 
 const DEFAULT_CONFIG: ServiceConfig = {
   timeout: 10000,
@@ -17,11 +18,11 @@ const DEFAULT_CONFIG: ServiceConfig = {
 };
 
 function generateRequestId(): string {
-  return `req_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+  return `req_${Date.now()}_${random().toString(36).substr(2, 9)}`;
 }
 
 function randomInRange(min: number, max: number): number {
-  return Math.floor(Math.random() * (max - min + 1)) + min;
+  return seededRandomInt(min, max + 1);
 }
 
 async function simulateLatency(config: ServiceConfig): Promise<void> {
@@ -34,7 +35,7 @@ async function simulateLatency(config: ServiceConfig): Promise<void> {
 function shouldSimulateFailure(config: ServiceConfig): boolean {
   if (!config.simulateFailure) return false;
   const failureRate = config.failureRate || DEFAULT_CONFIG.failureRate!;
-  return Math.random() < failureRate;
+  return random() < failureRate;
 }
 
 function createServiceError(

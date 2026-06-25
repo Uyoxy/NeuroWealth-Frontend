@@ -2,6 +2,7 @@
 
 import React, { useRef, useState, useCallback, useId } from "react";
 import Image from "next/image";
+import { random } from "@/lib/seeded-rng";
 
 export interface UploadFile {
   id: string;
@@ -29,7 +30,7 @@ function mockUpload(
   let pct = 0;
   const tick = () => {
     if (signal.aborted) return;
-    pct = Math.min(100, pct + Math.random() * 18 + 4);
+    pct = Math.min(100, pct + random() * 18 + 4);
     onProgress(fileId, Math.round(pct));
     if (pct < 100) setTimeout(tick, 120);
     else onDone(fileId);

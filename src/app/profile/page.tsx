@@ -686,6 +686,8 @@ export default function ProfilePage() {
           border: 1px solid rgba(148, 163, 184, 0.15);
           border-radius: 12px;
           padding: 14px 20px;
+          /* #423: add safe-area-inset-bottom so buttons clear the home indicator */
+          padding-bottom: max(14px, calc(14px + var(--sai-bottom, 0px)));
           display: flex;
           align-items: center;
           justify-content: space-between;

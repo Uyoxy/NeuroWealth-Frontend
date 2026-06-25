@@ -88,9 +88,12 @@ export function Drawer({
           {children}
         </div>
 
-        {/* Footer — 16px padding */}
+        {/* Footer — 16px padding + safe-area-inset-bottom for notched devices (#423) */}
         {footer && (
-      <div className="px-4 py-4 border-t border-zinc-200 dark:border-zinc-700 flex justify-end gap-3">
+      <div
+        className="px-4 pt-4 border-t border-zinc-200 dark:border-zinc-700 flex justify-end gap-3"
+        style={{ paddingBottom: "max(1rem, calc(1rem + var(--sai-bottom, 0px)))" }}
+      >
             {footer}
           </div>
         )}

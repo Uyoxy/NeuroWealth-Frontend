@@ -1,5 +1,6 @@
 import { BaseAdapter } from "./base-adapter";
 import { ServiceResponse, PaginatedResponse, PaginationParams } from "./types";
+import { random } from "../seeded-rng";
 
 export interface Portfolio {
   id: string;
@@ -73,7 +74,7 @@ export class PortfolioService extends BaseAdapter {
     const history: PortfolioHistory[] = [];
     for (let i = 30; i >= 0; i--) {
       const date = new Date(Date.now() - i * 24 * 60 * 60 * 1000);
-      const value = 10000 + Math.random() * 5000;
+      const value = 10000 + random() * 5000;
       history.push({
         date: date.toISOString(),
         value,
@@ -128,16 +129,16 @@ export class PortfolioService extends BaseAdapter {
       }
 
       // Simulate value changes
-      portfolio.totalValue = portfolio.totalValue * (1 + (Math.random() - 0.5) * 0.02);
-      portfolio.totalValueChange24h = portfolio.totalValue * (Math.random() - 0.5) * 0.05;
+      portfolio.totalValue = portfolio.totalValue * (1 + (random() - 0.5) * 0.02);
+      portfolio.totalValueChange24h = portfolio.totalValue * (random() - 0.5) * 0.05;
       portfolio.totalValueChange24hPercent = (portfolio.totalValueChange24h / portfolio.totalValue) * 100;
       portfolio.updatedAt = new Date().toISOString();
 
       // Update asset values
       portfolio.assets = portfolio.assets.map((asset) => ({
         ...asset,
-        value: asset.value * (1 + (Math.random() - 0.5) * 0.03),
-        valueChange24h: asset.value * (Math.random() - 0.5) * 0.05,
+        value: asset.value * (1 + (random() - 0.5) * 0.03),
+        valueChange24h: asset.value * (random() - 0.5) * 0.05,
         valueChange24hPercent: (asset.valueChange24h / asset.value) * 100,
       }));
 

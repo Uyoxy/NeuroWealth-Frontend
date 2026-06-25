@@ -26,7 +26,7 @@ Set these in `.env.local`:
 | `NEXT_PUBLIC_API_URL` | Yes | Base URL for internal Next.js `/api/*` routes |
 | `NEXT_PUBLIC_STELLAR_NETWORK` | Optional | Network name — `testnet` or `mainnet` (default: `testnet`) |
 | `NEXT_PUBLIC_STELLAR_HORIZON_URL` | Optional | Stellar Horizon endpoint (overrides the SDK default) |
-| `NEXT_PUBLIC_DEMO_SEED` | Optional | Integer seed for deterministic mock data in local dev |
+| `NEXT_PUBLIC_DEMO_SEED` | Optional | String seed for deterministic mock data in demos and visual baselines. Any non-empty string activates the Mulberry32 seeded PRNG; unset or empty uses `Math.random()`. See `docs/qa/demo-seed.md`. |
 
 Example `.env.local`:
 
@@ -35,7 +35,7 @@ NEXT_PUBLIC_WEBHOOK_URL=http://localhost:2000
 NEXT_PUBLIC_API_URL=http://localhost:3001
 NEXT_PUBLIC_STELLAR_NETWORK=testnet
 NEXT_PUBLIC_STELLAR_HORIZON_URL=https://horizon-testnet.stellar.org
-NEXT_PUBLIC_DEMO_SEED=42
+NEXT_PUBLIC_DEMO_SEED=demo-seed-2026
 ```
 
 ### Server-only (Node runtime)

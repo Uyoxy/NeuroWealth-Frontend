@@ -52,10 +52,14 @@ export default function DashboardShell({ children }: DashboardShellProps) {
           pt-16          /* clear fixed header (64px) */
           sm:pl-14       /* clear collapsed tablet sidebar (56px) */
           lg:pl-64       /* clear full desktop sidebar (256px) */
-          pb-20 sm:pb-0  /* clear mobile bottom nav on xs only */
           min-h-screen
           bg-app-bg
         "
+        style={{
+          // On mobile (<640px): clear fixed bottom nav (80px) plus home indicator.
+          // On sm+: bottom nav is hidden so no extra clearance needed.
+          paddingBottom: "max(5rem, calc(5rem + var(--sai-bottom, 0px)))",
+        }}
         id={MAIN_CONTENT_LANDMARK_ID}
         tabIndex={-1}
         aria-labelledby={DASHBOARD_ROUTE_TITLE_ID}

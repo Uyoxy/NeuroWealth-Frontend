@@ -12,6 +12,19 @@ const OUTPUT_DIR = path.resolve(
   DATE_STAMP,
 );
 
+// ─── Demo seed ────────────────────────────────────────────────────────────────
+// NEXT_PUBLIC_DEMO_SEED must be set in the environment of the *server* process
+// that is already running (yarn dev / yarn start) before this script is called.
+// The browser-side RNG is initialised from the inlined env var at build time,
+// so the value baked into the running server is what matters here.
+//
+// Recommended workflow:
+//   NEXT_PUBLIC_DEMO_SEED=demo-seed-2026 yarn dev
+//   yarn qa:visual-baseline
+//
+// The seed value is written into the manifest so baselines are traceable.
+const DEMO_SEED = process.env.NEXT_PUBLIC_DEMO_SEED ?? "";
+
 const DESKTOP_VIEWPORT = {
   name: "desktop-1440x900",
   options: {
@@ -483,6 +496,16 @@ async function captureScenario(browser, viewport, scenario) {
 async function main() {
   await ensureDir(OUTPUT_DIR);
 
+  if (!DEMO_SEED) {
+    console.warn(
+      "⚠  NEXT_PUBLIC_DEMO_SEED is not set. Mock chart data will be random " +
+      "and baselines may differ between runs.\n" +
+      "   Recommended: NEXT_PUBLIC_DEMO_SEED=demo-seed-2026 yarn dev, then re-run this script.",
+    );
+  } else {
+    console.log(`ℹ  Demo seed: "${DEMO_SEED}" — mock data will be deterministic.`);
+  }
+
   const browser = await chromium.launch({
     headless: true,
   });
@@ -518,6 +541,7 @@ async function main() {
       {
         capturedAt: new Date().toISOString(),
         baseUrl: BASE_URL,
+        demoSeed: DEMO_SEED || null,
         namingConvention:
           "<date>__<viewport>__<page>__<state>.png",
         scenarioCount: scenarios.length,

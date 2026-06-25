@@ -21,6 +21,7 @@ import {
   type ValidationErrors,
   createDebouncedAsyncCheck,
 } from "@/lib/form-validation";
+import { random } from "@/lib/seeded-rng";
 
 interface FormData {
   name: string;
@@ -112,8 +113,8 @@ export default function SupportForm() {
 
   const generateReferenceId = () => {
     const timestamp = Date.now().toString(36);
-    const random = Math.random().toString(36).slice(2, 7);
-    return `NW-${timestamp}-${random}`.toUpperCase();
+    const rand = random().toString(36).slice(2, 7);
+    return `NW-${timestamp}-${rand}`.toUpperCase();
   };
 
   const validateTransactionIdAsync = async (value: string) => {

@@ -16,6 +16,14 @@
 :root {
   --font-sans: Inter, "Segoe UI", -apple-system, BlinkMacSystemFont, "Helvetica Neue", sans-serif;
   --font-mono: "Roboto Mono", "IBM Plex Mono", "SFMono-Regular", ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  /* Safe-area inset tokens — require viewport-fit=cover (set in layout.tsx).
+   * Use var(--sai-bottom) anywhere a fixed/sticky element sits at the bottom
+   * of the screen so it clears the home indicator on notched iOS devices.
+   * Falls back to 0px on devices without a notch. */
+  --sai-top: env(safe-area-inset-top, 0px);
+  --sai-right: env(safe-area-inset-right, 0px);
+  --sai-bottom: env(safe-area-inset-bottom, 0px);
+  --sai-left: env(safe-area-inset-left, 0px);
   --positive: #10b981;
   --negative: #ef4444;
   --neutral: #94a3b8;
@@ -105,3 +113,17 @@ html.theme-transitioning * {
     background-position: -200% 0;
   }
 }
+
+/**
+ * Safe-area utility classes — #423
+ * Apply to any element that must clear the home indicator / notch.
+ * These mirror what Tailwind's safe-area plugin would generate but keep us
+ * plugin-free. The var(--sai-*) tokens are defined in :root above.
+ *
+ * Usage: add class="pb-safe" (or combine: "pb-safe pt-safe") on any
+ * fixed/sticky element sitting at a screen edge.
+ */
+.pb-safe { padding-bottom: var(--sai-bottom); }
+.pt-safe { padding-top: var(--sai-top); }
+.pl-safe { padding-left: var(--sai-left); }
+.pr-safe { padding-right: var(--sai-right); }
