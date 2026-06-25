@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { Card } from '@/components/ui/Card';
 import { Button } from '@/components/ui/Button';
 import { useToast } from '@/components/notifications/ToastProvider';
@@ -17,18 +17,18 @@ export default function OnboardingSettings() {
   const [isResetting, setIsResetting] = useState(false);
   const { pushToast } = useToast();
 
-  useEffect(() => {
-    fetchOnboardingState();
-  }, []);
-
-  const fetchOnboardingState = () => {
+  const fetchOnboardingState = useCallback(() => {
     try {
       const state = getOnboardingState();
       setOnboardingState(state);
     } catch (error) {
       console.error('Failed to load onboarding state:', error);
     }
-  };
+  }, []);
+
+  useEffect(() => {
+    fetchOnboardingState();
+  }, [fetchOnboardingState]);
 
   const handleResetOnboarding = async () => {
     if (!confirm('Are you sure you want to reset the onboarding process? This will allow you to go through the setup again.')) {
