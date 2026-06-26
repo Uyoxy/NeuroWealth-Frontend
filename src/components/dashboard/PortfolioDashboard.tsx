@@ -23,6 +23,7 @@ import {
 import { ApiRequestError, apiRequest } from "@/lib/api-client";
 import { useSandbox, ScenarioType } from "@/contexts/SandboxContext";
 import { AllocationChart } from "./AllocationChart";
+import { useI18n } from "@/contexts/I18nContext";
 
 type ThemeMode = "light" | "dark";
 
@@ -158,13 +159,13 @@ function renderActivityIcon(kind: ActivityItem["kind"]) {
   }
 }
 
-function renderSourceLabel(source: PortfolioPayload["source"]) {
+function renderSourceLabel(source: PortfolioPayload["source"], t: any) {
   if (source === "api") {
-    return "Live backend";
+    return t.liveWidgets;
   }
 
   if (source === "fallback") {
-    return "Fallback demo";
+    return t.emptyStates;
   }
 
   return "Preview data";
@@ -188,6 +189,8 @@ function SummarySkeleton() {
 }
 
 export function PortfolioDashboard() {
+  const { messages } = useI18n();
+  const t = messages.dashboard.portfolio;
   const router = useRouter();
   const searchParams = useSearchParams();
   const { getCurrentScenario, isSandboxMode } = useSandbox();
@@ -293,10 +296,8 @@ export function PortfolioDashboard() {
           <div className={styles.topbar}>
             <div>
               <span className={styles.eyebrow}>
-                <span className={styles.eyebrowDot} />
-                Portfolio widgets
-              </span>
-              <h2 className={styles.heading}>NeuroWealth overview</h2>
+                <span className={styles.eyebrowDot} />{t.overview.split(" ")[0]} widgets</span>
+              <h2 className={styles.heading}>{t.overview}</h2>
               <p className={styles.subheading}>
                 Total balance, yield, APY, strategy, allocation, and recent
                 activity in a single review surface with measurable light and
@@ -306,7 +307,7 @@ export function PortfolioDashboard() {
 
             <div className={styles.controls}>
               <div className={styles.controlCard}>
-                <p className={styles.controlLabel}>Theme preview</p>
+                <p className={styles.controlLabel}>{t.themePreview}</p>
                 <div className={styles.segmentGroup}>
                   {(["light", "dark"] as const).map((option) => (
                     <button
@@ -318,19 +319,19 @@ export function PortfolioDashboard() {
                       onClick={() => updateParam("theme", option)}
                       type="button"
                     >
-                      {option === "light" ? "Light mode" : "Dark mode"}
+                      {option === "light" ? t.lightMode : t.darkMode}
                     </button>
                   ))}
                 </div>
               </div>
 
               <div className={styles.controlCard}>
-                <p className={styles.controlLabel}>Scenario preview</p>
+                <p className={styles.controlLabel}>{t.scenarioPreview}</p>
                 <div className={styles.segmentGroup}>
                   {(
                     [
-                      { label: "Live widgets", value: "live" },
-                      { label: "Empty states", value: "empty" },
+                      { label: t.liveWidgets, value: "live" },
+                      { label: t.emptyStates, value: "empty" },
                     ] as const
                   ).map((option) => (
                     <button
@@ -355,45 +356,38 @@ export function PortfolioDashboard() {
           <div className={styles.banner}>
             <div className={styles.bannerText}>
               <span className={styles.bannerTitle}>
-                {portfolio?.notice ?? "Loading portfolio widget state..."}
+                {portfolio?.notice ?? t.loadingWidget}
               </span>
               <span className={styles.bannerMeta}>
                 {portfolio
                   ? formatSyncLabel(portfolio.updatedAt)
-                  : "Syncing portfolio data"}
+                  : t.syncingData}
               </span>
             </div>
 
             <div className={styles.bannerChips}>
               {isSandboxMode && (
-                <span className={styles.chip} style={{ backgroundColor: "#10b981", color: "white" }}>
-                  Sandbox: {scenario}
+                <span className={styles.chip} style={{ backgroundColor: "#10b981", color: "white" }}>{t.sandbox}: {scenario}
                 </span>
               )}
-              <span className={styles.chip}>Theme: {theme}</span>
-              <span className={styles.chip}>
-                Source:{" "}
-                {portfolio ? renderSourceLabel(portfolio.source) : "Loading"}
+              <span className={styles.chip}>{t.theme}: {theme}</span>
+              <span className={styles.chip}>{t.source}:{" "}
+                {portfolio ? renderSourceLabel(portfolio.source, t) : "Loading"}
               </span>
             </div>
           </div>
 
           {error && !portfolio ? (
             <div className={`${styles.card} ${styles.errorState}`}>
-              <h2 className={styles.errorTitle}>
-                Portfolio widgets unavailable
-              </h2>
+              <h2 className={styles.errorTitle}>{t.unavailableTitle}</h2>
               <p className={styles.errorCopy}>
-                {error} The dashboard can retry once connectivity to the
-                portfolio API is restored.
+                {error} {t.unavailableDesc}
               </p>
               <button
                 className={styles.emptyButton}
                 onClick={resetToLivePreview}
                 type="button"
-              >
-                Retry widgets
-              </button>
+              >{t.retryWidgets}</button>
             </div>
           ) : (
             <>
@@ -411,16 +405,13 @@ export function PortfolioDashboard() {
                 <article className={`${styles.card} ${styles.panel}`}>
                   <header className={styles.panelHeader}>
                     <div>
-                      <h2 className={styles.panelTitle}>Asset allocation</h2>
-                      <p className={styles.panelMeta}>
-                        Visible deployment mix across strategy buckets and
-                        reserve capital.
-                      </p>
+                      <h2 className={styles.panelTitle}>{t.allocationTitle}</h2>
+                      <p className={styles.panelMeta}>{t.allocationDesc}</p>
                     </div>
                     {!loading && portfolio ? (
                       <span className={styles.chip}>
                         {portfolio.allocation.length} allocation
-                        {portfolio.allocation.length === 1 ? " line" : " lines"}
+                        {portfolio.allocation.length === 1 ? " " + t.line : " " + t.lines}
                       </span>
                     ) : null}
                   </header>
@@ -491,8 +482,8 @@ export function PortfolioDashboard() {
                     </div>
                   ) : (
                     <EmptyState
-                      copy="No allocation yet. Add a deposit to see deployed positions and reserve coverage."
-                      cta="Load sample data"
+                      copy={t.emptyAllocation}
+                      cta={t.loadSample}
                       icon={<PieIcon />}
                       onAction={resetToLivePreview}
                     />
@@ -502,16 +493,12 @@ export function PortfolioDashboard() {
                 <article className={`${styles.card} ${styles.panel}`}>
                   <header className={styles.panelHeader}>
                     <div>
-                      <h2 className={styles.panelTitle}>Recent activity</h2>
-                      <p className={styles.panelMeta}>
-                        Latest deposits, yield events, rebalances, and scheduled
-                        cash flows.
-                      </p>
+                      <h2 className={styles.panelTitle}>{t.activityTitle}</h2>
+                      <p className={styles.panelMeta}>{t.activityDesc}</p>
                     </div>
                     {!loading && portfolio ? (
                       <span className={styles.chip}>
-                        {portfolio.activity.length} event
-                        {portfolio.activity.length === 1 ? "" : "s"}
+                        {portfolio.activity.length} {portfolio.activity.length === 1 ? t.event : t.events}
                       </span>
                     ) : null}
                   </header>
@@ -571,7 +558,7 @@ export function PortfolioDashboard() {
                               className={`${styles.activityAmount} ${amountClassName}`}
                             >
                               {item.amount == null
-                                ? "No amount"
+                                ? t.noAmount
                                 : formatSignedCurrency(item.amount)}
                             </div>
                           </div>
@@ -580,8 +567,8 @@ export function PortfolioDashboard() {
                     </div>
                   ) : (
                     <EmptyState
-                      copy="No recent activity yet. Deposits and rebalances will appear here as soon as they happen."
-                      cta="Load sample data"
+                      copy={t.emptyActivity}
+                      cta={t.loadSample}
                       icon={<ActivityIcon />}
                       onAction={resetToLivePreview}
                     />
