@@ -197,6 +197,7 @@ export function PortfolioDashboard() {
   const [portfolio, setPortfolio] = useState<PortfolioPayload | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [retryNonce, setRetryNonce] = useState(0);
 
   const theme = getTheme(searchParams);
   const scenario = getScenario(searchParams, mapScenarioTypeToPortfolio(getCurrentScenario("portfolio")));
@@ -241,7 +242,7 @@ export function PortfolioDashboard() {
     void loadPortfolio();
 
     return () => controller.abort();
-  }, [scenario]);
+  }, [scenario, retryNonce]);
 
   function updateParam(key: "scenario" | "theme", value: string) {
     const nextParams = new URLSearchParams(searchParams.toString());
@@ -254,6 +255,10 @@ export function PortfolioDashboard() {
 
   function resetToLivePreview() {
     updateParam("scenario", "live");
+  }
+
+  function retryPortfolio() {
+    setRetryNonce((value) => value + 1);
   }
 
   const summaryCards = portfolio
