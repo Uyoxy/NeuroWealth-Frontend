@@ -8,6 +8,8 @@
 
 # testing
 /coverage
+**/__snapshots__
+**/*.snap
 
 # next.js
 /.next/
@@ -19,6 +21,7 @@
 # misc
 .DS_Store
 *.pem
+Thumbs.db
 
 # debug
 npm-debug.log*
@@ -44,3 +47,9 @@ next-env.d.ts
 # local build artifacts
 build.log
 install.log
+
+# editor
+.vscode/
+.idea/
+*.swp
+*.swo
