@@ -2,14 +2,16 @@
 /**
  * Chart Color Contrast Verification Script
  *
- * Programmatically verifies that all chart colors meet WCAG AA standards
- * for the actual backgrounds used in the application.
+ * Programmatically verifies chart colors for WCAG AA graphics contrast and
+ * simulated CVD distinguishability on the actual application backgrounds.
  *
  * Usage: npx tsx scripts/verify-chart-contrast.ts
  */
 
 import {
   CVD_PALETTES,
+  type CvdMode,
+  getCvdPairDistance,
   getContrastRatio,
   meetsWCAGAA,
 } from "../src/lib/chart-colors-cvd";
@@ -26,6 +28,8 @@ const BACKGROUNDS = {
 const WCAG_AA_TEXT = 4.5;
 const WCAG_AA_GRAPHICS = 3.0;
 const WCAG_AAA_TEXT = 7.0;
+const MIN_CVD_PAIR_DISTANCE = 35;
+const CVD_MODES: CvdMode[] = ["protanopia", "deuteranopia", "tritanopia"];
 
 interface ContrastResult {
   color: string;
@@ -62,6 +66,10 @@ function formatResult(result: ContrastResult): string {
   const aaaStatus = result.passesAAAText ? "(AAA)" : "";
 
   return `${graphicsStatus} ${textStatus} ${result.color.padEnd(18)} ${result.hex} → ${result.ratio.toFixed(2)}:1 ${aaaStatus}`;
+}
+
+function formatDistance(value: number): string {
+  return Math.round(value * 10) / 10 + "";
 }
 
 function main() {
@@ -163,25 +171,35 @@ function main() {
   );
 
   // Color differentiation test
-  console.log("\n\n🔍 COLOR DIFFERENTIATION TEST\n");
+  console.log("\n\n🔍 CVD DIFFERENTIATION TEST\n");
   console.log(
-    "Testing contrast between palette colors (should be distinguishable):\n",
+    `Testing simulated RGB distance between palette colors (minimum ${MIN_CVD_PAIR_DISTANCE}):\n`,
   );
 
   const paletteColors = Object.entries(CVD_PALETTES.primary);
+  let allCvdPairsPass = true;
 
-  for (let i = 0; i < paletteColors.length; i++) {
-    for (let j = i + 1; j < paletteColors.length; j++) {
-      const [name1, hex1] = paletteColors[i];
-      const [name2, hex2] = paletteColors[j];
-      const ratio = getContrastRatio(hex1, hex2);
-      const status = ratio >= 1.5 ? "✅" : "⚠️";
+  CVD_MODES.forEach((mode) => {
+    console.log(`\n${mode.toUpperCase()}\n`);
 
-      console.log(
-        `${status} ${name1.padEnd(10)} vs ${name2.padEnd(10)}: ${ratio.toFixed(2)}:1`,
-      );
+    for (let i = 0; i < paletteColors.length; i++) {
+      for (let j = i + 1; j < paletteColors.length; j++) {
+        const [name1, hex1] = paletteColors[i];
+        const [name2, hex2] = paletteColors[j];
+        const distance = getCvdPairDistance(hex1, hex2, mode);
+        const passes = distance >= MIN_CVD_PAIR_DISTANCE;
+        const status = passes ? "✅" : "❌";
+
+        if (!passes) {
+          allCvdPairsPass = false;
+        }
+
+        console.log(
+          `${status} ${name1.padEnd(10)} vs ${name2.padEnd(10)}: ${formatDistance(distance)}`,
+        );
+      }
     }
-  }
+  });
 
   console.log("\n" + "=".repeat(80));
   console.log("\n✨ Verification complete!\n");
@@ -191,6 +209,20 @@ function main() {
   if (!allSurfaceGraphicsPass) {
     console.error(
       "❌ CRITICAL: Some colors fail WCAG AA graphics contrast (3:1) on surface backgrounds\n",
+    );
+    process.exit(1);
+  }
+
+  if (!allLightGraphicsPass) {
+    console.error(
+      "❌ CRITICAL: Some colors fail WCAG AA graphics contrast (3:1) on light backgrounds\n",
+    );
+    process.exit(1);
+  }
+
+  if (!allCvdPairsPass) {
+    console.error(
+      `❌ CRITICAL: Some chart colors are too close under simulated CVD modes (minimum ${MIN_CVD_PAIR_DISTANCE})\n`,
     );
     process.exit(1);
   }
@@ -208,7 +240,7 @@ function main() {
   }
 
   console.log(
-    "✅ All critical accessibility requirements met for chart graphics!\n",
+    "✅ All critical accessibility requirements met for chart graphics and CVD differentiation!\n",
   );
 }
 

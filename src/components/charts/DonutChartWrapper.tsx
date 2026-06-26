@@ -2,7 +2,7 @@
 
 import { PieChart, Pie, Cell, Tooltip, Legend } from "recharts";
 import { BaseChart, ChartTooltip, type ChartTooltipFormatter, usePrefersReducedMotion } from "./BaseChart";
-import { chartTheme, chartDimensions, getChartColor } from "@/lib/chart-theme";
+import { chartTheme, getChartColor, getChartStrokeDasharray } from "@/lib/chart-theme";
 import type { AssetAllocationSlice } from "@/lib/mock-chart-data";
 
 interface DonutChartWrapperProps {
@@ -41,6 +41,9 @@ export function DonutChartWrapper({
             <Cell
               key={`cell-${index}`}
               fill={entry.tone ? getChartColor(entry.tone) : chartTheme.colors.primary}
+              stroke={chartTheme.tooltip.contentStyle.backgroundColor}
+              strokeDasharray={entry.tone ? getChartStrokeDasharray(entry.tone) : chartTheme.patterns.primary}
+              strokeWidth={2}
             />
           ))}
         </Pie>

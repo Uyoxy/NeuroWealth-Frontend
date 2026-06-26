@@ -327,4 +327,4 @@ curl -X POST http://localhost:3000/api/transactions \
 
 - #167: Document NEUROWEALTH_API contract (paths, auth, error JSON) for integration
 - #131: Align cookie consent storage keys and settings page labels
-- #163: Data viz: verify chart colors against design tokens and contrast for CVD
+- #422: Data viz: verify chart colors against design tokens and contrast for CVD
