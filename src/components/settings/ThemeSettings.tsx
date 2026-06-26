@@ -11,7 +11,15 @@ const THEME_OPTIONS: { value: ThemeMode; label: string; icon: typeof Sun }[] = [
 ];
 
 export function ThemeSettings() {
-  const { theme, setTheme } = useTheme();
+  const { theme, setTheme, mounted } = useTheme();
+
+  if (!mounted) {
+    return (
+      <div className="flex items-center gap-1.5 rounded-xl bg-surface-elevated p-1" role="radiogroup" aria-label="Theme selection">
+        <div className="min-h-[44px] w-full" />
+      </div>
+    );
+  }
 
   return (
     <div className="flex items-center gap-1.5 rounded-xl bg-surface-elevated p-1" role="radiogroup" aria-label="Theme selection">

@@ -45,10 +45,10 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en" className="dark" suppressHydrationWarning>
+      <head>
+        <script dangerouslySetInnerHTML={{ __html: themeHtmlBootScript }} />
+      </head>
       <body className="antialiased font-sans bg-dark-900 text-slate-200">
-        <Script id="nw-theme-html-boot" strategy="beforeInteractive">
-          {themeHtmlBootScript}
-        </Script>
         <a
           href={`#${MAIN_CONTENT_LANDMARK_ID}`}
           className="sr-only focus:not-sr-only focus:fixed focus:top-4 focus:left-4 focus:z-[9999] focus:px-4 focus:py-2 focus:rounded-lg focus:bg-sky-500 focus:text-white focus:font-semibold focus:shadow-lg focus:outline focus:outline-2 focus:outline-offset-2 focus:outline-white"
