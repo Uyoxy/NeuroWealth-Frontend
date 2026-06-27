@@ -1,5 +1,15 @@
 "use client";
 
+/**
+ * @dev-only — async-states demo page
+ *
+ * This route is intentionally excluded from production:
+ *   - `notFound()` is called at render time when NODE_ENV !== "development"
+ *   - `devOnly: true` in routeMetadata keeps it out of dashboardNavigation and commandPaletteRoutes
+ *
+ * To move under a different prefix, update the folder path and the href in routeMetadata.tsx.
+ */
+
 export const dynamic = "force-dynamic";
 
 import { useCallback, useEffect, useMemo, useState } from "react";

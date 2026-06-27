@@ -4,9 +4,6 @@ import { startTransition, useEffect, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import styles from "./portfolio-dashboard.module.css";
 import {
-  ActivityItem,
-  AllocationItem,
-  ChartTone,
   PortfolioPayload,
   PortfolioScenario,
   parseScenario,
@@ -14,11 +11,8 @@ import {
 import {
   formatApy,
   formatCurrency,
-  formatPercent,
   formatSignedCurrency,
-  formatSignedPercent,
   formatSyncLabel,
-  formatTimestamp,
 } from "@/lib/formatters";
 import { ApiRequestError, apiRequest } from "@/lib/api-client";
 import { useSandbox, ScenarioType } from "@/contexts/SandboxContext";
@@ -29,81 +23,6 @@ type ThemeMode = "light" | "dark";
 
 function getTheme(searchParams: Pick<URLSearchParams, "get">): ThemeMode {
   return searchParams.get("theme") === "dark" ? "dark" : "light";
-}
-
-interface EmptyStateProps {
-  icon: React.ReactNode;
-  copy: string;
-  cta: string;
-  onAction: () => void;
-}
-
-interface MetricCardProps {
-  label: string;
-  value: string;
-  helper: string;
-  tone: "default" | "positive" | "negative" | "neutral";
-  mono?: boolean;
-}
-
-const toneMap: Record<ChartTone, string> = {
-  primary: "var(--chart-primary)",
-  accent: "var(--chart-accent)",
-  warning: "var(--chart-warning)",
-  "neutral-strong": "var(--chart-neutral-strong)",
-  "neutral-soft": "var(--chart-neutral-soft)",
-};
-
-const activityLabels: Record<ActivityItem["kind"], string> = {
-  deposit: "Deposit",
-  yield: "Yield",
-  rebalance: "Rebalance",
-  withdrawal: "Withdrawal",
-};
-
-function MetricCard({
-  helper,
-  label,
-  mono = false,
-  tone,
-  value,
-}: MetricCardProps) {
-  const toneClassName =
-    tone === "positive"
-      ? styles.valuePositive
-      : tone === "negative"
-        ? styles.valueNegative
-        : tone === "neutral"
-          ? styles.valueNeutral
-          : styles.valueDefault;
-
-  return (
-    <article className={`${styles.card} ${styles.metricCard}`}>
-      <p className={styles.metricLabel}>{label}</p>
-      <p
-        className={[
-          styles.metricValue,
-          toneClassName,
-          mono ? styles.metricValueMono : "",
-        ].join(" ")}
-      >
-        {value}
-      </p>
-      <p className={styles.helperText}>{helper}</p>
-    </article>
-  );
-}
-
-function EmptyState({ copy, cta, icon, onAction }: EmptyStateProps) {
-  return (
-    <div className={styles.emptyState}>
-      <div className={styles.emptyIcon}>{icon}</div>
-      <p className={styles.emptyCopy}>{copy}</p>
-      <button className={styles.emptyButton} onClick={onAction} type="button">
-        {cta}
-      </button>
-    </div>
-  );
 }
 
 function getScenario(
@@ -122,14 +41,8 @@ function mapScenarioTypeToPortfolio(scenario: ScenarioType): PortfolioScenario {
 }
 
 function getValueTone(value: number): "positive" | "negative" | "neutral" {
-  if (value > 0) {
-    return "positive";
-  }
-
-  if (value < 0) {
-    return "negative";
-  }
-
+  if (value > 0) return "positive";
+  if (value < 0) return "negative";
   return "neutral";
 }
 
@@ -171,23 +84,6 @@ function renderSourceLabel(source: PortfolioPayload["source"], t: any) {
   return "Preview data";
 }
 
-function SummarySkeleton() {
-  return (
-    <>
-      {Array.from({ length: 4 }).map((_, index) => (
-        <article
-          className={`${styles.card} ${styles.metricCard} ${styles.skeletonCard}`}
-          key={index}
-        >
-          <span className={styles.skeletonLine} />
-          <span className={styles.skeletonValue} />
-          <span className={`${styles.skeletonLine} ${styles.skeletonCopy}`} />
-        </article>
-      ))}
-    </>
-  );
-}
-
 export function PortfolioDashboard() {
   const { messages } = useI18n();
   const t = messages.dashboard.portfolio;
@@ -200,7 +96,10 @@ export function PortfolioDashboard() {
   const [retryNonce, setRetryNonce] = useState(0);
 
   const theme = getTheme(searchParams);
-  const scenario = getScenario(searchParams, mapScenarioTypeToPortfolio(getCurrentScenario("portfolio")));
+  const scenario = getScenario(
+    searchParams,
+    mapScenarioTypeToPortfolio(getCurrentScenario("portfolio")),
+  );
 
   useEffect(() => {
     const controller = new AbortController();
@@ -212,42 +111,29 @@ export function PortfolioDashboard() {
       try {
         const payload = await apiRequest<PortfolioPayload>(
           `/api/portfolio?scenario=${scenario}`,
-          {
-          cache: "no-store",
-          signal: controller.signal,
-            timeoutMs: 12000,
-          },
+          { cache: "no-store", signal: controller.signal, timeoutMs: 12000 },
         );
-
         setPortfolio(payload);
       } catch (loadError) {
-        if (controller.signal.aborted) {
-          return;
-        }
-
+        if (controller.signal.aborted) return;
         const message =
           loadError instanceof ApiRequestError || loadError instanceof Error
             ? loadError.message
             : "Unable to load portfolio widgets.";
-
         setError(message);
         setPortfolio(null);
       } finally {
-        if (!controller.signal.aborted) {
-          setLoading(false);
-        }
+        if (!controller.signal.aborted) setLoading(false);
       }
     }
 
     void loadPortfolio();
-
     return () => controller.abort();
   }, [scenario, retryNonce]);
 
   function updateParam(key: "scenario" | "theme", value: string) {
     const nextParams = new URLSearchParams(searchParams.toString());
     nextParams.set(key, value);
-
     startTransition(() => {
       router.replace(`/dashboard?${nextParams.toString()}`, { scroll: false });
     });
@@ -267,7 +153,7 @@ export function PortfolioDashboard() {
           label: "Total balance",
           value: formatCurrency(portfolio.summary.totalBalance),
           helper: "Across active positions and protected reserve holdings.",
-          tone: "default" as const,
+          tone: "default",
           mono: true,
         },
         {
@@ -279,7 +165,6 @@ export function PortfolioDashboard() {
         },
         {
           label: "APY",
-          // Issue 468 spec: APY uses 2–4 dp precision.
           value: formatApy(portfolio.summary.apy),
           helper: "Weighted live rate across the current strategy mix.",
           tone: getValueTone(portfolio.summary.apy),
@@ -289,7 +174,7 @@ export function PortfolioDashboard() {
           label: "Strategy",
           value: portfolio.summary.strategyLabel,
           helper: portfolio.summary.strategyDescription,
-          tone: "default" as const,
+          tone: "default",
         },
       ]
     : [];
@@ -298,15 +183,15 @@ export function PortfolioDashboard() {
     <div className={styles.page}>
       <section className={styles.shell} data-theme={theme}>
         <div className={styles.content}>
+          {/* ── Top bar ── */}
           <div className={styles.topbar}>
             <div>
               <span className={styles.eyebrow}>
                 <span className={styles.eyebrowDot} />{t.overview.split(" ")[0]} widgets</span>
               <h2 className={styles.heading}>{t.overview}</h2>
               <p className={styles.subheading}>
-                Total balance, yield, APY, strategy, allocation, and recent
-                activity in a single review surface with measurable light and
-                dark theme parity.
+                Total balance, yield, APY, strategy, allocation, and recent activity in a single
+                review surface with measurable light and dark theme parity.
               </p>
             </div>
 
@@ -342,9 +227,7 @@ export function PortfolioDashboard() {
                     <button
                       className={[
                         styles.segmentButton,
-                        scenario === option.value
-                          ? styles.segmentButtonActive
-                          : "",
+                        scenario === option.value ? styles.segmentButtonActive : "",
                       ].join(" ")}
                       key={option.value}
                       onClick={() => updateParam("scenario", option.value)}
@@ -358,6 +241,7 @@ export function PortfolioDashboard() {
             </div>
           </div>
 
+          {/* ── Status banner ── */}
           <div className={styles.banner}>
             <div className={styles.bannerText}>
               <span className={styles.bannerTitle}>
@@ -369,7 +253,6 @@ export function PortfolioDashboard() {
                   : t.syncingData}
               </span>
             </div>
-
             <div className={styles.bannerChips}>
               {isSandboxMode && (
                 <span className={styles.chip} style={{ backgroundColor: "#10b981", color: "white" }}>{t.sandbox}: {scenario}
@@ -585,179 +468,5 @@ export function PortfolioDashboard() {
         </div>
       </section>
     </div>
-  );
-}
-
-function PieIcon() {
-  return (
-    <svg
-      aria-hidden="true"
-      fill="none"
-      height="24"
-      viewBox="0 0 24 24"
-      width="24"
-    >
-      <path
-        d="M11 3a9 9 0 1 0 9 9h-9V3Z"
-        stroke="currentColor"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-        strokeWidth="1.8"
-      />
-      <path
-        d="M14.5 3.7A9 9 0 0 1 20.3 9.5H14.5V3.7Z"
-        fill="currentColor"
-        opacity="0.24"
-      />
-    </svg>
-  );
-}
-
-function ActivityIcon() {
-  return (
-    <svg
-      aria-hidden="true"
-      fill="none"
-      height="24"
-      viewBox="0 0 24 24"
-      width="24"
-    >
-      <path
-        d="M5 19.25h14"
-        stroke="currentColor"
-        strokeLinecap="round"
-        strokeWidth="1.8"
-      />
-      <path
-        d="M7 15.75 10.2 12l2.8 2.4 4-5.15"
-        stroke="currentColor"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-        strokeWidth="1.8"
-      />
-      <circle cx="7" cy="15.75" fill="currentColor" opacity="0.24" r="1.4" />
-      <circle cx="10.2" cy="12" fill="currentColor" opacity="0.24" r="1.4" />
-      <circle cx="13" cy="14.4" fill="currentColor" opacity="0.24" r="1.4" />
-      <circle cx="17" cy="9.25" fill="currentColor" opacity="0.24" r="1.4" />
-    </svg>
-  );
-}
-
-function ArrowDownIcon() {
-  return (
-    <svg
-      aria-hidden="true"
-      fill="none"
-      height="20"
-      viewBox="0 0 24 24"
-      width="20"
-    >
-      <path
-        d="M12 5v14"
-        stroke="currentColor"
-        strokeLinecap="round"
-        strokeWidth="1.8"
-      />
-      <path
-        d="m6.5 13.5 5.5 5.5 5.5-5.5"
-        stroke="currentColor"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-        strokeWidth="1.8"
-      />
-    </svg>
-  );
-}
-
-function ArrowUpIcon() {
-  return (
-    <svg
-      aria-hidden="true"
-      fill="none"
-      height="20"
-      viewBox="0 0 24 24"
-      width="20"
-    >
-      <path
-        d="M12 19V5"
-        stroke="currentColor"
-        strokeLinecap="round"
-        strokeWidth="1.8"
-      />
-      <path
-        d="M17.5 10.5 12 5 6.5 10.5"
-        stroke="currentColor"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-        strokeWidth="1.8"
-      />
-    </svg>
-  );
-}
-
-function ShuffleIcon() {
-  return (
-    <svg
-      aria-hidden="true"
-      fill="none"
-      height="20"
-      viewBox="0 0 24 24"
-      width="20"
-    >
-      <path
-        d="M16 4h4v4"
-        stroke="currentColor"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-        strokeWidth="1.8"
-      />
-      <path
-        d="M4 18h3.2c1.3 0 2.5-.6 3.3-1.6L20 4"
-        stroke="currentColor"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-        strokeWidth="1.8"
-      />
-      <path
-        d="M16 20h4v-4"
-        stroke="currentColor"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-        strokeWidth="1.8"
-      />
-      <path
-        d="M4 6h3.2c1.3 0 2.5.6 3.3 1.6L12 9"
-        stroke="currentColor"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-        strokeWidth="1.8"
-      />
-      <path
-        d="m14 15 1.5 1.8c.8 1 2 1.6 3.3 1.6H20"
-        stroke="currentColor"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-        strokeWidth="1.8"
-      />
-    </svg>
-  );
-}
-
-function SparkIcon() {
-  return (
-    <svg
-      aria-hidden="true"
-      fill="none"
-      height="20"
-      viewBox="0 0 24 24"
-      width="20"
-    >
-      <path
-        d="m12 3 1.9 5.1L19 10l-5.1 1.9L12 17l-1.9-5.1L5 10l5.1-1.9L12 3Z"
-        stroke="currentColor"
-        strokeLinejoin="round"
-        strokeWidth="1.8"
-      />
-    </svg>
   );
 }
