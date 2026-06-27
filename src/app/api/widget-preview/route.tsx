@@ -533,4 +533,6 @@ export async function GET(request: Request) {
       height: 1080,
     },
   );
+
+  return imageResponse;
 }

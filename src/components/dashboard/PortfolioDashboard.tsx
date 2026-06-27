@@ -16,9 +16,8 @@ import {
 } from "@/lib/formatters";
 import { ApiRequestError, apiRequest } from "@/lib/api-client";
 import { useSandbox, ScenarioType } from "@/contexts/SandboxContext";
-import { SummarySection, SummaryCard } from "./SummarySection";
-import { AllocationSection } from "./AllocationSection";
-import { ActivitySection } from "./ActivitySection";
+import { AllocationChart } from "./AllocationChart";
+import { useI18n } from "@/contexts/I18nContext";
 
 type ThemeMode = "light" | "dark";
 
@@ -47,19 +46,54 @@ function getValueTone(value: number): "positive" | "negative" | "neutral" {
   return "neutral";
 }
 
-function renderSourceLabel(source: PortfolioPayload["source"]) {
-  if (source === "api") return "Live backend";
-  if (source === "fallback") return "Fallback demo";
+function buildDonutBackground(allocation: AllocationItem[]): string {
+  let start = 0;
+
+  const segments = allocation.map((item) => {
+    const end = start + item.share;
+    const segment = `${toneMap[item.tone]} ${start}% ${end}%`;
+    start = end;
+    return segment;
+  });
+
+  return `conic-gradient(${segments.join(", ")})`;
+}
+
+function renderActivityIcon(kind: ActivityItem["kind"]) {
+  switch (kind) {
+    case "deposit":
+      return <ArrowDownIcon />;
+    case "withdrawal":
+      return <ArrowUpIcon />;
+    case "rebalance":
+      return <ShuffleIcon />;
+    default:
+      return <SparkIcon />;
+  }
+}
+
+function renderSourceLabel(source: PortfolioPayload["source"], t: any) {
+  if (source === "api") {
+    return t.liveWidgets;
+  }
+
+  if (source === "fallback") {
+    return t.emptyStates;
+  }
+
   return "Preview data";
 }
 
 export function PortfolioDashboard() {
+  const { messages } = useI18n();
+  const t = messages.dashboard.portfolio;
   const router = useRouter();
   const searchParams = useSearchParams();
   const { getCurrentScenario, isSandboxMode } = useSandbox();
   const [portfolio, setPortfolio] = useState<PortfolioPayload | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [retryNonce, setRetryNonce] = useState(0);
 
   const theme = getTheme(searchParams);
   const scenario = getScenario(
@@ -95,7 +129,7 @@ export function PortfolioDashboard() {
 
     void loadPortfolio();
     return () => controller.abort();
-  }, [scenario]);
+  }, [scenario, retryNonce]);
 
   function updateParam(key: "scenario" | "theme", value: string) {
     const nextParams = new URLSearchParams(searchParams.toString());
@@ -109,7 +143,11 @@ export function PortfolioDashboard() {
     updateParam("scenario", "live");
   }
 
-  const summaryCards: SummaryCard[] = portfolio
+  function retryPortfolio() {
+    setRetryNonce((value) => value + 1);
+  }
+
+  const summaryCards = portfolio
     ? [
         {
           label: "Total balance",
@@ -149,10 +187,8 @@ export function PortfolioDashboard() {
           <div className={styles.topbar}>
             <div>
               <span className={styles.eyebrow}>
-                <span className={styles.eyebrowDot} />
-                Portfolio widgets
-              </span>
-              <h2 className={styles.heading}>NeuroWealth overview</h2>
+                <span className={styles.eyebrowDot} />{t.overview.split(" ")[0]} widgets</span>
+              <h2 className={styles.heading}>{t.overview}</h2>
               <p className={styles.subheading}>
                 Total balance, yield, APY, strategy, allocation, and recent activity in a single
                 review surface with measurable light and dark theme parity.
@@ -161,7 +197,7 @@ export function PortfolioDashboard() {
 
             <div className={styles.controls}>
               <div className={styles.controlCard}>
-                <p className={styles.controlLabel}>Theme preview</p>
+                <p className={styles.controlLabel}>{t.themePreview}</p>
                 <div className={styles.segmentGroup}>
                   {(["light", "dark"] as const).map((option) => (
                     <button
@@ -173,19 +209,19 @@ export function PortfolioDashboard() {
                       onClick={() => updateParam("theme", option)}
                       type="button"
                     >
-                      {option === "light" ? "Light mode" : "Dark mode"}
+                      {option === "light" ? t.lightMode : t.darkMode}
                     </button>
                   ))}
                 </div>
               </div>
 
               <div className={styles.controlCard}>
-                <p className={styles.controlLabel}>Scenario preview</p>
+                <p className={styles.controlLabel}>{t.scenarioPreview}</p>
                 <div className={styles.segmentGroup}>
                   {(
                     [
-                      { label: "Live widgets", value: "live" },
-                      { label: "Empty states", value: "empty" },
+                      { label: t.liveWidgets, value: "live" },
+                      { label: t.emptyStates, value: "empty" },
                     ] as const
                   ).map((option) => (
                     <button
@@ -209,43 +245,226 @@ export function PortfolioDashboard() {
           <div className={styles.banner}>
             <div className={styles.bannerText}>
               <span className={styles.bannerTitle}>
-                {portfolio?.notice ?? "Loading portfolio widget state..."}
+                {portfolio?.notice ?? t.loadingWidget}
               </span>
               <span className={styles.bannerMeta}>
-                {portfolio ? formatSyncLabel(portfolio.updatedAt) : "Syncing portfolio data"}
+                {portfolio
+                  ? formatSyncLabel(portfolio.updatedAt)
+                  : t.syncingData}
               </span>
             </div>
             <div className={styles.bannerChips}>
               {isSandboxMode && (
-                <span className={styles.chip} style={{ backgroundColor: "#10b981", color: "white" }}>
-                  Sandbox: {scenario}
+                <span className={styles.chip} style={{ backgroundColor: "#10b981", color: "white" }}>{t.sandbox}: {scenario}
                 </span>
               )}
-              <span className={styles.chip}>Theme: {theme}</span>
-              <span className={styles.chip}>
-                Source: {portfolio ? renderSourceLabel(portfolio.source) : "Loading"}
+              <span className={styles.chip}>{t.theme}: {theme}</span>
+              <span className={styles.chip}>{t.source}:{" "}
+                {portfolio ? renderSourceLabel(portfolio.source, t) : "Loading"}
               </span>
             </div>
           </div>
 
-          {/* ── Summary metrics ── */}
-          <SummarySection loading={loading} cards={summaryCards} />
+          {error && !portfolio ? (
+            <div className={`${styles.card} ${styles.errorState}`}>
+              <h2 className={styles.errorTitle}>{t.unavailableTitle}</h2>
+              <p className={styles.errorCopy}>
+                {error} {t.unavailableDesc}
+              </p>
+              <button
+                className={styles.emptyButton}
+                onClick={resetToLivePreview}
+                type="button"
+              >{t.retryWidgets}</button>
+            </div>
+          ) : (
+            <>
+              <div className={styles.summaryGrid}>
+                {loading ? (
+                  <SummarySkeleton />
+                ) : (
+                  summaryCards.map((card) => (
+                    <MetricCard {...card} key={card.label} />
+                  ))
+                )}
+              </div>
 
-          {/* ── Allocation + Activity ── */}
-          <div className={styles.contentGrid}>
-            <AllocationSection
-              loading={loading}
-              error={error}
-              allocation={portfolio?.allocation ?? []}
-              onRetry={resetToLivePreview}
-            />
-            <ActivitySection
-              loading={loading}
-              error={error}
-              activity={portfolio?.activity ?? []}
-              onRetry={resetToLivePreview}
-            />
-          </div>
+              <div className={styles.contentGrid}>
+                <article className={`${styles.card} ${styles.panel}`}>
+                  <header className={styles.panelHeader}>
+                    <div>
+                      <h2 className={styles.panelTitle}>{t.allocationTitle}</h2>
+                      <p className={styles.panelMeta}>{t.allocationDesc}</p>
+                    </div>
+                    {!loading && portfolio ? (
+                      <span className={styles.chip}>
+                        {portfolio.allocation.length} allocation
+                        {portfolio.allocation.length === 1 ? " " + t.line : " " + t.lines}
+                      </span>
+                    ) : null}
+                  </header>
+
+                  {loading ? (
+                    <div className={styles.emptyState}>
+                      <span className={styles.skeletonValue} />
+                      <span
+                        className={`${styles.skeletonLine} ${styles.skeletonCopy}`}
+                      />
+                    </div>
+                  ) : portfolio && portfolio.allocation.length > 0 ? (
+                      <div className={styles.allocationLayout}>
+                        <AllocationChart 
+                          data={portfolio.allocation.map(item => ({
+                            name: item.label,
+                            value: item.amount,
+                            tone: item.tone
+                          }))}
+                          height={200}
+                          innerRadius={60}
+                          outerRadius={90}
+                        />
+
+                        <div className={styles.allocationList}>
+                        {portfolio.allocation.map((item) => {
+                          const changeTone = getValueTone(item.change);
+                          const changeClassName =
+                            changeTone === "positive"
+                              ? styles.valuePositive
+                              : changeTone === "negative"
+                                ? styles.valueNegative
+                                : styles.valueNeutral;
+
+                          return (
+                            <div className={styles.allocationRow} key={item.id}>
+                              <div className={styles.allocationIdentity}>
+                                <span
+                                  className={styles.allocationDot}
+                                  style={{ background: toneMap[item.tone] }}
+                                />
+                                <div>
+                                  <p className={styles.allocationName}>
+                                    {item.label}
+                                  </p>
+                                  <p className={styles.allocationSymbol}>
+                                    {item.symbol}
+                                  </p>
+                                </div>
+                              </div>
+                              <span className={styles.allocationShare}>
+                                {formatPercent(item.share)}
+                              </span>
+                              <div className={styles.allocationValueWrap}>
+                                <span className={styles.allocationAmount}>
+                                  {formatCurrency(item.amount)}
+                                </span>
+                                <span
+                                  className={`${styles.allocationChange} ${changeClassName}`}
+                                >
+                                  {formatSignedPercent(item.change)}
+                                </span>
+                              </div>
+                            </div>
+                          );
+                        })}
+                      </div>
+                    </div>
+                  ) : (
+                    <EmptyState
+                      copy={t.emptyAllocation}
+                      cta={t.loadSample}
+                      icon={<PieIcon />}
+                      onAction={resetToLivePreview}
+                    />
+                  )}
+                </article>
+
+                <article className={`${styles.card} ${styles.panel}`}>
+                  <header className={styles.panelHeader}>
+                    <div>
+                      <h2 className={styles.panelTitle}>{t.activityTitle}</h2>
+                      <p className={styles.panelMeta}>{t.activityDesc}</p>
+                    </div>
+                    {!loading && portfolio ? (
+                      <span className={styles.chip}>
+                        {portfolio.activity.length} {portfolio.activity.length === 1 ? t.event : t.events}
+                      </span>
+                    ) : null}
+                  </header>
+
+                  {loading ? (
+                    <div className={styles.emptyState}>
+                      <span className={styles.skeletonValue} />
+                      <span
+                        className={`${styles.skeletonLine} ${styles.skeletonCopy}`}
+                      />
+                    </div>
+                  ) : portfolio && portfolio.activity.length > 0 ? (
+                    <div className={styles.activityList}>
+                      {portfolio.activity.map((item) => {
+                        const statusClassName =
+                          item.status === "pending"
+                            ? styles.statusPending
+                            : item.status === "scheduled"
+                              ? styles.statusScheduled
+                              : styles.statusCompleted;
+
+                        const amountTone = getValueTone(item.amount ?? 0);
+                        const amountClassName =
+                          amountTone === "positive"
+                            ? styles.valuePositive
+                            : amountTone === "negative"
+                              ? styles.valueNegative
+                              : styles.valueNeutral;
+
+                        return (
+                          <div className={styles.activityItem} key={item.id}>
+                            <div className={styles.activityIcon}>
+                              {renderActivityIcon(item.kind)}
+                            </div>
+
+                            <div className={styles.activityBody}>
+                              <div className={styles.activityTitleRow}>
+                                <p className={styles.activityTitle}>
+                                  {item.title}
+                                </p>
+                                <span
+                                  className={`${styles.statusBadge} ${statusClassName}`}
+                                >
+                                  {item.status}
+                                </span>
+                              </div>
+                              <p className={styles.activityDetail}>
+                                {item.detail}
+                              </p>
+                              <div className={styles.activityMeta}>
+                                <span>{activityLabels[item.kind]}</span>
+                                <span>{formatTimestamp(item.occurredAt)}</span>
+                              </div>
+                            </div>
+
+                            <div
+                              className={`${styles.activityAmount} ${amountClassName}`}
+                            >
+                              {item.amount == null
+                                ? t.noAmount
+                                : formatSignedCurrency(item.amount)}
+                            </div>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  ) : (
+                    <EmptyState
+                      copy={t.emptyActivity}
+                      cta={t.loadSample}
+                      icon={<ActivityIcon />}
+                      onAction={resetToLivePreview}
+                    />
+                  )}
+                </article>
+              </div>
+            </>
+          )}
         </div>
       </section>
     </div>

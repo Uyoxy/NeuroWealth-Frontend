@@ -9,6 +9,7 @@ interface ThemeContextType {
   theme: ThemeMode;
   resolvedTheme: "light" | "dark";
   setTheme: (theme: ThemeMode) => void;
+  mounted: boolean;
 }
 
 const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
@@ -55,10 +56,17 @@ interface ThemeProviderProps {
 }
 
 export function ThemeProvider({ children }: ThemeProviderProps) {
-  const [theme, setThemeState] = useState<ThemeMode>(getStoredTheme);
-  const [resolvedTheme, setResolvedTheme] = useState<"light" | "dark">(() =>
-    resolveTheme(getStoredTheme()),
-  );
+  const [theme, setThemeState] = useState<ThemeMode>("system");
+  const [resolvedTheme, setResolvedTheme] = useState<"light" | "dark">("dark");
+
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    const stored = getStoredTheme();
+    setThemeState(stored);
+    setResolvedTheme(resolveTheme(stored));
+    setMounted(true);
+  }, []);
 
   const setTheme = useCallback((newTheme: ThemeMode) => {
     setThemeState(newTheme);
@@ -70,6 +78,7 @@ export function ThemeProvider({ children }: ThemeProviderProps) {
   }, []);
 
   useEffect(() => {
+    if (!mounted) return;
     // Apply initial theme immediately to prevent flash
     applyTheme(resolvedTheme);
 
@@ -86,13 +95,14 @@ export function ThemeProvider({ children }: ThemeProviderProps) {
       mediaQuery.addEventListener("change", handleChange);
       return () => mediaQuery.removeEventListener("change", handleChange);
     }
-  }, [theme, resolvedTheme]);
+  }, [theme, resolvedTheme, mounted]);
 
   const contextValue = useMemo(() => ({
     theme,
     resolvedTheme,
     setTheme,
-  }), [theme, resolvedTheme, setTheme]);
+    mounted,
+  }), [theme, resolvedTheme, setTheme, mounted]);
 
   return (
     <ThemeContext.Provider value={contextValue}>

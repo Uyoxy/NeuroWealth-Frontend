@@ -80,7 +80,7 @@ export default function NotificationsDemo() {
           </div>
 
           <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-            <Button onClick={() => handleToast("success")} variant="default">Success Toast</Button>
+            <Button onClick={() => handleToast("success")} variant="primary">Success Toast</Button>
             <Button onClick={() => handleToast("info")} variant="ghost">Info Toast</Button>
             <Button onClick={() => handleToast("warning")} variant="ghost">Warning Toast</Button>
             <Button onClick={() => handleToast("error")} variant="ghost">Error Toast</Button>
@@ -89,7 +89,7 @@ export default function NotificationsDemo() {
           <div className="bg-dark-800 rounded-xl border border-white/10 p-6">
             <h3 className="text-white font-medium mb-4">Mock Common Flows</h3>
             <div className="flex flex-wrap gap-3">
-              <Button onClick={() => handleMockFlow("save")} variant="default">Save Flow</Button>
+              <Button onClick={() => handleMockFlow("save")} variant="primary">Save Flow</Button>
               <Button onClick={() => handleMockFlow("failure")} variant="ghost">Failure Flow</Button>
               <Button onClick={() => handleMockFlow("timeout")} variant="ghost">Timeout Flow</Button>
             </div>

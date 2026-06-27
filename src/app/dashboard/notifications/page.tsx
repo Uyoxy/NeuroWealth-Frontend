@@ -16,9 +16,10 @@ import {
 } from "lucide-react";
 import { useToast } from "@/components/notifications/ToastProvider";
 import { Button, Card, InlineBanner } from "@/components/ui";
-import { runMockFlow, type MockFlowKey } from "./mockFlows";
+import { runMockFlow, useMockFlows, type MockFlowKey } from "./mockFlows";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { useSandbox } from "@/contexts/SandboxContext";
+import { useAsyncState } from "@/hooks/useAsyncState";
 import { NotificationListSkeleton } from "@/components/ui/Skeleton";
 
 export const dynamic = "force-dynamic";
@@ -110,19 +111,22 @@ const bannerExamples = [
 
 function NotificationInbox() {
   const { getCurrentScenario, isSandboxMode } = useSandbox();
-  const [simLoading, setSimLoading] = useState(false);
   const [items, setItems] = useState<NotificationItem[]>(MOCK_NOTIFICATIONS);
+  const { state: fetchState, run: fetchNotifications } = useAsyncState<NotificationItem[]>();
   const scenario = getCurrentScenario("notifications");
 
   useEffect(() => {
-    if (scenario === "loading") {
-      setSimLoading(true);
-      const t = setTimeout(() => setSimLoading(false), 3000);
-      return () => clearTimeout(t);
-    } else {
-      setSimLoading(false);
-    }
-  }, [scenario]);
+    fetchNotifications(async () => {
+      if (scenario === "loading") {
+        await new Promise((r) => setTimeout(r, 3000));
+      }
+      return MOCK_NOTIFICATIONS;
+    }).then(() => {
+      setItems(MOCK_NOTIFICATIONS);
+    });
+  }, [scenario, fetchNotifications]);
+
+  const simLoading = fetchState.status === "loading";
 
   const markAllRead = () => setItems((prev) => prev.map((n) => ({ ...n, read: true })));
   const markRead = (id: string) => setItems((prev) => prev.map((n) => n.id === id ? { ...n, read: true } : n));
@@ -227,13 +231,7 @@ function NotificationRow({ item, onRead }: { item: NotificationItem; onRead: (id
 
 function ToastSystemDemo() {
   const { limit, pushToast, setLimit } = useToast();
-  const [activeFlow, setActiveFlow] = useState<MockFlowKey | null>(null);
-
-  const triggerMockFlow = useCallback(async (flow: MockFlowKey) => {
-    setActiveFlow(flow);
-    await runMockFlow(flow, pushToast);
-    setTimeout(() => setActiveFlow(null), 1000);
-  }, [pushToast]);
+  const { activeFlow, triggerMockFlow } = useMockFlows(pushToast);
 
   return (
     <>

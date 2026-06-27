@@ -1,5 +1,6 @@
 import assert from "node:assert/strict";
-import test from "node:test";
+import test, { before } from "node:test";
+import type { AuditService } from "./mock-audit";
 
 // mock-audit.ts relies on localStorage which is unavailable in Node.
 // Provide a minimal in-memory shim before importing.
@@ -21,7 +22,11 @@ Object.defineProperty(globalThis, "navigator", {
   configurable: true,
 });
 
-const { mockAuditService } = await import("./mock-audit.js");
+let mockAuditService: AuditService;
+
+before(async () => {
+  ({ mockAuditService } = await import("./mock-audit.js"));
+});
 
 test("logEvent persists an event and returns it", async () => {
   localStorageShim.clear();

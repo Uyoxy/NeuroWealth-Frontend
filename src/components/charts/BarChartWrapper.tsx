@@ -1,7 +1,7 @@
 "use client";
 
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend } from "recharts";
-import { BaseChart, ChartTooltip } from "./BaseChart";
+import { BaseChart, ChartTooltip, type ChartTooltipFormatter } from "./BaseChart";
 import { chartTheme, chartDimensions } from "@/lib/chart-theme";
 import type { ChartDatum } from "@/lib/mock-chart-data";
 
@@ -13,8 +13,9 @@ interface BarChartWrapperProps<T extends ChartDatum> {
   showGrid?: boolean;
   showLegend?: boolean;
   color?: string;
+  strokeDasharray?: string;
   barSize?: number;
-  formatter?: (value: any, name: string) => [string, string];
+  formatter?: ChartTooltipFormatter;
 }
 
 export function BarChartWrapper<T extends ChartDatum = ChartDatum>({
@@ -25,6 +26,7 @@ export function BarChartWrapper<T extends ChartDatum = ChartDatum>({
   showGrid = true,
   showLegend = false,
   color = chartTheme.colors.primary,
+  strokeDasharray = chartTheme.patterns.primary,
   barSize,
   formatter,
 }: BarChartWrapperProps<T>) {
@@ -54,6 +56,8 @@ export function BarChartWrapper<T extends ChartDatum = ChartDatum>({
         <Bar
           dataKey={dataKey}
           fill={color}
+          stroke={color}
+          strokeDasharray={strokeDasharray}
           radius={[4, 4, 0, 0]}
           barSize={barSize}
         />

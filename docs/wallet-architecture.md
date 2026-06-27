@@ -4,7 +4,12 @@ This document describes how NeuroWealth manages wallet connections, persistence,
 
 ## Metadata Dictionary (LocalStorage)
 
-The `WalletProvider` persists minimal connection metadata to `localStorage` via `src/lib/wallet-persistence.ts`. All keys are defined in `src/lib/storage-keys.ts`.
+The `WalletProvider` (via `src/lib/wallet-persistence.ts`) owns and manages minimal connection metadata in `localStorage`. All keys are centrally defined in `src/lib/storage-keys.ts`.
+
+**Lifecycle:**
+- **Created**: When a user successfully connects their wallet via the `WalletProvider.connect` method.
+- **Cleared**: When a user disconnects their wallet (`WalletProvider.disconnect`) or if auto-reconnect fails on mount (e.g., wallet locked, extension uninstalled).
+- **Logout Behavior**: Disconnecting the wallet clears these keys. However, logging out of an application *session* (if session auth is implemented) should also trigger wallet disconnect to ensure connection state doesn't leak across users.
 
 | Key (`STORAGE_KEYS`) | localStorage value | Description |
 |:---|:---|:---|
@@ -21,17 +26,18 @@ Legacy `stellar_wallet_*` keys are migrated automatically on first read.
 
 ## Connection vs. Session Auth
 
-It is critical to distinguish between the **Wallet Connection** and **Application Authentication**:
+It is critical to explicitly distinguish between the **Wallet Connection**, **Application Authentication**, and **Cookie Storage**:
 
-1.  **Wallet Connection (Frontend-only)**:
+1.  **Wallet Connection State (Frontend-only, LocalStorage)**:
     - Facilitated by `WalletProvider`.
     - Allows the frontend to request transaction signatures via the user's browser extension.
     - Status is stored in the `localStorage` keys listed above.
     - **Security**: Low. LocalStorage can be read by any script on the origin. This only gives the app the user's *public* address.
 
-2.  **Session Auth (Future / Backend-integrated)**:
-    - To perform actions on the user's behalf or access private data, a proper Auth session (JWT or Cookie) is required.
+2.  **Session / Authentication State (Cookie/Auth Storage)**:
+    - To perform actions on the user's behalf or access private data, a proper Auth session (JWT or secure HTTP-only Cookie) is required.
     - This typically involves the user signing a "Challenge" (SEP-10 standard) to prove ownership of the private key.
+    - Cookie storage is distinct from localStorage and should be used for persistent, secure session identifiers.
     - NeuroWealth currently uses the wallet connection primarily for triggering on-chain transactions from the browser.
 
 ## WalletProvider Behavior

@@ -112,6 +112,7 @@ export function DataTable<T extends object>({
   emptyMessage = "No results found.",
   onRowClick,
   className,
+  pageSize,
 }: DataTableProps<T>) {
   const [sort, setSort] = useState<{ key: string; direction: SortDirection }>(
     initialSort ?? { key: "", direction: null },

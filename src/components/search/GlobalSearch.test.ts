@@ -1,12 +1,17 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 
-import { computeNextIndex } from "@/components/search/GlobalSearch";
+import {
+  computeNextIndex,
+  createLatestRequestTracker,
+  resolveLiveRegionMessage,
+} from "@/components/search/GlobalSearch";
 import {
   GroupedSearchResults,
   hasAnySearchResults,
   searchMockIndex,
 } from "@/lib/mock-search-index";
+import { getSearchDataProvider, setSearchDataProvider } from "@/lib/search-service";
 
 // ── computeNextIndex ─────────────────────────────────────────────────────────
 
@@ -40,6 +45,66 @@ test("computeNextIndex returns -1 when total is 0", () => {
 
 test("computeNextIndex clamps out-of-range current to 0", () => {
   assert.equal(computeNextIndex(99, 1, 5), 0);
+});
+
+// ── createLatestRequestTracker (race safety, #365) ───────────────────────────
+
+test("tracker: a response for the latest request is applied", () => {
+  const tracker = createLatestRequestTracker();
+  const id = tracker.start();
+  assert.equal(tracker.isStale(id), false);
+});
+
+test("tracker: rapid typing supersedes the earlier in-flight request", () => {
+  const tracker = createLatestRequestTracker();
+  // User types, fires a search, then types again before the first resolves.
+  const first = tracker.start();
+  const second = tracker.start();
+
+  // Slow first response arrives after the second query started → dropped.
+  assert.equal(tracker.isStale(first), true);
+  // Newer query's response is still applied.
+  assert.equal(tracker.isStale(second), false);
+});
+
+test("tracker: out-of-order resolution never lets a stale result win", () => {
+  const tracker = createLatestRequestTracker();
+  const first = tracker.start();
+  const second = tracker.start();
+
+  // Even if the second resolves first and the first resolves last,
+  // the first remains stale and cannot overwrite the newer results.
+  assert.equal(tracker.isStale(second), false);
+  assert.equal(tracker.isStale(first), true);
+});
+
+test("tracker: invalidate() drops the in-flight request (clear / navigate / unmount)", () => {
+  const tracker = createLatestRequestTracker();
+  const id = tracker.start();
+  tracker.invalidate();
+
+  // A late response after clearing the query can no longer repopulate.
+  assert.equal(tracker.isStale(id), true);
+});
+
+test("tracker: a fresh request after invalidate is honoured again", () => {
+  const tracker = createLatestRequestTracker();
+  tracker.start();
+  tracker.invalidate();
+
+  const next = tracker.start();
+  assert.equal(tracker.isStale(next), false);
+});
+
+test("tracker: ids are strictly increasing across starts and invalidations", () => {
+  const tracker = createLatestRequestTracker();
+  const a = tracker.start();
+  const b = tracker.start();
+  tracker.invalidate();
+  const c = tracker.start();
+
+  assert.ok(b > a);
+  assert.ok(c > b);
 });
 
 // ── hasAnySearchResults ──────────────────────────────────────────────────────
@@ -165,4 +230,54 @@ test("searchMockIndex 'usdc' returns deposit action and TX record", async () => 
   const results = await searchMockIndex("usdc");
   assert.ok(results.Actions.some((a) => a.id === "action-start-deposit"));
   assert.ok(results.Records.some((r) => r.id === "record-tx-7f1"));
+});
+
+// ── resolveLiveRegionMessage ─────────────────────────────────────────────────
+
+test("live region: empty query returns no message", () => {
+  assert.equal(resolveLiveRegionMessage(false, null, false, false, "", 0), "");
+});
+
+test("live region: loading state returns no message to avoid noise", () => {
+  assert.equal(resolveLiveRegionMessage(true, null, true, false, "test", 0), "");
+});
+
+test("live region: error state returns error message", () => {
+  assert.equal(resolveLiveRegionMessage(false, "Network error", true, false, "test", 0), "Search error: Network error");
+});
+
+test("live region: committed query with no results returns empty message", () => {
+  assert.equal(resolveLiveRegionMessage(false, null, true, false, "unknown", 0), "No results found for unknown");
+});
+
+test("live region: results returns count and navigation instruction", () => {
+  assert.equal(resolveLiveRegionMessage(false, null, true, true, "test", 1), "1 search result available. Use arrow keys to navigate.");
+  assert.equal(resolveLiveRegionMessage(false, null, true, true, "test", 5), "5 search results available. Use arrow keys to navigate.");
+});
+
+// ── SearchDataProvider Mock ──────────────────────────────────────────────────
+
+test("provider: mocked provider intercepts search queries", async () => {
+  const original = getSearchDataProvider();
+  
+  const customProvider = {
+    search: async (query: string) => {
+      if (query === "mocked") {
+        return { Pages: [], Actions: [], Records: [] };
+      }
+      throw new Error("Provider error");
+    }
+  };
+  
+  setSearchDataProvider(customProvider);
+  
+  const empty = await getSearchDataProvider().search("mocked");
+  assert.equal(hasAnySearchResults(empty), false);
+  
+  await assert.rejects(
+    () => getSearchDataProvider().search("error"),
+    /Provider error/
+  );
+  
+  setSearchDataProvider(original);
 });

@@ -243,7 +243,7 @@ ${checklist.signOffs.map((signOff) => `- **${signOff.role.charAt(0).toUpperCase(
               <span className="text-slate-400 text-sm">Progress:</span>
               <span className="text-white font-semibold ml-2">{progress}%</span>
             </div>
-            <Button onClick={exportSummary} variant="default" size="sm">
+            <Button onClick={exportSummary} variant="primary" size="sm">
               <Download className="h-4 w-4 mr-2" />
               Export
             </Button>

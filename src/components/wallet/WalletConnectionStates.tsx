@@ -33,24 +33,24 @@ export function WalletConnectionStates({
   if (isRestoring) {
     return (
       <div
-        className="rounded-lg border border-gray-200 bg-gradient-to-r from-gray-50 to-gray-100 p-4 space-y-3"
+        className="rounded-lg border border-surface-border bg-surface p-4 space-y-3"
         data-qa="wallet-state-restoring"
       >
         <div className="flex items-center gap-3">
           <div className="animate-pulse">
-            <WalletIcon className="w-5 h-5 text-gray-400" />
+            <WalletIcon className="w-5 h-5 text-text-secondary" />
           </div>
           <div className="flex-1">
-            <p className="text-sm font-medium text-gray-700">
+            <p className="text-sm font-medium text-text-primary">
               Checking wallet connection...
             </p>
-            <p className="text-xs text-gray-500 mt-0.5">
+            <p className="text-xs text-text-muted mt-0.5">
               Restoring your previous session
             </p>
           </div>
         </div>
-        <div className="h-2 bg-gray-200 rounded-full overflow-hidden">
-          <div className="h-full w-1/3 bg-blue-500 animate-pulse" />
+        <div className="h-2 bg-surface-elevated rounded-full overflow-hidden">
+          <div className="h-full w-1/3 bg-primary animate-pulse" />
         </div>
       </div>
     );
@@ -83,38 +83,38 @@ export function WalletConnectionStates({
   // Disconnected state
   return (
     <div
-      className="rounded-lg border border-gray-300 bg-gray-50 p-4 space-y-4"
+      className="rounded-lg border border-surface-border bg-surface p-4 space-y-4"
       data-qa="wallet-state-disconnected"
     >
       <div className="space-y-2">
         <div className="flex items-center gap-2">
-          <LockIcon className="w-5 h-5 text-gray-600" />
-          <h3 className="text-sm font-semibold text-gray-900">
+          <LockIcon className="w-5 h-5 text-text-secondary" />
+          <h3 className="text-sm font-semibold text-text-primary">
             Wallet Not Connected
           </h3>
         </div>
-        <p className="text-sm text-gray-600">
+        <p className="text-sm text-text-secondary">
           Connect your Stellar wallet to access investment strategies and manage
           your portfolio.
         </p>
       </div>
 
       {showDetails && (
-        <div className="space-y-2 pt-2 border-t border-gray-200">
-          <p className="text-xs font-medium text-gray-700 uppercase">
+        <div className="space-y-2 pt-2 border-t border-surface-border">
+          <p className="text-xs font-medium text-text-muted uppercase">
             Benefits:
           </p>
-          <ul className="space-y-1.5 text-sm text-gray-600">
+          <ul className="space-y-1.5 text-sm text-text-secondary">
             <li className="flex items-start gap-2">
-              <span className="text-blue-600 font-bold mt-0.5">✓</span>
+              <span className="text-primary font-bold mt-0.5">✓</span>
               <span>View AI-powered portfolio insights</span>
             </li>
             <li className="flex items-start gap-2">
-              <span className="text-blue-600 font-bold mt-0.5">✓</span>
+              <span className="text-primary font-bold mt-0.5">✓</span>
               <span>Execute automated investment strategies</span>
             </li>
             <li className="flex items-start gap-2">
-              <span className="text-blue-600 font-bold mt-0.5">✓</span>
+              <span className="text-primary font-bold mt-0.5">✓</span>
               <span>Track transactions and balances</span>
             </li>
           </ul>
@@ -142,9 +142,9 @@ export function WalletRequiredGuard({
 
   if (isRestoring) {
     return (
-      <div className="rounded-lg border border-gray-200 bg-gray-50 p-4 text-center">
+      <div className="rounded-lg border border-surface-border bg-surface p-4 text-center">
         <div className="animate-pulse">
-          <p className="text-sm text-gray-600">Loading wallet status...</p>
+          <p className="text-sm text-text-secondary">Loading wallet status...</p>
         </div>
       </div>
     );

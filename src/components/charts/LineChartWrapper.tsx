@@ -1,7 +1,7 @@
 "use client";
 
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend } from "recharts";
-import { BaseChart, ChartTooltip } from "./BaseChart";
+import { BaseChart, ChartTooltip, type ChartTooltipFormatter } from "./BaseChart";
 import { chartTheme, chartDimensions } from "@/lib/chart-theme";
 import type { ChartDatum } from "@/lib/mock-chart-data";
 
@@ -14,8 +14,9 @@ interface LineChartWrapperProps<T extends ChartDatum> {
   showLegend?: boolean;
   color?: string;
   strokeWidth?: number;
+  strokeDasharray?: string;
   dot?: boolean | object;
-  formatter?: (value: any, name: string) => [string, string];
+  formatter?: ChartTooltipFormatter;
 }
 
 export function LineChartWrapper<T extends ChartDatum = ChartDatum>({
@@ -27,6 +28,7 @@ export function LineChartWrapper<T extends ChartDatum = ChartDatum>({
   showLegend = false,
   color = chartTheme.colors.primary,
   strokeWidth = 2,
+  strokeDasharray = chartTheme.patterns.primary,
   dot = false,
   formatter,
 }: LineChartWrapperProps<T>) {
@@ -58,6 +60,7 @@ export function LineChartWrapper<T extends ChartDatum = ChartDatum>({
           dataKey={dataKey}
           stroke={color}
           strokeWidth={strokeWidth}
+          strokeDasharray={strokeDasharray}
           dot={dot}
           activeDot={{ r: 4, stroke: color, strokeWidth: 2, fill: "#fff" }}
         />

@@ -144,7 +144,7 @@ function ComponentsView({ savedAvatar }: { savedAvatar?: string }) {
           <div>
             <h3 className="text-sm font-medium text-gray-400 mb-3">Image</h3>
             <div className="flex gap-4">
-              <Avatar size={48} src={mockSrc} alt="Image variant" />
+              <Avatar size={40} src={mockSrc} alt="Image variant" />
             </div>
             <p className="text-xs text-gray-400 mt-2">
               Displays image with border
@@ -156,7 +156,7 @@ function ComponentsView({ savedAvatar }: { savedAvatar?: string }) {
             <div className="flex gap-4">
               {["Alice Brown", "Bob Jones", "Charlie Lee", "Diana Wu"].map(
                 (name) => (
-                  <Avatar key={name} size={48} name={name} />
+                  <Avatar key={name} size={40} name={name} />
                 ),
               )}
             </div>
@@ -170,7 +170,7 @@ function ComponentsView({ savedAvatar }: { savedAvatar?: string }) {
               Placeholder
             </h3>
             <div className="flex gap-4">
-              <Avatar size={48} />
+              <Avatar size={40} />
             </div>
             <p className="text-xs text-gray-400 mt-2">
               Default when no name or image provided
@@ -278,7 +278,7 @@ function UploaderView({
             <div>
               <p className="font-medium">Save</p>
               <p className="text-gray-400">
-                Click "Apply crop" to save (returns 256×256 square output)
+                Click &quot;Apply crop&quot; to save (returns 256×256 square output)
               </p>
             </div>
           </div>

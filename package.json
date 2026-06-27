@@ -11,13 +11,14 @@
     "build": "next build",
     "start": "next start",
     "typecheck": "tsc --noEmit",
-    "test": "TZ=UTC node --import tsx --test \"src/**/*.test.ts\"",
+    "test": "TZ=UTC node --import tsx --test $(find src -name '*.test.ts' -print)",
     "qa:visual-baseline": "node scripts/capture-visual-baselines.mjs",
     "lint": "next lint",
     "validate:env": "yarn validate:env:server && yarn validate:env:frontend",
     "validate:env:server": "tsx scripts/validate-env.ts",
     "validate:env:frontend": "tsx scripts/validate-frontend-env.ts",
     "analyze": "ANALYZE=true next build",
+    "validate:config": "node -e \"['package.json','tsconfig.json'].forEach(f=>{try{const d=JSON.parse(require('fs').readFileSync(f,'utf8'));console.log('✓',f,'is valid JSON');}catch(e){console.error('✗',f,'validation failed:',e.message);process.exit(1);}})\"",
     "prepare": "husky"
   },
   "dependencies": {
@@ -35,6 +36,10 @@
   },
   "optionalDependencies": {
     "@tailwindcss/oxide-linux-x64-gnu": "4.2.2"
+  },
+  "lint-staged": {
+    "package.json": "node -e \"try{JSON.parse(require('fs').readFileSync('package.json','utf8'));console.log('✓ package.json valid');}catch(e){console.error('✗ package.json invalid:',e.message);process.exit(1);}\"",
+    "tsconfig.json": "node -e \"try{JSON.parse(require('fs').readFileSync('tsconfig.json','utf8'));console.log('✓ tsconfig.json valid');}catch(e){console.error('✗ tsconfig.json invalid:',e.message);process.exit(1);}\""
   },
   "overrides": {
     "csstype": "3.1.3"

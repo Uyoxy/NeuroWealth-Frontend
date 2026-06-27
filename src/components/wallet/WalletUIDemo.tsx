@@ -17,7 +17,6 @@ import { WalletStatusBadge } from "./WalletStatusBadge";
 interface DemoStateProps {
   title: string;
   description?: string;
-  state: "disconnected" | "restoring" | "connected" | "mismatch";
   children: React.ReactNode;
 }
 

@@ -114,24 +114,24 @@ function DoDont({
 
 const chartPalette = [
   {
-    name: "Primary (Blue)",
+    name: "Primary (Sky)",
     value: chartTheme.colors.primary,
-    usage: "Main data series, portfolio growth, primary KPI lines",
+    usage: "Main data series, portfolio growth, primary KPI lines; solid stroke",
   },
   {
     name: "Accent (Orange)",
     value: chartTheme.colors.accent,
-    usage: "Secondary series, yield/return bars, comparison lines",
+    usage: "Secondary series, yield/return bars, comparison lines; dashed stroke",
   },
   {
-    name: "Warning (Teal)",
+    name: "Warning (Magenta)",
     value: chartTheme.colors.warning,
-    usage: "Third data series, benchmark overlays, neutral metrics",
+    usage: "Third data series, benchmark overlays, neutral metrics; dotted stroke",
   },
   {
     name: "Neutral Strong",
     value: chartTheme.colors["neutral-strong"],
-    usage: "Suppressed data, inactive slices, low-emphasis fills",
+    usage: "Suppressed data, inactive slices, low-emphasis fills; long dash",
   },
 ];
 
@@ -187,7 +187,7 @@ export default function ChartStyleGuidePage() {
         <Section
           id="palette"
           title="Approved Chart Palette"
-          description="All charts must use tokens from this palette. The set is CVD-safe (tested for deuteranopia, protanopia, and tritanopia) and meets WCAG AA contrast on dark backgrounds."
+          description="All charts must use tokens from this palette. The set is CVD-tested for deuteranopia, protanopia, and tritanopia, and meets WCAG AA graphics contrast on dark and light chart backgrounds."
         >
           <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
             {chartPalette.map((swatch) => (
@@ -296,6 +296,7 @@ import { chartTheme } from "@/lib/chart-theme";
                 xAxisKey="name"
                 height={220}
                 color={chartTheme.colors.accent}
+                strokeDasharray={chartTheme.patterns.accent}
                 formatter={(v) => [`$${Number(v).toLocaleString()}`, "Yield"]}
               />
             </div>
@@ -309,6 +310,7 @@ import { chartTheme } from "@/lib/chart-theme";
                 xAxisKey="name"
                 height={220}
                 color={chartTheme.colors.warning}
+                strokeDasharray={chartTheme.patterns.warning}
                 formatter={(v) => [`$${Number(v).toLocaleString()}`, "Amount"]}
               />
             </div>
@@ -324,6 +326,7 @@ import { chartTheme } from "@/lib/chart-theme";
   xAxisKey="name"
   height={220}
   color={chartTheme.colors.accent}
+  strokeDasharray={chartTheme.patterns.accent}
   formatter={(v) => [\`$\${Number(v).toLocaleString()}\`, "Yield"]}
 />`}
           />
@@ -359,8 +362,9 @@ import { assetAllocationData } from "@/lib/mock-chart-data";
           />
           <div className="mt-3 rounded-lg border border-slate-700/40 bg-slate-900/40 p-3 text-xs text-slate-400">
             Each donut slice maps a <code className="text-sky-300">tone</code>{" "}
-            field to an approved palette colour. The legend renders below the
-            chart on mobile and to the right on desktop automatically.
+            field to an approved palette colour and a redundant stroke pattern.
+            The legend renders below the chart on mobile and to the right on
+            desktop automatically.
           </div>
         </Section>
 
@@ -372,12 +376,12 @@ import { assetAllocationData } from "@/lib/mock-chart-data";
         >
           <div className="space-y-4">
             <DoDont
-              doText="Use approved palette tokens (primary, accent, warning, neutral-strong). Colours are pre-tested for CVD safety."
-              dontText="Introduce custom hex colours outside the chart palette — this breaks CVD safety guarantees and visual consistency."
+              doText="Use approved palette tokens (primary, accent, warning, neutral-strong). Colours are tested for CVD distance and chart contrast."
+              dontText="Introduce custom hex colours outside the chart palette — this breaks CVD guarantees and visual consistency."
             />
             <DoDont
-              doText="Pair colour with a text label or legend entry. Screen readers and colour-blind users rely on labels, not colour."
-              dontText="Use colour as the only differentiator between series. A user with monochromacy would see identical lines."
+              doText="Pair colour with a text label, legend entry, and stroke pattern where the wrapper supports it."
+              dontText="Use colour as the only differentiator between series. Simulated CVD checks can still miss unlabeled intent."
             />
             <DoDont
               doText="Keep axis labels at least 12 px and use the axis.fill token (#64748b) so labels are readable on dark backgrounds."

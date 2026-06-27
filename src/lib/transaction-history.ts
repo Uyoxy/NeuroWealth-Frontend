@@ -86,7 +86,8 @@ function generateHistoryItems(count: number): TransactionHistoryItem[] {
     const date = new Date(baseDate.getTime() - i * 4 * 60 * 60 * 1000);
     const rawAmount = amounts[i % amounts.length];
     const amount = tmpl.kind === "withdrawal" ? (rawAmount != null ? -rawAmount : null) : rawAmount;
-    const hasTx = tmpl.status !== "pending" && tmpl.status !== "failed";
+    const status: HistoryStatus = i % 7 === 2 ? "pending" : i % 11 === 0 ? "failed" : "success";
+    const hasTx = status !== "pending" && status !== "failed";
     const txKey = TX_HASH_KEYS[i % TX_HASH_KEYS.length];
 
     items.push({
@@ -95,7 +96,7 @@ function generateHistoryItems(count: number): TransactionHistoryItem[] {
       title: tmpl.title,
       detail: tmpl.detail,
       amount,
-      status: i % 7 === 2 ? "pending" : i % 11 === 0 ? "failed" : "success",
+      status,
       occurredAt: date.toISOString(),
       txHash: hasTx ? MOCK_TX_HASHES[txKey] : null,
     });

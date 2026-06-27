@@ -1,3 +1,5 @@
+import { useState, useCallback } from "react";
+import { useAsyncState } from "@/hooks/useAsyncState";
 import type { ToastInput } from "@/components/notifications/ToastProvider";
 
 type MockFlowKey = "save" | "failure" | "timeout";
@@ -25,6 +27,31 @@ export async function runMockFlow(key: MockFlowKey, pushToast: (t: ToastInput) =
     if (step.delayBefore) await new Promise((r) => setTimeout(r, step.delayBefore));
     pushToast(step.toast);
   }
+}
+
+/**
+ * Reusable React hook to manage mock flows using useAsyncState.
+ * Encapsulates triggering flow and tracking the active flow key.
+ */
+export function useMockFlows(pushToast: (t: ToastInput) => void) {
+  const { run } = useAsyncState<MockFlowKey>();
+  const [activeFlow, setActiveFlow] = useState<MockFlowKey | null>(null);
+
+  const triggerMockFlow = useCallback(async (flow: MockFlowKey) => {
+    setActiveFlow(flow);
+    await run(async () => {
+      await runMockFlow(flow, pushToast);
+      // Small visual delay to show loading state cleanly
+      await new Promise((r) => setTimeout(r, 1000));
+      return flow;
+    });
+    setActiveFlow(null);
+  }, [run, pushToast]);
+
+  return {
+    activeFlow,
+    triggerMockFlow,
+  };
 }
 
 export type { MockFlowKey, MockFlowStep };

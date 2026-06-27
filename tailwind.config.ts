@@ -1,10 +1,12 @@
 /**
  * TAILWIND TOKEN OWNERSHIP RULE
  * ─────────────────────────────
- * • globals.css @theme  → single source of truth for design tokens
- *                          (colors: dark-*, brand-*, semantic variables via CSS custom properties)
- * • tailwind.config.ts  → content globs, animations, keyframes, fontFamily, plugins only.
- *                          Do NOT add duplicate color tokens here; add them to @theme instead.
+ * • globals.css @theme  → single source of truth for ALL design token values
+ *                          (colors, shadows, spacing, motion, etc.)
+ * • tailwind.config.ts  → content globs, animations, keyframes, fontFamily,
+ *                          fontWeight, boxShadow, backdropBlur, motion tokens,
+ *                          transitionTimingFunction, plugins, darkMode only.
+ *                          Do NOT add duplicate color tokens here; put them in @theme.
  */
 import type { Config } from 'tailwindcss';
 
@@ -16,26 +18,6 @@ const config: Config = {
   ],
   theme: {
     extend: {
-      colors: {
-        // App-level (legacy — migrate new tokens to globals.css @theme)
-        "app-bg": "#030712",
-        // Widget surfaces (Issue 29 spec)
-        "surface": "#111827",
-        "surface-border": "#1F2937",
-        "surface-elevated": "#1F2937",
-        // Primary / focus ring color (Issue 29 spec)
-        "primary": "#0EA5E9",
-        "primary-hover": "#0284C7",
-        // Text
-        "text-primary": "#F8FAFC",
-        "text-secondary": "#9CA3AF",
-        "text-muted": "#6B7280",
-        // Status
-        "success": "#10B981",
-        "error": "#EF4444",
-        "warning": "#F59E0B",
-        "info": "#0EA5E9",
-      },
       fontFamily: {
         sans: ["Inter", "system-ui", "sans-serif"],
         mono: ["Roboto Mono", "JetBrains Mono", "monospace"],
@@ -69,7 +51,6 @@ const config: Config = {
       backgroundImage: {
         "skeleton-gradient":
           "linear-gradient(90deg, #1F2937 25%, #374151 50%, #1F2937 75%)",
-        // dark-* and brand-* tokens live in globals.css @theme — not here
         slate: {
           50: '#f8fafc',
           100: '#f1f5f9',
@@ -104,9 +85,6 @@ const config: Config = {
           800: '#1f2937',
           900: '#111827',
         },
-      },
-      boxShadow: {
-        card: '0 1px 3px rgba(0, 0, 0, 0.1)',
       },
       backdropBlur: {
         md: '12px',

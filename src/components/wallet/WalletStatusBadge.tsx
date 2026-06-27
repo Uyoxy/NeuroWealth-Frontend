@@ -54,35 +54,35 @@ export function WalletStatusBadge({
 
   return (
     <div
-      className="rounded-lg border border-gray-200 bg-white p-3 space-y-2"
+      className="rounded-lg border border-surface-border bg-surface p-3 space-y-2"
       data-qa="wallet-status-badge"
     >
       {/* Wallet Connection Status */}
       <div className="flex items-center gap-2">
-        <CheckCircleIcon className="w-4 h-4 text-green-600" />
+        <CheckCircleIcon className="w-4 h-4 text-success" />
         <div className="flex-1">
-          <p className="text-xs text-gray-500 font-medium uppercase">Wallet</p>
-          <p className="text-sm font-semibold text-gray-900">{walletName}</p>
+          <p className="text-xs text-text-muted font-medium uppercase">Wallet</p>
+          <p className="text-sm font-semibold text-text-primary">{walletName}</p>
         </div>
       </div>
 
       {/* Public Key / Address */}
-      <div className="flex items-start gap-2 pt-2 border-t border-gray-100">
-        <WalletIcon className="w-4 h-4 text-gray-600 mt-0.5 flex-shrink-0" />
+      <div className="flex items-start gap-2 pt-2 border-t border-surface-border">
+        <WalletIcon className="w-4 h-4 text-text-secondary mt-0.5 flex-shrink-0" />
         <div className="flex-1 min-w-0">
-          <p className="text-xs text-gray-500 font-medium uppercase">Address</p>
-          <code className="text-xs text-gray-700 break-all font-mono">
+          <p className="text-xs text-text-muted font-medium uppercase">Address</p>
+          <code className="text-xs text-text-secondary break-all font-mono">
             {publicKey}
           </code>
-          <p className="text-xs text-gray-400 mt-1">{truncatedAddress}</p>
+          <p className="text-xs text-text-muted mt-1">{truncatedAddress}</p>
         </div>
       </div>
 
       {/* Network Status */}
       {showNetwork && (
         <div
-          className={`flex items-center gap-2 pt-2 border-t border-gray-100 ${
-            networkStatus.hasMismatch ? "text-amber-600" : "text-green-600"
+          className={`flex items-center gap-2 pt-2 border-t border-surface-border ${
+            networkStatus.hasMismatch ? "text-warning" : "text-success"
           }`}
         >
           {networkStatus.hasMismatch ? (

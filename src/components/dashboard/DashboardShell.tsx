@@ -12,8 +12,11 @@ interface DashboardShellProps {
 }
 
 /**
- * Client-side shell that provides auth context and the persistent
- * layout chrome (sidebar, header, mobile nav).
+ * Client-side shell for the persistent dashboard layout chrome
+ * (sidebar, header, mobile nav).
+ *
+ * Auth is provided by {@link ClientProviders} at the root — this
+ * component does NOT wrap its own AuthProvider.
  *
  * Layout — Desktop (≥ 1024px):
  *   ┌────────────┬────────────────────────┐

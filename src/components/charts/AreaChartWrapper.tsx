@@ -1,7 +1,7 @@
 "use client";
 
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, Legend } from "recharts";
-import { BaseChart, ChartTooltip, usePrefersReducedMotion } from "./BaseChart";
+import { BaseChart, ChartTooltip, type ChartTooltipFormatter } from "./BaseChart";
 import { chartTheme, chartDimensions } from "@/lib/chart-theme";
 import type { ChartDatum } from "@/lib/mock-chart-data";
 
@@ -14,7 +14,7 @@ interface AreaChartWrapperProps<T extends ChartDatum> {
   showLegend?: boolean;
   fillOpacity?: number;
   color?: string;
-  formatter?: (value: any, name: string) => [string, string];
+  formatter?: ChartTooltipFormatter;
 }
 
 export function AreaChartWrapper<T extends ChartDatum = ChartDatum>({

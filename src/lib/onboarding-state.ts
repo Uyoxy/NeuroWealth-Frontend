@@ -10,15 +10,20 @@ const STORAGE_KEY = STORAGE_KEYS.ONBOARDING_STATE;
 // Legacy key used by older code paths (kept for migration/backwards compatibility)
 const LEGACY_KEY = 'onboarding-state';
 
+function getStorage(): Storage | null {
+  return globalThis.localStorage ?? null;
+}
+
 export function loadOnboardingState(): OnboardingState | null {
-  if (typeof window === 'undefined' || !window?.localStorage) {
+  const storage = getStorage();
+  if (!storage) {
     return null;
   }
 
-  let raw = window.localStorage.getItem(STORAGE_KEY);
+  let raw = storage.getItem(STORAGE_KEY);
   // Fallback to legacy key for existing installs
   if (!raw) {
-    raw = window.localStorage.getItem(LEGACY_KEY) ?? null;
+    raw = storage.getItem(LEGACY_KEY) ?? null;
   }
   if (!raw) {
     return null;
@@ -37,24 +42,26 @@ export function loadOnboardingState(): OnboardingState | null {
 }
 
 export function saveOnboardingState(state: OnboardingState): void {
-  if (typeof window === 'undefined' || !window?.localStorage) {
+  const storage = getStorage();
+  if (!storage) {
     return;
   }
 
   try {
     // Always write to canonical key; keep legacy key untouched to avoid surprising deletes
-    window.localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+    storage.setItem(STORAGE_KEY, JSON.stringify(state));
   } catch (error) {
     console.error('Failed to save onboarding state:', error);
   }
 }
 
 export function clearOnboardingState(): void {
-  if (typeof window === 'undefined' || !window?.localStorage) {
+  const storage = getStorage();
+  if (!storage) {
     return;
   }
 
-  window.localStorage.removeItem(STORAGE_KEY);
+  storage.removeItem(STORAGE_KEY);
 }
 
 export function isOnboardingCompleted(): boolean {

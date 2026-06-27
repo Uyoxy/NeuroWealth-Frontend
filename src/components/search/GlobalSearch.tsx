@@ -45,6 +45,46 @@ export function computeNextIndex(
   return next;
 }
 
+export function resolveLiveRegionMessage(
+  isLoading: boolean,
+  errorMessage: string | null,
+  hasCommittedQuery: boolean,
+  hasResults: boolean,
+  debouncedQuery: string,
+  numResults: number
+): string {
+  if (isLoading) return "";
+  if (errorMessage) return `Search error: ${errorMessage}`;
+  if (hasCommittedQuery && !hasResults) return `No results found for ${debouncedQuery}`;
+  if (hasResults) return `${numResults} search result${numResults !== 1 ? "s" : ""} available. Use arrow keys to navigate.`;
+  return "";
+}
+
+/**
+ * Tracks the latest in-flight async search so stale responses can be dropped.
+ * Extracted as a pure helper (rather than inlined ref arithmetic) so the
+ * latest-wins / supersede behaviour can be unit-tested directly — see #365.
+ */
+export interface LatestRequestTracker {
+  /** Begin a new request; supersedes all earlier ones and returns its id. */
+  start(): number;
+  /** True once `id` is no longer the latest (a newer request or invalidate ran). */
+  isStale(id: number): boolean;
+  /** Supersede any in-flight request without starting a new one (clear/navigate/unmount). */
+  invalidate(): void;
+}
+
+export function createLatestRequestTracker(): LatestRequestTracker {
+  let latest = 0;
+  return {
+    start: () => ++latest,
+    isStale: (id: number) => id !== latest,
+    invalidate: () => {
+      latest += 1;
+    },
+  };
+}
+
 export function GlobalSearch({
   placeholder = "Search pages, actions, or records",
   onRequestClose,
@@ -66,10 +106,10 @@ export function GlobalSearch({
 
   const rootRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
-  // Monotonic id for the latest in-flight search. A response is applied only
-  // when its id still matches, so a slow search can never overwrite a newer
-  // one (or results that were cleared / navigated away from).
-  const requestIdRef = useRef(0);
+  // Tracks the latest in-flight search. A response is applied only when its id
+  // is still the latest, so a slow search can never overwrite a newer one (or
+  // results that were cleared / navigated away from).
+  const requestTrackerRef = useRef<LatestRequestTracker>(createLatestRequestTracker());
 
   useOnClickOutside(rootRef, () => {
     setIsOpen(false);
@@ -86,9 +126,11 @@ export function GlobalSearch({
   }, [autoFocus]);
 
   useEffect(() => {
+    const tracker = requestTrackerRef.current;
+
     if (!debouncedQuery) {
       // Invalidate any in-flight search so a late response can't repopulate.
-      requestIdRef.current += 1;
+      tracker.invalidate();
       setResults(EMPTY_RESULTS);
       setErrorMessage(null);
       setIsLoading(false);
@@ -96,33 +138,33 @@ export function GlobalSearch({
       return;
     }
 
-    const requestId = ++requestIdRef.current;
+    const requestId = tracker.start();
     setIsLoading(true);
     setErrorMessage(null);
 
     getSearchDataProvider()
       .search(debouncedQuery)
       .then((grouped) => {
-        if (requestId !== requestIdRef.current) return;
+        if (tracker.isStale(requestId)) return;
         setResults(grouped);
         const nextFlat = flattenResults(grouped);
         setActiveIndex(nextFlat.length > 0 ? 0 : -1);
       })
       .catch(() => {
-        if (requestId !== requestIdRef.current) return;
+        if (tracker.isStale(requestId)) return;
         setResults(EMPTY_RESULTS);
         setActiveIndex(-1);
         setErrorMessage("Search is temporarily unavailable. Please try again.");
       })
       .finally(() => {
-        if (requestId === requestIdRef.current) {
+        if (!tracker.isStale(requestId)) {
           setIsLoading(false);
         }
       });
 
     return () => {
       // A newer query (or unmount) supersedes this run; ignore its result.
-      requestIdRef.current += 1;
+      tracker.invalidate();
     };
   }, [debouncedQuery, retryKey]);
 
@@ -142,7 +184,7 @@ export function GlobalSearch({
   };
 
   const clearQuery = () => {
-    requestIdRef.current += 1; // drop any in-flight search so it can't repopulate
+    requestTrackerRef.current.invalidate(); // drop any in-flight search so it can't repopulate
     setQuery("");
     setResults(EMPTY_RESULTS);
     setErrorMessage(null);
@@ -152,7 +194,7 @@ export function GlobalSearch({
   };
 
   const navigateToResult = (item: SearchResultItem) => {
-    requestIdRef.current += 1; // drop any in-flight search before navigating away
+    requestTrackerRef.current.invalidate(); // drop any in-flight search before navigating away
     router.push(item.href);
     setIsOpen(false);
     setQuery("");
@@ -249,13 +291,14 @@ export function GlobalSearch({
           : ""}
       </div>
       <div className="sr-only" aria-live="polite" aria-atomic="true">
-        {!isLoading && errorMessage
-          ? `Search error: ${errorMessage}`
-          : !isLoading && hasCommittedQuery && !hasResults
-            ? `No results found for ${debouncedQuery}`
-            : !isLoading && hasResults
-              ? `${flatResults.length} search result${flatResults.length !== 1 ? "s" : ""} available. Use arrow keys to navigate.`
-              : ""}
+        {resolveLiveRegionMessage(
+          isLoading,
+          errorMessage,
+          hasCommittedQuery,
+          hasResults,
+          debouncedQuery,
+          flatResults.length
+        )}
       </div>
 
       {shouldShowPanel && (
