@@ -142,6 +142,50 @@ test("createServerApiClient returns null when NEUROWEALTH_API_BASE_URL is not se
   assert.equal(client, null);
 });
 
+test("apiRequest rejects timed-out requests with REQUEST_TIMEOUT", async () => {
+  globalThis.fetch = async (_url, init) => {
+    return new Promise((_resolve, reject) => {
+      const signal = init?.signal;
+      if (!signal) return;
+
+      signal.addEventListener(
+        "abort",
+        () => reject(new DOMException("The operation was aborted.", "AbortError")),
+        { once: true },
+      );
+    });
+  };
+
+  await assert.rejects(
+    () => apiRequest("/api/test", { timeoutMs: 50 }),
+    (error: unknown) => {
+      assert.ok(error instanceof ApiRequestError);
+      assert.equal(error.code, "REQUEST_TIMEOUT");
+      assert.equal(error.status, 408);
+      assert.match(error.message, /timed out/i);
+      return true;
+    },
+  );
+});
+
+test("apiRequest forwards external AbortSignal and rejects with NETWORK_ERROR when aborted early", async () => {
+  const controller = new AbortController();
+
+  globalThis.fetch = async () => {
+    controller.abort();
+    throw new DOMException("The operation was aborted.", "AbortError");
+  };
+
+  await assert.rejects(
+    () => apiRequest("/api/test", { signal: controller.signal }),
+    (error: unknown) => {
+      assert.ok(error instanceof ApiRequestError);
+      assert.equal(error.code, "NETWORK_ERROR");
+      return true;
+    },
+  );
+});
+
 test("createServerApiClient returns a callable client when base URL is set", async () => {
   process.env.NEUROWEALTH_API_BASE_URL = "https://api.example.com";
   process.env.NEUROWEALTH_API_AUTH_TOKEN = "test-token";

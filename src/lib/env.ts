@@ -27,6 +27,13 @@
  *                                    (default: /transactions)
  *   NEUROWEALTH_STRATEGY_PATH        Backend path for strategy preference
  *                                    (default: /strategy/preference)
+ *
+ * ── Related docs ──────────────────────────────────────────────────────────────
+ *
+ *   NEUROWEALTH_API.md      Full HTTP contract — paths, auth headers, error envelope
+ *   docs/env.md             Deployment notes and validation scripts
+ *   docs/api-integration.md Endpoint schemas and integration checklist
+ *   README.md               Mock vs real API mode overview for contributors
  */
 
 interface EnvConfig {
