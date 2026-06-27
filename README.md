@@ -209,4 +209,4 @@ To report a vulnerability or for our handling and response expectations, see [SE
 
 ## License
 
-Internal/demo project — see repository owner for license details.
+Internal/demo project — see repository owner for license details
