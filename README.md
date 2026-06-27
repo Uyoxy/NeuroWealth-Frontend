@@ -91,7 +91,53 @@ Lint runs via `yarn lint` (ESLint + `eslint-config-next`).
 ## Environment variables
 
 See `docs/env.md` for the full variable reference, including the public/server-only split,
-Edge middleware constraints, and runtime validation notes.
+Edge middleware constraints, and runtime validation notes. Typed accessors and validation
+live in `src/lib/env.ts` — each field is documented with its corresponding env var name.
+
+## Backend integration (mock vs real API)
+
+The frontend supports two runtime modes controlled by **server-only** env vars (see
+`src/lib/env.ts` and [NEUROWEALTH_API.md](NEUROWEALTH_API.md)):
+
+| Mode | Condition | Behaviour |
+| --- | --- | --- |
+| **Demo / mock** | `NEUROWEALTH_API_BASE_URL` unset | All `/api/*` route handlers return in-process mock data (`source: "demo"`). No backend required — default for local dev and PR previews. |
+| **Real API** | `NEUROWEALTH_API_BASE_URL` set | Route handlers proxy to the backend via `createServerApiClient()` with `Authorization: Bearer <NEUROWEALTH_API_AUTH_TOKEN>`. |
+
+### Request paths
+
+| Browser calls | Next.js route | Backend path (when configured) |
+| --- | --- | --- |
+| Portfolio data | `GET /api/portfolio` | `GET {NEUROWEALTH_PORTFOLIO_PATH}` (default `/portfolio/overview`) |
+| Transactions | `POST /api/transactions` | `POST {NEUROWEALTH_TRANSACTIONS_PATH}` (default `/transactions`) |
+| Strategy | `GET/PUT /api/strategy` | `GET/PUT {NEUROWEALTH_STRATEGY_PATH}` (default `/strategy/preference`) |
+
+Browser → Next.js requests authenticate via the httpOnly session cookie (`nw_session`).
+Next.js → backend requests require the Bearer token — never expose it to the client bundle.
+
+### Headers
+
+| Hop | Required headers |
+| --- | --- |
+| Browser → `/api/*` | `Accept: application/json`; `Content-Type: application/json` on writes; session cookie |
+| Server → backend | `Accept: application/json`; `Authorization: Bearer <NEUROWEALTH_API_AUTH_TOKEN>` |
+
+### Response envelope & errors
+
+All `/api/*` responses use the unified envelope defined in `src/lib/api-response.ts`:
+
+```json
+{ "success": true, "data": { } }
+{ "success": false, "error": { "code": "ERROR_CODE", "message": "…", "details": { } } }
+```
+
+The typed client in `src/lib/api-client.ts` unwraps success payloads and throws `ApiRequestError`
+on failure. Built-in client error codes include `REQUEST_TIMEOUT` (408), `NETWORK_ERROR` (503),
+`INVALID_JSON`, and `INVALID_ENVELOPE`. Backend codes are forwarded verbatim.
+
+Use `useAsyncData((signal) => apiRequest("/api/…", { signal }))` so in-flight requests abort on
+unmount. See [NEUROWEALTH_API.md](NEUROWEALTH_API.md) and [docs/api-integration.md](docs/api-integration.md)
+for full endpoint schemas and integration checklists.
 
 ## Provider tree & data flow
 
