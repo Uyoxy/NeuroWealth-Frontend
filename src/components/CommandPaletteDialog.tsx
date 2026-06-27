@@ -124,7 +124,7 @@ export function CommandPaletteDialog({ onClose }: CommandPaletteDialogProps) {
   return (
     <div className="fixed inset-0 z-[9999] flex items-start justify-center px-0 pt-[10vh] sm:px-4 sm:pt-[20vh]">
       <div
-        className="fixed inset-0 bg-black/60 backdrop-blur-sm"
+        className="fixed inset-0 bg-black/60 backdrop-blur-sm transition-opacity motion-reduce:transition-none"
         onClick={onClose}
         aria-hidden="true"
       />

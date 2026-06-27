@@ -1,6 +1,10 @@
 /** @type {import('next').NextConfig} */
 // Fixes issue 443: Implement frontend performance optimization pass
 const nextConfig = {
+  eslint: {
+    // Lint errors must be resolved before a production build succeeds.
+    ignoreDuringBuilds: false,
+  },
   reactStrictMode: true,
   staticPageGenerationTimeout: 0,
   // Compress responses with gzip for smaller transfer sizes
