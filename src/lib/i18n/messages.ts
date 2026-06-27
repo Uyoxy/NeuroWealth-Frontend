@@ -164,7 +164,9 @@ export interface AppMessages {
       emptyActivity: string;
       noAmount: string;
     };
-  };\n  settings: {\n    index: {
+  };
+  settings: {
+    index: {
       title: string;
       subtitle: string;
       appearance: {
@@ -571,7 +573,9 @@ export const dictionaries: Record<AppLocale, AppMessages> = {
         emptyActivity: "No recent activity yet. Deposits and rebalances will appear here as soon as they happen.",
         noAmount: "No amount",
       },
-    },\n    settings: {\n      index: {
+    },
+    settings: {
+      index: {
         title: "Settings",
         subtitle: "Manage your account preferences and connected wallet.",
         appearance: {
@@ -973,7 +977,9 @@ export const dictionaries: Record<AppLocale, AppMessages> = {
         emptyActivity: "Aucune activité récente. Les dépôts et rééquilibrages apparaîtront ici dès qu'ils se produiront.",
         noAmount: "Aucun montant",
       },
-    },\n    settings: {\n      index: {
+    },
+    settings: {
+      index: {
         title: "Paramètres",
         subtitle: "Gérez les préférences de votre compte et votre portefeuille connecté.",
         appearance: {

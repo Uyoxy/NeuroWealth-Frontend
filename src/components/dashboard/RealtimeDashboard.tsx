@@ -167,13 +167,13 @@ export function RealtimeDashboard() {
                 <span className="text-sm font-semibold text-slate-100">{t.simulatedStream}</span>
                 <span
                   className="flex items-center gap-1.5 rounded-full border border-white/10 bg-white/5 px-2 py-0.5 text-xs font-medium text-slate-300"
-                  aria-label={`Stream status: ${statusLabel(status)}`}
+                  aria-label={`Stream status: ${statusLabel(status, t)}`}
                 >
                   <span
                     className={`h-1.5 w-1.5 rounded-full ${statusDot(status)}`}
                     aria-hidden
                   />
-                  {statusLabel(status)}
+                  {statusLabel(status, t)}
                 </span>
               </div>
               <p className="mt-0.5 text-xs text-slate-500">{t.firesEvery}</p>

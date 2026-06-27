@@ -45,6 +45,21 @@ export function computeNextIndex(
   return next;
 }
 
+export function resolveLiveRegionMessage(
+  isLoading: boolean,
+  errorMessage: string | null,
+  hasCommittedQuery: boolean,
+  hasResults: boolean,
+  debouncedQuery: string,
+  numResults: number
+): string {
+  if (isLoading) return "";
+  if (errorMessage) return `Search error: ${errorMessage}`;
+  if (hasCommittedQuery && !hasResults) return `No results found for ${debouncedQuery}`;
+  if (hasResults) return `${numResults} search result${numResults !== 1 ? "s" : ""} available. Use arrow keys to navigate.`;
+  return "";
+}
+
 /**
  * Tracks the latest in-flight async search so stale responses can be dropped.
  * Extracted as a pure helper (rather than inlined ref arithmetic) so the
@@ -276,13 +291,14 @@ export function GlobalSearch({
           : ""}
       </div>
       <div className="sr-only" aria-live="polite" aria-atomic="true">
-        {!isLoading && errorMessage
-          ? `Search error: ${errorMessage}`
-          : !isLoading && hasCommittedQuery && !hasResults
-            ? `No results found for ${debouncedQuery}`
-            : !isLoading && hasResults
-              ? `${flatResults.length} search result${flatResults.length !== 1 ? "s" : ""} available. Use arrow keys to navigate.`
-              : ""}
+        {resolveLiveRegionMessage(
+          isLoading,
+          errorMessage,
+          hasCommittedQuery,
+          hasResults,
+          debouncedQuery,
+          flatResults.length
+        )}
       </div>
 
       {shouldShowPanel && (
